@@ -1,0 +1,58 @@
+# Visual Studio temporary files, build results, and
+# user-specific files
+.vscode/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vcxproj.user
+
+# Rider (JetBrains IDE) specific files
+.idea/
+
+# Compiled DLLs and other outputs
+bin/
+obj/
+
+# ASP.NET Core configuration
+appsettings.*.json
+appsettings.json
+
+# User secrets
+secrets.json
+
+# Logs and database files
+*.log
+*.ldb
+*.mdf
+*.ldf
+
+# Build directories
+artifacts/
+
+# NuGet packages
+*.nupkg
+packages/
+# The packages folder can be ignored because of
+# package restore
+*.snupkg
+
+# Resharper settings
+_ReSharper.Caches/
+
+# macOS specific files
+.DS_Store
+
+# Windows image file caches
+Thumbs.db
+ehthumbs.db
+
+# Files built by Visual Studio
+*.vsix
+*.pidb
+*.svclog
+*.sln.ide
+
+# Entity Framework Migrations
+*.designer.cs
