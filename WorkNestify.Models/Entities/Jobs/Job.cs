@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WorkNestify.Models.Entities.Companies;
+using WorkNestify.Models.Entities.JobApplications;
 
 namespace WorkNestify.Models.Entities.Jobs;
 
@@ -60,4 +62,14 @@ public class Job
     [ForeignKey(nameof(JobStatusID))]
     [Display(Name = "Job Status")]
     public JobStatus JobStatus { get; set; }
+    
+    [Required]
+    [Display(Name = "Company ID")]
+    public int CompanyID { get; set; }
+    
+    [ForeignKey(nameof(CompanyID))]
+    [Display(Name = "Company")]
+    public Company Company { get; set; }
+    
+    public List<JobApplication> JobApplications { get; set; } = new List<JobApplication>();
 }

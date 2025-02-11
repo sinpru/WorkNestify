@@ -12,4 +12,6 @@ public class CompanySize
     [Column(TypeName = "TEXT")]
     [Display(Name = "Company Size Name")]
     public string CompanySizeName { get; set; }
+    
+    public List<Company> Companies { get; set; } = new List<Company>();
 }

@@ -137,6 +137,8 @@ namespace WorkNestify.DataAccess.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers", (string)null);
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -279,6 +281,36 @@ namespace WorkNestify.DataAccess.Migrations
                     b.ToTable("Companies");
                 });
 
+            modelBuilder.Entity("WorkNestify.Models.Entities.Companies.CompanyReview", b =>
+                {
+                    b.Property<int>("CompanyReviewID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompanyReviewID"));
+
+                    b.Property<int>("CompanyID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CompanyID1")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CompanyReviewContent")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<double>("Rating")
+                        .HasColumnType("FLOAT");
+
+                    b.HasKey("CompanyReviewID");
+
+                    b.HasIndex("CompanyID");
+
+                    b.HasIndex("CompanyID1");
+
+                    b.ToTable("CompanyReviews");
+                });
+
             modelBuilder.Entity("WorkNestify.Models.Entities.Companies.CompanySize", b =>
                 {
                     b.Property<int>("CompanySizeID")
@@ -313,6 +345,72 @@ namespace WorkNestify.DataAccess.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WorkNestify.Models.Entities.JobApplications.JobApplication", b =>
+                {
+                    b.Property<int>("JobApplicationID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JobApplicationID"));
+
+                    b.Property<DateTime>("ApplicationDate")
+                        .HasColumnType("DATETIME");
+
+                    b.Property<string>("CoverLetter")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("JobApplicationStatusID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("JobApplicationStatusID1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("JobID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("JobID1")
+                        .HasColumnType("int");
+
+                    b.Property<string>("JobSeekerID")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("ModifiedDate")
+                        .HasColumnType("DATETIME");
+
+                    b.HasKey("JobApplicationID");
+
+                    b.HasIndex("JobApplicationStatusID");
+
+                    b.HasIndex("JobApplicationStatusID1");
+
+                    b.HasIndex("JobID");
+
+                    b.HasIndex("JobID1");
+
+                    b.HasIndex("JobSeekerID");
+
+                    b.ToTable("JobApplications");
+                });
+
+            modelBuilder.Entity("WorkNestify.Models.Entities.JobApplications.JobApplicationStatus", b =>
+                {
+                    b.Property<int>("JobApplicationStatusID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JobApplicationStatusID"));
+
+                    b.Property<string>("StatusName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("JobApplicationStatusID");
+
+                    b.ToTable("JobApplicationStatuses");
+                });
+
             modelBuilder.Entity("WorkNestify.Models.Entities.Jobs.Job", b =>
                 {
                     b.Property<int>("JobID")
@@ -320,6 +418,12 @@ namespace WorkNestify.DataAccess.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JobID"));
+
+                    b.Property<int>("CompanyID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CompanyID1")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("DATETIME");
@@ -334,11 +438,17 @@ namespace WorkNestify.DataAccess.Migrations
                     b.Property<int>("JobStatusID")
                         .HasColumnType("int");
 
+                    b.Property<int?>("JobStatusID1")
+                        .HasColumnType("int");
+
                     b.Property<string>("JobTitle")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<int>("JobTypeID")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("JobTypeID1")
                         .HasColumnType("int");
 
                     b.Property<string>("Location")
@@ -356,9 +466,17 @@ namespace WorkNestify.DataAccess.Migrations
 
                     b.HasKey("JobID");
 
+                    b.HasIndex("CompanyID");
+
+                    b.HasIndex("CompanyID1");
+
                     b.HasIndex("JobStatusID");
 
+                    b.HasIndex("JobStatusID1");
+
                     b.HasIndex("JobTypeID");
+
+                    b.HasIndex("JobTypeID1");
 
                     b.ToTable("Jobs");
                 });
@@ -441,6 +559,43 @@ namespace WorkNestify.DataAccess.Migrations
                         });
                 });
 
+            modelBuilder.Entity("WorkNestify.Models.Entities.Users.ApplicationUser", b =>
+                {
+                    b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(100)");
+
+                    b.ToTable("ApplicationUsers");
+                });
+
+            modelBuilder.Entity("WorkNestify.Models.Entities.Users.Employer", b =>
+                {
+                    b.HasBaseType("WorkNestify.Models.Entities.Users.ApplicationUser");
+
+                    b.Property<int>("CompanyID")
+                        .HasColumnType("int");
+
+                    b.HasIndex("CompanyID");
+
+                    b.ToTable("Employers");
+                });
+
+            modelBuilder.Entity("WorkNestify.Models.Entities.Users.JobSeeker", b =>
+                {
+                    b.HasBaseType("WorkNestify.Models.Entities.Users.ApplicationUser");
+
+                    b.Property<string>("ResumeUrl")
+                        .IsRequired()
+                        .HasColumnType("NVARCHAR(255)");
+
+                    b.ToTable("JobSeekers");
+                });
+
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -495,7 +650,7 @@ namespace WorkNestify.DataAccess.Migrations
             modelBuilder.Entity("WorkNestify.Models.Entities.Companies.Company", b =>
                 {
                     b.HasOne("WorkNestify.Models.Entities.Companies.CompanySize", "CompanySize")
-                        .WithMany()
+                        .WithMany("Companies")
                         .HasForeignKey("CompanySizeID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -503,23 +658,158 @@ namespace WorkNestify.DataAccess.Migrations
                     b.Navigation("CompanySize");
                 });
 
+            modelBuilder.Entity("WorkNestify.Models.Entities.Companies.CompanyReview", b =>
+                {
+                    b.HasOne("WorkNestify.Models.Entities.Companies.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkNestify.Models.Entities.Companies.Company", null)
+                        .WithMany("CompanyReviews")
+                        .HasForeignKey("CompanyID1");
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("WorkNestify.Models.Entities.JobApplications.JobApplication", b =>
+                {
+                    b.HasOne("WorkNestify.Models.Entities.JobApplications.JobApplicationStatus", "JobApplicationStatus")
+                        .WithMany()
+                        .HasForeignKey("JobApplicationStatusID")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WorkNestify.Models.Entities.JobApplications.JobApplicationStatus", null)
+                        .WithMany("JobApplications")
+                        .HasForeignKey("JobApplicationStatusID1");
+
+                    b.HasOne("WorkNestify.Models.Entities.Jobs.Job", "Job")
+                        .WithMany()
+                        .HasForeignKey("JobID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkNestify.Models.Entities.Jobs.Job", null)
+                        .WithMany("JobApplications")
+                        .HasForeignKey("JobID1");
+
+                    b.HasOne("WorkNestify.Models.Entities.Users.JobSeeker", "JobSeeker")
+                        .WithMany("JobApplications")
+                        .HasForeignKey("JobSeekerID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Job");
+
+                    b.Navigation("JobApplicationStatus");
+
+                    b.Navigation("JobSeeker");
+                });
+
             modelBuilder.Entity("WorkNestify.Models.Entities.Jobs.Job", b =>
                 {
+                    b.HasOne("WorkNestify.Models.Entities.Companies.Company", "Company")
+                        .WithMany()
+                        .HasForeignKey("CompanyID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkNestify.Models.Entities.Companies.Company", null)
+                        .WithMany("Jobs")
+                        .HasForeignKey("CompanyID1");
+
                     b.HasOne("WorkNestify.Models.Entities.Jobs.JobStatus", "JobStatus")
                         .WithMany()
                         .HasForeignKey("JobStatusID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("WorkNestify.Models.Entities.Jobs.JobStatus", null)
+                        .WithMany("Jobs")
+                        .HasForeignKey("JobStatusID1");
 
                     b.HasOne("WorkNestify.Models.Entities.Jobs.JobType", "JobType")
                         .WithMany()
                         .HasForeignKey("JobTypeID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("WorkNestify.Models.Entities.Jobs.JobType", null)
+                        .WithMany("Jobs")
+                        .HasForeignKey("JobTypeID1");
+
+                    b.Navigation("Company");
 
                     b.Navigation("JobStatus");
 
                     b.Navigation("JobType");
+                });
+
+            modelBuilder.Entity("WorkNestify.Models.Entities.Users.Employer", b =>
+                {
+                    b.HasOne("WorkNestify.Models.Entities.Companies.Company", "Company")
+                        .WithMany("Employers")
+                        .HasForeignKey("CompanyID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("WorkNestify.Models.Entities.Users.ApplicationUser", null)
+                        .WithOne()
+                        .HasForeignKey("WorkNestify.Models.Entities.Users.Employer", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Company");
+                });
+
+            modelBuilder.Entity("WorkNestify.Models.Entities.Users.JobSeeker", b =>
+                {
+                    b.HasOne("WorkNestify.Models.Entities.Users.ApplicationUser", null)
+                        .WithOne()
+                        .HasForeignKey("WorkNestify.Models.Entities.Users.JobSeeker", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("WorkNestify.Models.Entities.Companies.Company", b =>
+                {
+                    b.Navigation("CompanyReviews");
+
+                    b.Navigation("Employers");
+
+                    b.Navigation("Jobs");
+                });
+
+            modelBuilder.Entity("WorkNestify.Models.Entities.Companies.CompanySize", b =>
+                {
+                    b.Navigation("Companies");
+                });
+
+            modelBuilder.Entity("WorkNestify.Models.Entities.JobApplications.JobApplicationStatus", b =>
+                {
+                    b.Navigation("JobApplications");
+                });
+
+            modelBuilder.Entity("WorkNestify.Models.Entities.Jobs.Job", b =>
+                {
+                    b.Navigation("JobApplications");
+                });
+
+            modelBuilder.Entity("WorkNestify.Models.Entities.Jobs.JobStatus", b =>
+                {
+                    b.Navigation("Jobs");
+                });
+
+            modelBuilder.Entity("WorkNestify.Models.Entities.Jobs.JobType", b =>
+                {
+                    b.Navigation("Jobs");
+                });
+
+            modelBuilder.Entity("WorkNestify.Models.Entities.Users.JobSeeker", b =>
+                {
+                    b.Navigation("JobApplications");
                 });
 #pragma warning restore 612, 618
         }

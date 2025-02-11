@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using WorkNestify.Models.Entities.Jobs;
+using WorkNestify.Models.Entities.Users;
 
 namespace WorkNestify.Models.Entities.Companies;
 
@@ -70,4 +72,8 @@ public class Company
     [ForeignKey(nameof(CompanySizeID))]
     [Display(Name = "Company Size")]
     public CompanySize CompanySize { get; set; }
+    
+    public List<CompanyReview> CompanyReviews { get; set; } = new List<CompanyReview>();
+    public List<Employer> Employers { get; set; } = new List<Employer>();
+    public List<Job> Jobs { get; set; } = new List<Job>();
 }

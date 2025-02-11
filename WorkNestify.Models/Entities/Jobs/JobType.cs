@@ -12,4 +12,6 @@ public class JobType
     [Column(TypeName = "TEXT")]
     [Display(Name = "Job Type Name")]
     public string JobTypeName { get; set; }
+    
+    public List<Job> Jobs { get; set; } = new List<Job>();
 }
