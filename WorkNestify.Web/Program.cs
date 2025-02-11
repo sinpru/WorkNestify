@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using WorkNestify.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +12,9 @@ builder.Services.AddControllersWithViews();
 // Database connection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Register EmailSender
+builder.Services.AddTransient<IEmailSender, EmailSender>();
 
 // Setting up Identity
 builder.Services.AddIdentity<IdentityUser, IdentityRole>()
