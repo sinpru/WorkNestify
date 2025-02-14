@@ -51,7 +51,12 @@ builder.Services.AddAuthentication(options =>
         facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"]!;
     });
 
-// Register UnitOfWork
+// Repository Structure Implementation
+builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
+builder.Services.AddScoped<ICompanyReviewRepository, CompanyReviewRepository>();
+builder.Services.AddScoped<IJobRepository, JobRepository>();
+builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
+
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Add Razor Pages
