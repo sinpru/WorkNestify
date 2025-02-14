@@ -1,7 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using WorkNestify.DataAccess.Data;
-using WorkNestify.Web.Models;
+using WorkNestify.Models.ViewModels;
 
 namespace WorkNestify.Web.Controllers;
 

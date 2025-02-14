@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using WorkNestify.Models.Entities.Companies;
-using WorkNestify.Models.Entities.Jobs;
-using WorkNestify.Models.Entities.JobApplications;
-using WorkNestify.Models.Entities.Users;
+using WorkNestify.DataAccess.Entities.Companies;
+using WorkNestify.DataAccess.Entities.JobApplications;
+using WorkNestify.DataAccess.Entities.Jobs;
+using WorkNestify.DataAccess.Entities.Users;
 
 namespace WorkNestify.DataAccess.Data;
 
