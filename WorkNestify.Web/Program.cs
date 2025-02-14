@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using WorkNestify.DataAccess.Repositories.Implementations;
+using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,7 +34,6 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 // External Authentication
-// External logins
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -50,30 +51,13 @@ builder.Services.AddAuthentication(options =>
         facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"]!;
     });
 
-async Task CreateRoles(IServiceProvider serviceProvider)
-{
-    var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-    string[] roleNames = ["Admin", "Manager", "User"];
-
-    foreach (var roleName in roleNames)
-    {
-        if (!await roleManager.RoleExistsAsync(roleName))
-        {
-            await roleManager.CreateAsync(new IdentityRole(roleName));
-        }
-    }
-}
+// Register UnitOfWork
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
 // Add Razor Pages
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    await CreateRoles(services);
-}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
