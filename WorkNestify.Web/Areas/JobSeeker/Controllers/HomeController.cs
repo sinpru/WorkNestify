@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using WorkNestify.DataAccess.Data;
 using WorkNestify.Models.ViewModels;
 
-namespace WorkNestify.Web.Controllers;
+namespace WorkNestify.Web.Areas.JobSeeker.Controllers;
 
+[Area("JobSeeker")]
 public class HomeController : Controller
 {
     private readonly ApplicationDbContext _context;
@@ -16,12 +17,6 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return View();
-    }
-
-    public IActionResult CompanyReview()
-    {
-        
         return View();
     }
 

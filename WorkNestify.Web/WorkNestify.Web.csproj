@@ -27,4 +27,9 @@
       <ProjectReference Include="..\WorkNestify.Utilities\WorkNestify.Utilities.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <AdditionalFiles Include="Areas\JobSeeker\Views\Home\Index.cshtml" />
+      <AdditionalFiles Include="Areas\JobSeeker\Views\Home\Privacy.cshtml" />
+    </ItemGroup>
+
 </Project>

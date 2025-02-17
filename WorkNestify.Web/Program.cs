@@ -51,6 +51,8 @@ builder.Services.AddAuthentication(options =>
         facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"]!;
     });
 
+
+
 // Repository Structure Implementation
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<ICompanyReviewRepository, CompanyReviewRepository>();
@@ -86,6 +88,6 @@ app.MapRazorPages();
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{area=JobSeeker}/{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
