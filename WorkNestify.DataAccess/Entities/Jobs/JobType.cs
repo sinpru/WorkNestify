@@ -1,17 +1,16 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
 
-namespace WorkNestify.DataAccess.Entities.Jobs;
-
-public class JobType
+namespace WorkNestify.DataAccess.Entities.Jobs
 {
-    [Key]
-    public int JobTypeID { get; set; }
+    public class JobType
+    {
+        [Key]
+        public int Id { get; set; }
 
-    [Required]
-    [Column(TypeName = "TEXT")]
-    [Display(Name = "Job Type Name")]
-    public string JobTypeName { get; set; }
-    
-    public List<Job> Jobs { get; set; } = new List<Job>();
+        [Required]
+        [Display(Name = "Job Type")]
+        public string Name { get; set; }
+
+        public ICollection<Job> Jobs { get; set; } = new HashSet<Job>();
+    }
 }

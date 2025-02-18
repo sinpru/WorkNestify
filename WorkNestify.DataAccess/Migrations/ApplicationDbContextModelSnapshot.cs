@@ -86,6 +86,11 @@ namespace WorkNestify.DataAccess.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(21)
+                        .HasColumnType("nvarchar(21)");
+
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -138,7 +143,9 @@ namespace WorkNestify.DataAccess.Migrations
 
                     b.ToTable("AspNetUsers", (string)null);
 
-                    b.UseTptMappingStrategy();
+                    b.HasDiscriminator().HasValue("IdentityUser");
+
+                    b.UseTphMappingStrategy();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
@@ -222,344 +229,494 @@ namespace WorkNestify.DataAccess.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Companies.Company", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Companies.Company", b =>
                 {
-                    b.Property<int>("CompanyID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompanyID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Address")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("CompanyDescription")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("CompanyName")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("CompanySizeID")
+                    b.Property<int>("CompanySizeId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("DATETIME");
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("FoundedDate")
-                        .HasColumnType("DATE");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Industry")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Logo")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("DATETIME");
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Website")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("CompanyID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("CompanySizeID");
+                    b.HasIndex("CompanySizeId");
 
                     b.ToTable("Companies");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Companies.CompanyReview", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Companies.CompanyReview", b =>
                 {
-                    b.Property<int>("CompanyReviewID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompanyReviewID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CompanyID")
+                    b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CompanyID1")
+                    b.Property<int?>("CompanyId1")
                         .HasColumnType("int");
 
-                    b.Property<string>("CompanyReviewContent")
+                    b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<double>("Rating")
-                        .HasColumnType("FLOAT");
+                    b.Property<float>("Rating")
+                        .HasColumnType("real");
 
-                    b.HasKey("CompanyReviewID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("CompanyID");
+                    b.HasIndex("CompanyId");
 
-                    b.HasIndex("CompanyID1");
+                    b.HasIndex("CompanyId1");
 
                     b.ToTable("CompanyReviews");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Companies.CompanySize", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Companies.CompanySize", b =>
                 {
-                    b.Property<int>("CompanySizeID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CompanySizeID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CompanySizeName")
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("CompanySizeID");
+                    b.HasKey("Id");
 
                     b.ToTable("CompanySizes");
 
                     b.HasData(
                         new
                         {
-                            CompanySizeID = 1,
-                            CompanySizeName = "Small"
+                            Id = 1,
+                            Name = "Small"
                         },
                         new
                         {
-                            CompanySizeID = 2,
-                            CompanySizeName = "Medium"
+                            Id = 2,
+                            Name = "Medium"
                         },
                         new
                         {
-                            CompanySizeID = 3,
-                            CompanySizeName = "Large"
+                            Id = 3,
+                            Name = "Large"
                         });
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.JobApplications.JobApplication", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.JobApplications.JobApplication", b =>
                 {
-                    b.Property<int>("JobApplicationID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JobApplicationID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("ApplicationDate")
-                        .HasColumnType("DATETIME");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("CoverLetter")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("JobApplicationStatusID")
+                    b.Property<int>("JobApplicationStatusId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("JobApplicationStatusID1")
+                    b.Property<int?>("JobApplicationStatusId1")
                         .HasColumnType("int");
 
-                    b.Property<int>("JobID")
+                    b.Property<int>("JobId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("JobID1")
+                    b.Property<int?>("JobId1")
                         .HasColumnType("int");
 
-                    b.Property<string>("JobSeekerID")
+                    b.Property<string>("JobSeekerId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("ModifiedDate")
-                        .HasColumnType("DATETIME");
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("JobApplicationID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("JobApplicationStatusID");
+                    b.HasIndex("JobApplicationStatusId");
 
-                    b.HasIndex("JobApplicationStatusID1");
+                    b.HasIndex("JobApplicationStatusId1");
 
-                    b.HasIndex("JobID");
+                    b.HasIndex("JobId");
 
-                    b.HasIndex("JobID1");
+                    b.HasIndex("JobId1");
 
-                    b.HasIndex("JobSeekerID");
+                    b.HasIndex("JobSeekerId");
 
                     b.ToTable("JobApplications");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.JobApplications.JobApplicationStatus", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.JobApplications.JobApplicationStatus", b =>
                 {
-                    b.Property<int>("JobApplicationStatusID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JobApplicationStatusID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("StatusName")
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("JobApplicationStatusID");
+                    b.HasKey("Id");
 
                     b.ToTable("JobApplicationStatuses");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Jobs.Job", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Jobs.Job", b =>
                 {
-                    b.Property<int>("JobID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JobID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("CompanyID")
+                    b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CompanyID1")
+                    b.Property<int?>("CompanyId1")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("DATETIME");
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("EndDate")
-                        .HasColumnType("DATETIME");
+                        .HasColumnType("datetime2");
 
-                    b.Property<string>("JobDescription")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("JobStatusID")
+                    b.Property<int>("JobCategoryId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("JobStatusID1")
+                    b.Property<int?>("JobCategoryId1")
                         .HasColumnType("int");
 
-                    b.Property<string>("JobTitle")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<int>("JobTypeID")
+                    b.Property<int>("JobLevelId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("JobTypeID1")
+                    b.Property<int?>("JobLevelId1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("JobStatusId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("JobStatusId1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("JobTypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("JobTypeId1")
                         .HasColumnType("int");
 
                     b.Property<string>("Location")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("ModifiedDate")
-                        .HasColumnType("DATETIME");
+                        .HasColumnType("datetime2");
 
                     b.Property<double>("Salary")
                         .HasColumnType("float");
 
                     b.Property<DateTime?>("StartDate")
-                        .HasColumnType("DATETIME");
+                        .HasColumnType("datetime2");
 
-                    b.HasKey("JobID");
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasIndex("CompanyID");
+                    b.HasKey("Id");
 
-                    b.HasIndex("CompanyID1");
+                    b.HasIndex("CompanyId");
 
-                    b.HasIndex("JobStatusID");
+                    b.HasIndex("CompanyId1");
 
-                    b.HasIndex("JobStatusID1");
+                    b.HasIndex("JobCategoryId");
 
-                    b.HasIndex("JobTypeID");
+                    b.HasIndex("JobCategoryId1");
 
-                    b.HasIndex("JobTypeID1");
+                    b.HasIndex("JobLevelId");
+
+                    b.HasIndex("JobLevelId1");
+
+                    b.HasIndex("JobStatusId");
+
+                    b.HasIndex("JobStatusId1");
+
+                    b.HasIndex("JobTypeId");
+
+                    b.HasIndex("JobTypeId1");
 
                     b.ToTable("Jobs");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Jobs.JobStatus", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Jobs.JobCategory", b =>
                 {
-                    b.Property<int>("JobStatusID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JobStatusID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("JobStatusName")
+                    b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("JobStatusID");
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JobCategories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Software development, cybersecurity, networking, and IT support",
+                            Name = "Information Technology"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Digital marketing, SEO, content creation, and branding",
+                            Name = "Marketing"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Business development, B2B/B2C sales, and customer relationship management",
+                            Name = "Sales"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "Medical professionals, nursing, pharmaceuticals, and hospital administration",
+                            Name = "Healthcare"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Description = "Accounting, auditing, financial analysis, and banking",
+                            Name = "Finance & Accounting"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Description = "Recruitment, employee relations, and HR management",
+                            Name = "Human Resources"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Description = "Mechanical, electrical, civil, and software engineering",
+                            Name = "Engineering"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Description = "Teaching, tutoring, and corporate training",
+                            Name = "Education & Training"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Description = "Call center, technical support, and client relations",
+                            Name = "Customer Service"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Description = "Transportation, inventory management, and procurement",
+                            Name = "Logistics & Supply Chain"
+                        });
+                });
+
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Jobs.JobLevel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("JobLevels");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "An entry-level position for individuals who are gaining work experience in their field, typically through an internship program.",
+                            Name = "Intern"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "A recent graduate or someone who is new to the job market, with limited professional experience.",
+                            Name = "Fresher"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "A role for individuals with some experience in their field, typically 1-3 years, and who require supervision and guidance.",
+                            Name = "Junior"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Description = "An experienced professional with significant expertise in the field, typically with over 5 years of experience, often responsible for leading teams or projects.",
+                            Name = "Senior"
+                        });
+                });
+
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Jobs.JobStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
 
                     b.ToTable("JobStatuses");
 
                     b.HasData(
                         new
                         {
-                            JobStatusID = 1,
-                            JobStatusName = "Open"
+                            Id = 1,
+                            Name = "Open"
                         },
                         new
                         {
-                            JobStatusID = 2,
-                            JobStatusName = "Closed"
+                            Id = 2,
+                            Name = "Closed"
                         },
                         new
                         {
-                            JobStatusID = 3,
-                            JobStatusName = "Pending"
+                            Id = 3,
+                            Name = "Pending"
                         },
                         new
                         {
-                            JobStatusID = 4,
-                            JobStatusName = "Expired"
+                            Id = 4,
+                            Name = "Expired"
                         });
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Jobs.JobType", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Jobs.JobType", b =>
                 {
-                    b.Property<int>("JobTypeID")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("JobTypeID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("JobTypeName")
+                    b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("JobTypeID");
+                    b.HasKey("Id");
 
                     b.ToTable("JobTypes");
 
                     b.HasData(
                         new
                         {
-                            JobTypeID = 1,
-                            JobTypeName = "Full-Time"
+                            Id = 1,
+                            Name = "Full-Time"
                         },
                         new
                         {
-                            JobTypeID = 2,
-                            JobTypeName = "Part-Time"
+                            Id = 2,
+                            Name = "Part-Time"
                         },
                         new
                         {
-                            JobTypeID = 3,
-                            JobTypeName = "Freelance"
+                            Id = 3,
+                            Name = "Freelance"
                         },
                         new
                         {
-                            JobTypeID = 4,
-                            JobTypeName = "Remote"
+                            Id = 4,
+                            Name = "Remote"
                         });
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Users.ApplicationUser", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Users.ApplicationUser", b =>
                 {
                     b.HasBaseType("Microsoft.AspNetCore.Identity.IdentityUser");
 
@@ -570,30 +727,30 @@ namespace WorkNestify.DataAccess.Migrations
                         .IsRequired()
                         .HasColumnType("NVARCHAR(100)");
 
-                    b.ToTable("ApplicationUsers");
+                    b.HasDiscriminator().HasValue("ApplicationUser");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Users.Employer", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Users.Employer", b =>
                 {
-                    b.HasBaseType("WorkNestify.Models.Entities.Users.ApplicationUser");
+                    b.HasBaseType("WorkNestify.DataAccess.Entities.Users.ApplicationUser");
 
                     b.Property<int>("CompanyID")
                         .HasColumnType("int");
 
                     b.HasIndex("CompanyID");
 
-                    b.ToTable("Employers");
+                    b.HasDiscriminator().HasValue("Employer");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Users.JobSeeker", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Users.JobSeeker", b =>
                 {
-                    b.HasBaseType("WorkNestify.Models.Entities.Users.ApplicationUser");
+                    b.HasBaseType("WorkNestify.DataAccess.Entities.Users.ApplicationUser");
 
                     b.Property<string>("ResumeUrl")
                         .IsRequired()
                         .HasColumnType("NVARCHAR(255)");
 
-                    b.ToTable("JobSeekers");
+                    b.HasDiscriminator().HasValue("JobSeeker");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -647,57 +804,57 @@ namespace WorkNestify.DataAccess.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Companies.Company", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Companies.Company", b =>
                 {
-                    b.HasOne("WorkNestify.Models.Entities.Companies.CompanySize", "CompanySize")
+                    b.HasOne("WorkNestify.DataAccess.Entities.Companies.CompanySize", "CompanySize")
                         .WithMany("Companies")
-                        .HasForeignKey("CompanySizeID")
+                        .HasForeignKey("CompanySizeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CompanySize");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Companies.CompanyReview", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Companies.CompanyReview", b =>
                 {
-                    b.HasOne("WorkNestify.Models.Entities.Companies.Company", "Company")
+                    b.HasOne("WorkNestify.DataAccess.Entities.Companies.Company", "Company")
                         .WithMany()
-                        .HasForeignKey("CompanyID")
+                        .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WorkNestify.Models.Entities.Companies.Company", null)
+                    b.HasOne("WorkNestify.DataAccess.Entities.Companies.Company", null)
                         .WithMany("CompanyReviews")
-                        .HasForeignKey("CompanyID1");
+                        .HasForeignKey("CompanyId1");
 
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.JobApplications.JobApplication", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.JobApplications.JobApplication", b =>
                 {
-                    b.HasOne("WorkNestify.Models.Entities.JobApplications.JobApplicationStatus", "JobApplicationStatus")
+                    b.HasOne("WorkNestify.DataAccess.Entities.JobApplications.JobApplicationStatus", "JobApplicationStatus")
                         .WithMany()
-                        .HasForeignKey("JobApplicationStatusID")
+                        .HasForeignKey("JobApplicationStatusId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("WorkNestify.Models.Entities.JobApplications.JobApplicationStatus", null)
+                    b.HasOne("WorkNestify.DataAccess.Entities.JobApplications.JobApplicationStatus", null)
                         .WithMany("JobApplications")
-                        .HasForeignKey("JobApplicationStatusID1");
+                        .HasForeignKey("JobApplicationStatusId1");
 
-                    b.HasOne("WorkNestify.Models.Entities.Jobs.Job", "Job")
+                    b.HasOne("WorkNestify.DataAccess.Entities.Jobs.Job", "Job")
                         .WithMany()
-                        .HasForeignKey("JobID")
+                        .HasForeignKey("JobId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WorkNestify.Models.Entities.Jobs.Job", null)
+                    b.HasOne("WorkNestify.DataAccess.Entities.Jobs.Job", null)
                         .WithMany("JobApplications")
-                        .HasForeignKey("JobID1");
+                        .HasForeignKey("JobId1");
 
-                    b.HasOne("WorkNestify.Models.Entities.Users.JobSeeker", "JobSeeker")
+                    b.HasOne("WorkNestify.DataAccess.Entities.Users.JobSeeker", "JobSeeker")
                         .WithMany("JobApplications")
-                        .HasForeignKey("JobSeekerID")
+                        .HasForeignKey("JobSeekerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -708,72 +865,81 @@ namespace WorkNestify.DataAccess.Migrations
                     b.Navigation("JobSeeker");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Jobs.Job", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Jobs.Job", b =>
                 {
-                    b.HasOne("WorkNestify.Models.Entities.Companies.Company", "Company")
+                    b.HasOne("WorkNestify.DataAccess.Entities.Companies.Company", "Company")
                         .WithMany()
-                        .HasForeignKey("CompanyID")
+                        .HasForeignKey("CompanyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("WorkNestify.Models.Entities.Companies.Company", null)
+                    b.HasOne("WorkNestify.DataAccess.Entities.Companies.Company", null)
                         .WithMany("Jobs")
-                        .HasForeignKey("CompanyID1");
+                        .HasForeignKey("CompanyId1");
 
-                    b.HasOne("WorkNestify.Models.Entities.Jobs.JobStatus", "JobStatus")
+                    b.HasOne("WorkNestify.DataAccess.Entities.Jobs.JobCategory", "JobCategory")
                         .WithMany()
-                        .HasForeignKey("JobStatusID")
+                        .HasForeignKey("JobCategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("WorkNestify.Models.Entities.Jobs.JobStatus", null)
+                    b.HasOne("WorkNestify.DataAccess.Entities.Jobs.JobCategory", null)
                         .WithMany("Jobs")
-                        .HasForeignKey("JobStatusID1");
+                        .HasForeignKey("JobCategoryId1");
 
-                    b.HasOne("WorkNestify.Models.Entities.Jobs.JobType", "JobType")
+                    b.HasOne("WorkNestify.DataAccess.Entities.Jobs.JobLevel", "JobLevel")
                         .WithMany()
-                        .HasForeignKey("JobTypeID")
+                        .HasForeignKey("JobLevelId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("WorkNestify.Models.Entities.Jobs.JobType", null)
+                    b.HasOne("WorkNestify.DataAccess.Entities.Jobs.JobLevel", null)
                         .WithMany("Jobs")
-                        .HasForeignKey("JobTypeID1");
+                        .HasForeignKey("JobLevelId1");
+
+                    b.HasOne("WorkNestify.DataAccess.Entities.Jobs.JobStatus", "JobStatus")
+                        .WithMany()
+                        .HasForeignKey("JobStatusId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WorkNestify.DataAccess.Entities.Jobs.JobStatus", null)
+                        .WithMany("Jobs")
+                        .HasForeignKey("JobStatusId1");
+
+                    b.HasOne("WorkNestify.DataAccess.Entities.Jobs.JobType", "JobType")
+                        .WithMany()
+                        .HasForeignKey("JobTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("WorkNestify.DataAccess.Entities.Jobs.JobType", null)
+                        .WithMany("Jobs")
+                        .HasForeignKey("JobTypeId1");
 
                     b.Navigation("Company");
+
+                    b.Navigation("JobCategory");
+
+                    b.Navigation("JobLevel");
 
                     b.Navigation("JobStatus");
 
                     b.Navigation("JobType");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Users.Employer", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Users.Employer", b =>
                 {
-                    b.HasOne("WorkNestify.Models.Entities.Companies.Company", "Company")
+                    b.HasOne("WorkNestify.DataAccess.Entities.Companies.Company", "Company")
                         .WithMany("Employers")
                         .HasForeignKey("CompanyID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("WorkNestify.Models.Entities.Users.ApplicationUser", null)
-                        .WithOne()
-                        .HasForeignKey("WorkNestify.Models.Entities.Users.Employer", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Users.JobSeeker", b =>
-                {
-                    b.HasOne("WorkNestify.Models.Entities.Users.ApplicationUser", null)
-                        .WithOne()
-                        .HasForeignKey("WorkNestify.Models.Entities.Users.JobSeeker", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("WorkNestify.Models.Entities.Companies.Company", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Companies.Company", b =>
                 {
                     b.Navigation("CompanyReviews");
 
@@ -782,32 +948,42 @@ namespace WorkNestify.DataAccess.Migrations
                     b.Navigation("Jobs");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Companies.CompanySize", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Companies.CompanySize", b =>
                 {
                     b.Navigation("Companies");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.JobApplications.JobApplicationStatus", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.JobApplications.JobApplicationStatus", b =>
                 {
                     b.Navigation("JobApplications");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Jobs.Job", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Jobs.Job", b =>
                 {
                     b.Navigation("JobApplications");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Jobs.JobStatus", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Jobs.JobCategory", b =>
                 {
                     b.Navigation("Jobs");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Jobs.JobType", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Jobs.JobLevel", b =>
                 {
                     b.Navigation("Jobs");
                 });
 
-            modelBuilder.Entity("WorkNestify.Models.Entities.Users.JobSeeker", b =>
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Jobs.JobStatus", b =>
+                {
+                    b.Navigation("Jobs");
+                });
+
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Jobs.JobType", b =>
+                {
+                    b.Navigation("Jobs");
+                });
+
+            modelBuilder.Entity("WorkNestify.DataAccess.Entities.Users.JobSeeker", b =>
                 {
                     b.Navigation("JobApplications");
                 });

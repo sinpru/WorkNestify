@@ -22,7 +22,9 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     // Jobs
     public DbSet<Job> Jobs { get; set; }
     public DbSet<JobType> JobTypes { get; set; }
+    public DbSet<JobLevel> JobLevels { get; set; }
     public DbSet<JobStatus> JobStatuses { get; set; }
+    public DbSet<JobCategory> JobCategories { get; set; }
     
     // Job Applications
     public DbSet<JobApplication> JobApplications { get; set; }
@@ -39,65 +41,97 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
         // Seed Data for CompanySize
         modelBuilder.Entity<CompanySize>().HasData(
-            new CompanySize { CompanySizeID = 1, CompanySizeName = "Small" },
-            new CompanySize { CompanySizeID = 2, CompanySizeName = "Medium" },
-            new CompanySize { CompanySizeID = 3, CompanySizeName = "Large" });
+            new CompanySize { Id = 1, Name = "Small" },
+            new CompanySize { Id = 2, Name = "Medium" },
+            new CompanySize { Id = 3, Name = "Large" });
         
         // Seed Data for JobType
         modelBuilder.Entity<JobType>().HasData(
-            new JobType { JobTypeID = 1, JobTypeName = "Full-Time" },
-            new JobType { JobTypeID = 2, JobTypeName = "Part-Time" },
-            new JobType { JobTypeID = 3, JobTypeName = "Freelance" },
-            new JobType { JobTypeID = 4, JobTypeName = "Remote" });
+            new JobType { Id = 1, Name = "Full-Time" },
+            new JobType { Id = 2, Name = "Part-Time" },
+            new JobType { Id = 3, Name = "Freelance" },
+            new JobType { Id = 4, Name = "Remote" });
 
         // Seed Data for JobStatus
         modelBuilder.Entity<JobStatus>().HasData(
-            new JobStatus { JobStatusID = 1, JobStatusName = "Open" },
-            new JobStatus { JobStatusID = 2, JobStatusName = "Closed" },
-            new JobStatus { JobStatusID = 3, JobStatusName = "Pending" },
-            new JobStatus { JobStatusID = 4, JobStatusName = "Expired" });
+            new JobStatus { Id = 1, Name = "Open" },
+            new JobStatus { Id = 2, Name = "Closed" },
+            new JobStatus { Id = 3, Name = "Pending" },
+            new JobStatus { Id = 4, Name = "Expired" });
+        
+        // Seed Data for JobLevel
+        modelBuilder.Entity<JobLevel>().HasData(
+            new JobLevel { Id = 1, Name = "Intern", Description = "An entry-level position for individuals who are gaining work experience in their field, typically through an internship program." },
+            new JobLevel { Id = 2, Name = "Fresher", Description = "A recent graduate or someone who is new to the job market, with limited professional experience." },
+            new JobLevel { Id = 3, Name = "Junior", Description = "A role for individuals with some experience in their field, typically 1-3 years, and who require supervision and guidance." },
+            new JobLevel { Id = 4, Name = "Senior", Description = "An experienced professional with significant expertise in the field, typically with over 5 years of experience, often responsible for leading teams or projects." });
+        
+        // Seed Data for Job Category
+        modelBuilder.Entity<JobCategory>().HasData(
+            new JobCategory { Id = 1, Name = "Information Technology", Description = "Software development, cybersecurity, networking, and IT support" },
+            new JobCategory { Id = 2, Name = "Marketing", Description = "Digital marketing, SEO, content creation, and branding" },
+            new JobCategory { Id = 3, Name = "Sales", Description = "Business development, B2B/B2C sales, and customer relationship management" },
+            new JobCategory { Id = 4, Name = "Healthcare", Description = "Medical professionals, nursing, pharmaceuticals, and hospital administration" },
+            new JobCategory { Id = 5, Name = "Finance & Accounting", Description = "Accounting, auditing, financial analysis, and banking" },
+            new JobCategory { Id = 6, Name = "Human Resources", Description = "Recruitment, employee relations, and HR management" },
+            new JobCategory { Id = 7, Name = "Engineering", Description = "Mechanical, electrical, civil, and software engineering" },
+            new JobCategory { Id = 8, Name = "Education & Training", Description = "Teaching, tutoring, and corporate training" },
+            new JobCategory { Id = 9, Name = "Customer Service", Description = "Call center, technical support, and client relations" },
+            new JobCategory { Id = 10, Name = "Logistics & Supply Chain", Description = "Transportation, inventory management, and procurement" });
         
         // Relationships
         modelBuilder.Entity<Job>()
             .HasOne(j => j.JobType)
             .WithMany()
-            .HasForeignKey(j => j.JobTypeID)
+            .HasForeignKey(j => j.JobTypeId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Job>()
             .HasOne(j => j.JobStatus)
             .WithMany()
-            .HasForeignKey(j => j.JobStatusID)
+            .HasForeignKey(j => j.JobStatusId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<Job>()
+            .HasOne(j => j.JobLevel)
+            .WithMany()
+            .HasForeignKey(j => j.JobLevelId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<Job>()
+            .HasOne(j => j.JobCategory)
+            .WithMany()
+            .HasForeignKey(j => j.JobCategoryId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Job>()
             .HasOne(j => j.Company)
             .WithMany()
-            .HasForeignKey(j => j.CompanyID)
+            .HasForeignKey(j => j.CompanyId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<JobApplication>()
             .HasOne(ja => ja.JobSeeker)
             .WithMany(js => js.JobApplications)
-            .HasForeignKey(ja => ja.JobSeekerID)
+            .HasForeignKey(ja => ja.JobSeekerId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<JobApplication>()
             .HasOne(ja => ja.Job)
             .WithMany()
-            .HasForeignKey(ja => ja.JobID)
+            .HasForeignKey(ja => ja.JobId)
             .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<JobApplication>()
             .HasOne(ja => ja.JobApplicationStatus)
             .WithMany()
-            .HasForeignKey(ja => ja.JobApplicationStatusID)
+            .HasForeignKey(ja => ja.JobApplicationStatusId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<CompanyReview>()
             .HasOne(cr => cr.Company)
             .WithMany()
-            .HasForeignKey(cr => cr.CompanyID)
+            .HasForeignKey(cr => cr.CompanyId)
             .OnDelete(DeleteBehavior.Cascade);
     }
 }

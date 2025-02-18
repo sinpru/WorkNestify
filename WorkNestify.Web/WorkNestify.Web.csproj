@@ -32,4 +32,9 @@
       <AdditionalFiles Include="Areas\JobSeeker\Views\Home\Privacy.cshtml" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Areas\Employer\Controllers\" />
+      <Folder Include="Areas\Employer\Views\" />
+    </ItemGroup>
+
 </Project>

@@ -8,44 +8,33 @@ namespace WorkNestify.DataAccess.Entities.JobApplications
     public class JobApplication
     {
         [Key]
-        public int JobApplicationID { get; set; }
-        
+        public int Id { get; set; }
+
         [Required]
-        [Column(TypeName = "TEXT")]
         [Display(Name = "Cover Letter")]
         public string CoverLetter { get; set; }
-        
+
         [Required]
-        [DataType(DataType.DateTime)]
-        [Column(TypeName = "DATETIME")]
-        public DateTime ApplicationDate { get; set; } = DateTime.Now;
-        
-        [DataType(DataType.DateTime)]
-        [Column(TypeName = "DATETIME")]
-        public DateTime? ModifiedDate { get; set; } = DateTime.Now;
-        
+        public DateTime ApplicationDate { get; set; } = DateTime.UtcNow;
+
+        public DateTime? ModifiedDate { get; set; } = DateTime.UtcNow;
+
         [Required]
-        [Display(Name ="Job Seeker ID")]
-        public string JobSeekerID { get; set; }
-        
-        [ForeignKey(nameof(JobSeekerID))]
-        [Display(Name = "Job Seeker")]
+        public string JobSeekerId { get; set; }
+
+        [ForeignKey(nameof(JobSeekerId))]
         public JobSeeker JobSeeker { get; set; }
-        
+
         [Required]
-        [Display(Name = "Job ID")]
-        public int JobID { get; set; }
-        
-        [ForeignKey(nameof(JobID))]
-        [Display(Name = "Job")]
+        public int JobId { get; set; }
+
+        [ForeignKey(nameof(JobId))]
         public Job Job { get; set; }
-        
+
         [Required]
-        [Display(Name = "Job Application Status ID")]
-        public int JobApplicationStatusID { get; set; }
-        
-        [ForeignKey(nameof(JobApplicationStatusID))]
-        [Display(Name = "Job Application Status")]
+        public int JobApplicationStatusId { get; set; }
+
+        [ForeignKey(nameof(JobApplicationStatusId))]
         public JobApplicationStatus JobApplicationStatus { get; set; }
     }
 }

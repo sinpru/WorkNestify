@@ -3,73 +3,66 @@ using System.ComponentModel.DataAnnotations.Schema;
 using WorkNestify.DataAccess.Entities.Companies;
 using WorkNestify.DataAccess.Entities.JobApplications;
 
-namespace WorkNestify.DataAccess.Entities.Jobs;
-
-public class Job
+namespace WorkNestify.DataAccess.Entities.Jobs
 {
-    [Key]
-    public int JobID { get; set; }
+    public class Job
+    {
+        [Key]
+        public int Id { get; set; }
 
-    [Required]
-    [Column(TypeName = "TEXT")]
-    [Display(Name = "Job Title")]
-    public string JobTitle { get; set; }
+        [Required]
+        [Display(Name = "Job Title")]
+        public string Title { get; set; }
 
-    [Required]
-    [Column(TypeName = "TEXT")]
-    [Display(Name = "Job Description")]
-    public string JobDescription { get; set; }
+        [Required]
+        [Display(Name = "Job Description")]
+        public string Description { get; set; }
 
-    [Required]
-    [Column(TypeName = "TEXT")]
-    [Display(Name = "Location")]
-    public string Location { get; set; }
+        [Required]
+        public string Location { get; set; }
 
-    [Required]
-    [Display(Name = "Salary")]
-    public double Salary { get; set; }
+        [Required]
+        public double Salary { get; set; }
 
-    [Column(TypeName = "DATETIME")]
-    [Display(Name = "Start Date")]
-    public DateTime? StartDate { get; set; }
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
-    [Column(TypeName = "DATETIME")]
-    [Display(Name = "End Date")]
-    public DateTime? EndDate { get; set; }
+        [Required]
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
-    [Required]
-    [Column(TypeName = "DATETIME")]
-    [Display(Name = "Created Date")]
-    public DateTime CreatedDate { get; set; } = DateTime.Now;
+        [Required]
+        public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
 
-    [Required]
-    [Column(TypeName = "DATETIME")]
-    [Display(Name = "Modified Date")]
-    public DateTime ModifiedDate { get; set; } = DateTime.Now;
+        [Required]
+        public int JobTypeId { get; set; }
 
-    [Required]
-    [Display(Name = "Job Type ID")]
-    public int JobTypeID { get; set; }
+        [ForeignKey(nameof(JobTypeId))]
+        public JobType JobType { get; set; }
 
-    [ForeignKey(nameof(JobTypeID))]
-    [Display(Name = "Job Type")]
-    public JobType JobType { get; set; }
+        [Required]
+        public int JobStatusId { get; set; }
 
-    [Required]
-    [Display(Name = "Job Status ID")]
-    public int JobStatusID { get; set; }
+        [ForeignKey(nameof(JobStatusId))]
+        public JobStatus JobStatus { get; set; }
 
-    [ForeignKey(nameof(JobStatusID))]
-    [Display(Name = "Job Status")]
-    public JobStatus JobStatus { get; set; }
-    
-    [Required]
-    [Display(Name = "Company ID")]
-    public int CompanyID { get; set; }
-    
-    [ForeignKey(nameof(CompanyID))]
-    [Display(Name = "Company")]
-    public Company Company { get; set; }
-    
-    public List<JobApplication> JobApplications { get; set; } = new List<JobApplication>();
+        [Required]
+        public int JobLevelId { get; set; }
+
+        [ForeignKey(nameof(JobLevelId))]
+        public JobLevel JobLevel { get; set; }
+
+        [Required]
+        public int JobCategoryId { get; set; }
+
+        [ForeignKey(nameof(JobCategoryId))]
+        public JobCategory JobCategory { get; set; }
+
+        [Required]
+        public int CompanyId { get; set; }
+
+        [ForeignKey(nameof(CompanyId))]
+        public Company Company { get; set; }
+
+        public ICollection<JobApplication> JobApplications { get; set; } = new HashSet<JobApplication>();
+    }
 }
