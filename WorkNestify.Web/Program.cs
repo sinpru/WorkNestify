@@ -3,14 +3,17 @@ using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using WorkNestify.DataAccess.Entities.Users;
 using WorkNestify.DataAccess.Repositories.Implementations;
 using WorkNestify.DataAccess.Repositories.Implementations.Companies;
 using WorkNestify.DataAccess.Repositories.Implementations.JobApplications;
 using WorkNestify.DataAccess.Repositories.Implementations.Jobs;
+using WorkNestify.DataAccess.Repositories.Implementations.Users;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
+using WorkNestify.DataAccess.Repositories.Interfaces.Users;
 using WorkNestify.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -60,10 +63,25 @@ builder.Services.AddAuthentication(options =>
 
 
 // Repository Structure Implementation
+// Companies
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<ICompanyReviewRepository, CompanyReviewRepository>();
-builder.Services.AddScoped<IJobRepository, JobRepository>();
+builder.Services.AddScoped<ICompanySizeRepository, CompanySizeRepository>();
+
+// JobApplications
 builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
+builder.Services.AddScoped<IJobApplicationStatusRepository, JobApplicationStatusRepository>();
+
+// Jobs
+builder.Services.AddScoped<IJobRepository, JobRepository>();
+builder.Services.AddScoped<IJobCategoryRepository, JobCategoryRepository>();
+builder.Services.AddScoped<IJobLevelRepository, JobLevelRepository>();
+builder.Services.AddScoped<IJobStatusRepository, JobStatusRepository>();
+builder.Services.AddScoped<IJobTypeRepository, JobTypeRepository>();
+
+// Users
+builder.Services.AddScoped<IEmployerRepository, EmployerRepository>();
+builder.Services.AddScoped<IJobSeekerRepository, JobSeekerRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
