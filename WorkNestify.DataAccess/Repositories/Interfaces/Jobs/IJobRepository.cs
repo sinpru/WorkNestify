@@ -1,6 +1,6 @@
 ﻿using WorkNestify.DataAccess.Entities.Jobs;
 
-namespace WorkNestify.DataAccess.Repositories.Interfaces;
+namespace WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
 
 public interface IJobRepository : IRepository<Job>
 {

@@ -1,8 +1,8 @@
 ﻿using WorkNestify.DataAccess.Data;
 using WorkNestify.DataAccess.Entities.Companies;
-using WorkNestify.DataAccess.Repositories.Interfaces;
+using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
 
-namespace WorkNestify.DataAccess.Repositories.Implementations;
+namespace WorkNestify.DataAccess.Repositories.Implementations.Companies;
 
 public class CompanyReviewRepository : Repository<CompanyReview>, ICompanyReviewRepository
 {

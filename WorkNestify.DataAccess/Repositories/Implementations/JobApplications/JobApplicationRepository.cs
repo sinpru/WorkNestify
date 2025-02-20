@@ -1,8 +1,8 @@
 ﻿using WorkNestify.DataAccess.Data;
 using WorkNestify.DataAccess.Entities.JobApplications;
-using WorkNestify.DataAccess.Repositories.Interfaces;
+using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
 
-namespace WorkNestify.DataAccess.Repositories.Implementations;
+namespace WorkNestify.DataAccess.Repositories.Implementations.JobApplications;
 
 public class JobApplicationRepository : Repository<JobApplication>, IJobApplicationRepository
 {

@@ -4,7 +4,13 @@ using WorkNestify.DataAccess.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using WorkNestify.DataAccess.Repositories.Implementations;
+using WorkNestify.DataAccess.Repositories.Implementations.Companies;
+using WorkNestify.DataAccess.Repositories.Implementations.JobApplications;
+using WorkNestify.DataAccess.Repositories.Implementations.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces;
+using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
+using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
+using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
 using WorkNestify.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
