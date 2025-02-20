@@ -34,7 +34,6 @@
 
     <ItemGroup>
       <Folder Include="Areas\Employer\Controllers\" />
-      <Folder Include="Areas\Employer\Views\" />
     </ItemGroup>
 
 </Project>
