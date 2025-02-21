@@ -169,11 +169,16 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
         
         private void PopulateDropdowns(Job job = null)
         {
+            var currentDate = DateTime.Now;
+            var futureDate = currentDate.AddDays(14);
+            
             ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address", job?.CompanyId);
-            ViewData["JobCategoryId"] = new SelectList(_unitOfWork.JobCategories.GetAllAsync().Result, "Id", "Description", job?.JobCategoryId);
-            ViewData["JobLevelId"] = new SelectList(_unitOfWork.JobLevels.GetAllAsync().Result, "Id", "Description", job?.JobLevelId);
+            ViewData["JobCategoryId"] = new SelectList(_unitOfWork.JobCategories.GetAllAsync().Result, "Id", "Name", job?.JobCategoryId);
+            ViewData["JobLevelId"] = new SelectList(_unitOfWork.JobLevels.GetAllAsync().Result, "Id", "Name", job?.JobLevelId);
             ViewData["JobStatusId"] = new SelectList(_unitOfWork.JobStatuses.GetAllAsync().Result, "Id", "Name", job?.JobStatusId);
             ViewData["JobTypeId"] = new SelectList(_unitOfWork.JobTypes.GetAllAsync().Result, "Id", "Name", job?.JobTypeId);
+            ViewData["EndDate"] = job?.EndDate?.ToString("yyyy-MM-ddTHH:mm") ?? futureDate.ToString("yyyy-MM-ddTHH:mm");
+            ViewData["StartDate"] = job?.StartDate?.ToString("yyyy-MM-ddTHH:mm") ?? currentDate.ToString("yyyy-MM-ddTHH:mm");
         }
     }
 }

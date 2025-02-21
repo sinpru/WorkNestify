@@ -37,4 +37,12 @@
       <Folder Include="Areas\Employer\Controllers\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\lib\ckeditor5\ckeditor5.css" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\ckeditor5\ckeditor5.css.map" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\ckeditor5\ckeditor5.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\ckeditor5\ckeditor5.js.map" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\ckeditor5\LICENSE.md" />
+    </ItemGroup>
+
 </Project>

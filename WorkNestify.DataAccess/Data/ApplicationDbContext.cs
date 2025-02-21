@@ -114,13 +114,13 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .HasOne(ja => ja.JobSeeker)
             .WithMany(js => js.JobApplications)
             .HasForeignKey(ja => ja.JobSeekerId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<JobApplication>()
             .HasOne(ja => ja.Job)
             .WithMany()
             .HasForeignKey(ja => ja.JobId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<JobApplication>()
             .HasOne(ja => ja.JobApplicationStatus)

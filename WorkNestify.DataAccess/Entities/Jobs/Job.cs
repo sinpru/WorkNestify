@@ -24,7 +24,10 @@ namespace WorkNestify.DataAccess.Entities.Jobs
         [Required]
         public double Salary { get; set; }
 
+        [Display(Name = "Start Date")]
         public DateTime? StartDate { get; set; }
+        
+        [Display(Name = "End Date")]
         public DateTime? EndDate { get; set; }
 
         [Required]
@@ -37,24 +40,28 @@ namespace WorkNestify.DataAccess.Entities.Jobs
         public int JobTypeId { get; set; }
 
         [ForeignKey(nameof(JobTypeId))]
+        [Display(Name = "Job Type")]
         public JobType JobType { get; set; }
 
         [Required]
         public int JobStatusId { get; set; }
 
         [ForeignKey(nameof(JobStatusId))]
+        [Display(Name = "Job Status")]
         public JobStatus JobStatus { get; set; }
 
         [Required]
         public int JobLevelId { get; set; }
 
         [ForeignKey(nameof(JobLevelId))]
+        [Display(Name = "Job Level")]
         public JobLevel JobLevel { get; set; }
 
         [Required]
         public int JobCategoryId { get; set; }
 
         [ForeignKey(nameof(JobCategoryId))]
+        [Display(Name = "Job Category")]
         public JobCategory JobCategory { get; set; }
 
         [Required]
