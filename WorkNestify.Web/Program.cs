@@ -3,7 +3,6 @@ using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using WorkNestify.DataAccess.Entities.Users;
 using WorkNestify.DataAccess.Repositories.Implementations;
 using WorkNestify.DataAccess.Repositories.Implementations.Companies;
 using WorkNestify.DataAccess.Repositories.Implementations.JobApplications;
@@ -89,6 +88,13 @@ builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
+
+// Seed Roles and Admin
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    await DbInitializer.SeedRolesAndAdminAsync(services);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
