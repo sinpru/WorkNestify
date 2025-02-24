@@ -1,0 +1,86 @@
+@model WorkNestify.DataAccess.Entities.Jobs.Job
+
+@{
+    ViewData["Title"] = "Post a job";
+}
+
+<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/44.2.1/ckeditor5.css"/>
+<script src="https://cdn.ckeditor.com/ckeditor5/44.2.1/ckeditor5.umd.js"></script>
+
+<div class="d-flex justify-content-between align-items-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
+
+    <a class="btn btn-primary d-flex align-items-center" asp-action="Index">
+        <i class="fs-4 bi-arrow-left me-1"></i> Back to List
+    </a>
+</div>
+
+<hr/>
+
+<form asp-action="Create" class="row">
+    <div class="col-md-4">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group mb-2">
+            <label asp-for="Title" class="control-label"></label>
+            <input asp-for="Title" class="form-control"/>
+            <span asp-validation-for="Title" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-2">
+            <label asp-for="Location" class="control-label"></label>
+            <input asp-for="Location" class="form-control"/>
+            <span asp-validation-for="Location" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-2">
+            <label asp-for="Salary" class="control-label"></label>
+            <input asp-for="Salary" class="form-control"/>
+            <span asp-validation-for="Salary" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-2">
+            <label asp-for="StartDate" class="control-label"></label>
+            <input asp-for="StartDate" class="form-control" value="@ViewData["StartDate"]"/>
+            <span asp-validation-for="StartDate" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-2">
+            <label asp-for="EndDate" class="control-label"></label>
+            <input asp-for="EndDate" class="form-control" value="@ViewData["EndDate"]"/>
+            <span asp-validation-for="EndDate" class="text-danger"></span>
+        </div>
+        <div class="form-group mb-2">
+            <label asp-for="JobTypeId" class="control-label"></label>
+            <select asp-for="JobTypeId" class="form-control" asp-items="ViewBag.JobTypeId"></select>
+        </div>
+        <div class="form-group mb-2">
+            <label asp-for="JobStatusId" class="control-label"></label>
+            <select asp-for="JobStatusId" class="form-control" asp-items="ViewBag.JobStatusId"></select>
+        </div>
+        <div class="form-group mb-2">
+            <label asp-for="JobLevelId" class="control-label"></label>
+            <select asp-for="JobLevelId" class="form-control" asp-items="ViewBag.JobLevelId"></select>
+        </div>
+        <div class="form-group mb-2">
+            <label asp-for="JobCategoryId" class="control-label"></label>
+            <select asp-for="JobCategoryId" class="form-control" asp-items="ViewBag.JobCategoryId"></select>
+        </div>
+        <div class="form-group mb-2">
+            <label asp-for="CompanyId" class="control-label"></label>
+            <select asp-for="CompanyId" class="form-control" asp-items="ViewBag.CompanyId"></select>
+        </div>
+        <div class="form-group mb-2">
+            <input type="submit" value="Create" class="btn btn-primary"/>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="form-group">
+            <label asp-for="Description" class="control-label"></label>
+            <textarea asp-for="Description" id="editor" class="mh-100"></textarea>
+            <div id="editor-word-count"></div>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+    </div>
+</form>
+
+<script src="~/js/ImportCKEditor.js"></script>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
