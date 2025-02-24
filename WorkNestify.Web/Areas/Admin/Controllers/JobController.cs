@@ -9,9 +9,9 @@ using WorkNestify.DataAccess.Data;
 using WorkNestify.DataAccess.Entities.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 
-namespace WorkNestify.Web.Areas.Employer.Controllers
+namespace WorkNestify.Web.Areas.Admin.Controllers
 {
-    [Area("Employer")]
+    [Area("Admin")]
     public class JobController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -21,14 +21,19 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
             _unitOfWork = unitOfWork;
         }
 
-        // GET: Employer/Job
+        // GET: Admin/Job
         public async Task<IActionResult> Index()
         {
-            var jobs = _unitOfWork.Jobs.GetAllAsync();
-            return View(await jobs);
+            var jobs = await _unitOfWork.Jobs
+                .GetAllAsync(includeProperties: "Company," +
+                                                "JobCategory," +
+                                                "JobLevel," +
+                                                "JobStatus," +
+                                                "JobType");
+            return View(jobs);
         }
 
-        // GET: Employer/Job/Details/5
+        // GET: Admin/Job/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -36,8 +41,10 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
                 return NotFound();
             }
 
-            var job = await _unitOfWork.Jobs.GetAsync(j => j.Id == id);
-            
+            var job = await _unitOfWork.Jobs
+                .GetAsync(j => j.Id == id, 
+                    includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType");
+
             if (job == null)
             {
                 return NotFound();
@@ -46,7 +53,7 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
             return View(job);
         }
 
-        // GET: Employer/Job/Create
+        // GET: Admin/Job/Create
         public IActionResult Create()
         {
             PopulateDropdowns();
@@ -54,12 +61,15 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
             return View();
         }
 
-        // POST: Employer/Job/Create
+        // POST: Admin/Job/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,Location,Salary,StartDate,EndDate,CreatedDate,ModifiedDate,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,CompanyId")] Job job)
+        public async Task<IActionResult> Create(
+            [Bind(
+                "Id,Title,Description,Location,Salary,StartDate,EndDate,CreatedDate,ModifiedDate,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,CompanyId")]
+            Job job)
         {
             if (ModelState.IsValid)
             {
@@ -67,13 +77,13 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
                 await _unitOfWork.SaveAsync();
                 return RedirectToAction(nameof(Index));
             }
-            
+
             PopulateDropdowns();
             PopulateDateFields();
             return View(job);
         }
 
-        // GET: Employer/Job/Edit/5
+        // GET: Admin/Job/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -81,24 +91,29 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
                 return NotFound();
             }
 
-            var job = await _unitOfWork.Jobs.GetAsync(j => j.Id == id);
+            var job = await _unitOfWork.Jobs
+                .GetAsync(j => j.Id == id,
+                    includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType");
             
             if (job == null)
             {
                 return NotFound();
             }
-            
+
             PopulateDropdowns();
             PopulateDateFields();
             return View(job);
         }
 
-        // POST: Employer/Job/Edit/5
+        // POST: Admin/Job/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Location,Salary,StartDate,EndDate,CreatedDate,ModifiedDate,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,CompanyId")] Job job)
+        public async Task<IActionResult> Edit(int id,
+            [Bind(
+                "Id,Title,Description,Location,Salary,StartDate,EndDate,CreatedDate,ModifiedDate,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,CompanyId")]
+            Job job)
         {
             if (id != job.Id)
             {
@@ -123,16 +138,16 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
                         throw;
                     }
                 }
-                
+
                 return RedirectToAction(nameof(Index));
             }
-            
+
             PopulateDropdowns();
             PopulateDateFields();
             return View(job);
         }
 
-        // GET: Employer/Job/Delete/5
+        // GET: Admin/Job/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -140,7 +155,9 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
                 return NotFound();
             }
 
-            var job = await _unitOfWork.Jobs.GetAsync(j => j.Id == id);
+            var job = await _unitOfWork.Jobs
+                .GetAsync(j => j.Id == id,
+                    includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType");
             
             if (job == null)
             {
@@ -150,19 +167,21 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
             return View(job);
         }
 
-        // POST: Employer/Job/Delete/5
+        // POST: Admin/Job/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var job = await _unitOfWork.Jobs.GetAsync(j => j.Id == id);
+            var job = await _unitOfWork.Jobs
+                .GetAsync(j => j.Id == id,
+                    includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType");
             
             if (job != null)
             {
                 _unitOfWork.Jobs.Remove(job);
                 await _unitOfWork.SaveAsync();
             }
-            
+
             return RedirectToAction(nameof(Index));
         }
 
@@ -179,7 +198,7 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
             ViewData["JobStatusId"] = new SelectList(_unitOfWork.JobStatuses.GetAllAsync().Result, "Id", "Name", job?.JobStatusId);
             ViewData["JobTypeId"] = new SelectList(_unitOfWork.JobTypes.GetAllAsync().Result, "Id", "Name", job?.JobTypeId);
         }
-        
+
         private void PopulateDateFields(Job job = null)
         {
             var currentDate = DateTime.Now;
