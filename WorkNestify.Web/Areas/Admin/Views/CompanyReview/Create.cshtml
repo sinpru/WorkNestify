@@ -1,13 +1,19 @@
 @model WorkNestify.DataAccess.Entities.Companies.CompanyReview
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create New Review";
 }
 
-<h1>Create</h1>
+<div class="d-flex justify-content-between align-items-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
 
-<h4>CompanyReview</h4>
+    <a class="btn btn-primary d-flex align-items-center" asp-action="Index">
+        <i class="fs-4 bi-arrow-left me-1"></i> Back to List
+    </a>
+</div>
+
 <hr />
+
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
@@ -31,10 +37,6 @@
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

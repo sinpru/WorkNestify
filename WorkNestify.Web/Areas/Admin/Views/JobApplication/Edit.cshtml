@@ -1,13 +1,19 @@
 @model WorkNestify.DataAccess.Entities.JobApplications.JobApplication
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Job Application Details";
 }
 
-<h1>Edit</h1>
+<div class="d-flex justify-content-between align-items-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
 
-<h4>JobApplication</h4>
+    <a class="btn btn-primary d-flex align-items-center" asp-action="Index">
+        <i class="fs-4 bi-arrow-left me-1"></i> Back to List
+    </a>
+</div>
+
 <hr />
+
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
@@ -48,10 +54,6 @@
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
