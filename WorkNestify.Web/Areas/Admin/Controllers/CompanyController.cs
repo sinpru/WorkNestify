@@ -39,7 +39,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
             
             if (company == null)
             {
@@ -82,7 +82,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
             
             if (company == null)
             {
@@ -138,7 +138,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
             
             if (company == null)
             {
@@ -153,7 +153,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
             
             if (company != null)
             {
