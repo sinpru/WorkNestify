@@ -7,24 +7,25 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
 using WorkNestify.DataAccess.Entities.Companies;
+using WorkNestify.DataAccess.Repositories.Interfaces;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class CompanyController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CompanyController(ApplicationDbContext context)
+        public CompanyController(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: Admin/Company
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Companies.Include(c => c.CompanySize);
-            return View(await applicationDbContext.ToListAsync());
+            var companies = _unitOfWork.Companies.GetAllAsync();
+            return View(await companies);
         }
 
         // GET: Admin/Company/Details/5
@@ -35,9 +36,8 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _context.Companies
-                .Include(c => c.CompanySize)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
+            
             if (company == null)
             {
                 return NotFound();
@@ -49,7 +49,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         // GET: Admin/Company/Create
         public IActionResult Create()
         {
-            ViewData["CompanySizeId"] = new SelectList(_context.CompanySizes, "Id", "Name");
+            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
             return View();
         }
 
@@ -62,11 +62,12 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
-                _context.Add(company);
-                await _context.SaveChangesAsync();
+                await _unitOfWork.Companies.AddAsync(company);
+                await _unitOfWork.SaveAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CompanySizeId"] = new SelectList(_context.CompanySizes, "Id", "Name", company.CompanySizeId);
+            
+            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
             return View(company);
         }
 
@@ -78,12 +79,14 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _context.Companies.FindAsync(id);
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
+            
             if (company == null)
             {
                 return NotFound();
             }
-            ViewData["CompanySizeId"] = new SelectList(_context.CompanySizes, "Id", "Name", company.CompanySizeId);
+            
+            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
             return View(company);
         }
 
@@ -103,12 +106,12 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             {
                 try
                 {
-                    _context.Update(company);
-                    await _context.SaveChangesAsync();
+                    await _unitOfWork.Companies.UpdateAsync(company);
+                    await _unitOfWork.SaveAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CompanyExists(company.Id))
+                    if (!await CompanyExists(company.Id))
                     {
                         return NotFound();
                     }
@@ -119,7 +122,8 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CompanySizeId"] = new SelectList(_context.CompanySizes, "Id", "Name", company.CompanySizeId);
+            
+            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
             return View(company);
         }
 
@@ -131,9 +135,8 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _context.Companies
-                .Include(c => c.CompanySize)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
+            
             if (company == null)
             {
                 return NotFound();
@@ -147,19 +150,20 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var company = await _context.Companies.FindAsync(id);
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
+            
             if (company != null)
             {
-                _context.Companies.Remove(company);
+                _unitOfWork.Companies.Remove(company);
+                await _unitOfWork.SaveAsync();
             }
-
-            await _context.SaveChangesAsync();
+            
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CompanyExists(int id)
+        private async Task<bool> CompanyExists(int id)
         {
-            return _context.Companies.Any(e => e.Id == id);
+            return await _unitOfWork.Companies.GetAsync(c => c.Id == id) != null;
         }
     }
 }

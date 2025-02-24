@@ -4,9 +4,13 @@
     ViewData["Title"] = "Jobs Listing";
 }
 
-<h1 class="display-4">@ViewData["Title"]</h1>
+<div class="d-flex justify-content-between align-items-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
 
-<a class="btn btn-primary" asp-action="Create">Post a job</a>
+    <a class="btn btn-primary d-flex align-items-center" asp-action="Create">
+        <i class="fs-4 bi-plus-lg me-1"></i> Post a Job
+    </a>
+</div>
 
 <table class="table">
     <thead>

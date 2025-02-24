@@ -34,8 +34,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Areas\Admin\Controllers\" />
       <Folder Include="Areas\Employer\Controllers\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\CompanyReview\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\CompanyReview\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\CompanyReview\Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\CompanyReview\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Admin\Views\CompanyReview\Index.cshtml" />
     </ItemGroup>
 
 </Project>

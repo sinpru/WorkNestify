@@ -1,10 +1,21 @@
 @model WorkNestify.DataAccess.Entities.Jobs.Job
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Job Details";
 }
 
-<h1>Details</h1>
+<div class="d-flex justify-content-between align-items-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
+
+    <div>
+        <a class="btn btn-primary d-flex align-items-center" asp-action="Edit" asp-route-id="@Model?.Id">
+            <i class="fs-4 bi-pencil-square me-1"></i> Edit
+        </a>
+        <a class="btn btn-primary d-flex align-items-center" asp-action="Index">
+            <i class="fs-4 bi-arrow-left me-1"></i> Back to List
+        </a>
+    </div>
+</div>
 
 <div>
     <h4>Job</h4>
@@ -89,8 +100,4 @@
             @Html.DisplayFor(model => model.Company.Address)
         </dd>
     </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
 </div>

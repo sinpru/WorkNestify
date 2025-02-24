@@ -1,12 +1,17 @@
 @model WorkNestify.DataAccess.Entities.Companies.Company
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Company Details";
 }
 
-<h1>Edit</h1>
+<div class="d-flex justify-content-between align-items-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
 
-<h4>Company</h4>
+    <a class="btn btn-primary d-flex align-items-center" asp-action="Index">
+        <i class="fs-4 bi-arrow-left me-1"></i> Back to List
+    </a>
+</div>
+
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -78,10 +83,6 @@
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
