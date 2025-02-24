@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
 using WorkNestify.DataAccess.Entities.Companies;
@@ -15,17 +16,19 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
     public class CompanyController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ApplicationDbContext _context;
 
-        public CompanyController(IUnitOfWork unitOfWork)
+        public CompanyController(IUnitOfWork unitOfWork, ApplicationDbContext context)
         {
             _unitOfWork = unitOfWork;
+            _context = context;
         }
 
         // GET: Admin/Company
         public async Task<IActionResult> Index()
         {
-            var companies = _unitOfWork.Companies.GetAllAsync();
-            return View(await companies);
+            var companies = await _unitOfWork.Companies.GetAllAsync(includeProperties: "CompanySize");
+            return View(companies);
         }
 
         // GET: Admin/Company/Details/5

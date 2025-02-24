@@ -45,6 +45,74 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             new CompanySize { Id = 2, Name = "Medium" },
             new CompanySize { Id = 3, Name = "Large" });
         
+        // Seed Data for Company
+        modelBuilder.Entity<Company>().HasData(
+                new Company
+                {
+                    Id = 1,
+                    Name = "FPT Software",
+                    Website = "https://www.fpt-software.com",
+                    Email = "contact@fpt-software.com",
+                    Phone = "+84 24 7300 7300",
+                    Address = "Hanoi, Vietnam",
+                    Description = "<p>FPT Software is a global technology and IT services provider headquartered in Vietnam.</p>",
+                    Logo = "https://upload.wikimedia.org/wikipedia/en/thumb/9/99/FPT_logo.svg/1200px-FPT_logo.svg.png",
+                    Industry = "Information Technology",
+                    FoundedDate = new DateTime(1999, 9, 13),
+                    CreatedDate = DateTime.UtcNow,
+                    ModifiedDate = DateTime.UtcNow,
+                    CompanySizeId = 3 // Large
+                },
+                new Company
+                {
+                    Id = 2,
+                    Name = "VNG Corporation",
+                    Website = "https://www.vng.com.vn",
+                    Email = "support@vng.com.vn",
+                    Phone = "+84 28 3962 3888",
+                    Address = "Ho Chi Minh City, Vietnam",
+                    Description = "<p>VNG is a leading technology company in Vietnam, known for its digital entertainment, cloud services, and fintech solutions.</p>",
+                    Logo = "https://upload.wikimedia.org/wikipedia/en/thumb/8/85/VNG_Logo.svg/1200px-VNG_Logo.svg.png",
+                    Industry = "Technology & Entertainment",
+                    FoundedDate = new DateTime(2004, 9, 9),
+                    CreatedDate = DateTime.UtcNow,
+                    ModifiedDate = DateTime.UtcNow,
+                    CompanySizeId = 3
+                },
+                new Company
+                {
+                    Id = 3,
+                    Name = "Tiki.vn",
+                    Website = "https://www.tiki.vn",
+                    Email = "contact@tiki.vn",
+                    Phone = "+84 1900 6035",
+                    Address = "Ho Chi Minh City, Vietnam",
+                    Description = "<p>Tiki is one of the biggest e-commerce platforms in Vietnam, offering a wide range of products and fast delivery services.</p>",
+                    Logo = "https://upload.wikimedia.org/wikipedia/commons/8/89/Tiki.vn_logo.png",
+                    Industry = "E-commerce",
+                    FoundedDate = new DateTime(2010, 3, 3),
+                    CreatedDate = DateTime.UtcNow,
+                    ModifiedDate = DateTime.UtcNow,
+                    CompanySizeId = 2
+                },
+                new Company
+                {
+                    Id = 4,
+                    Name = "VinAI Research",
+                    Website = "https://www.vinai.io",
+                    Email = "info@vinai.io",
+                    Phone = "+84 24 7108 7788",
+                    Address = "Hanoi, Vietnam",
+                    Description = "<p>VinAI is an AI research lab established by Vingroup, focusing on artificial intelligence applications.</p>",
+                    Logo = "https://vinai.io/wp-content/uploads/2020/05/vinai-logo.svg",
+                    Industry = "Artificial Intelligence",
+                    FoundedDate = new DateTime(2019, 6, 10),
+                    CreatedDate = DateTime.UtcNow,
+                    ModifiedDate = DateTime.UtcNow,
+                    CompanySizeId = 1
+                }
+            );
+        
         // Seed Data for JobType
         modelBuilder.Entity<JobType>().HasData(
             new JobType { Id = 1, Name = "Full-Time" },

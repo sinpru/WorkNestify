@@ -1,14 +1,22 @@
 @model WorkNestify.DataAccess.Entities.Companies.CompanySize
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Company Size Details";
 }
 
-<h1>Details</h1>
+<div class="d-flex justify-content-between align-items-center">
+    <h1 class="display-4">@ViewData["Title"]</h1>
+
+    <div>
+        <a class="btn btn-primary d-flex align-items-center" asp-action="Index">
+            <i class="fs-4 bi-arrow-left me-1"></i> Back to List
+        </a>
+    </div>
+</div>
+
+<hr/>
 
 <div>
-    <h4>CompanySize</h4>
-    <hr />
     <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Name)
@@ -17,8 +25,4 @@
             @Html.DisplayFor(model => model.Name)
         </dd>
     </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
 </div>

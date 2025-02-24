@@ -56,10 +56,10 @@ namespace WorkNestify.DataAccess.Entities.Companies
 
         // Foreign Key to CompanySize
         [Required]
-        [Display(Name = "Company Size")]
         public int CompanySizeId { get; set; }
 
         [ForeignKey(nameof(CompanySizeId))]
+        [Display(Name = "Company Size")]
         public CompanySize CompanySize { get; set; }
 
         // Navigation Properties
