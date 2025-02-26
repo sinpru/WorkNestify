@@ -61,8 +61,10 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Website,Email,Phone,Address,Description,Logo,Industry,FoundedDate,CreatedDate,ModifiedDate,CompanySizeId")] Company company)
+        public async Task<IActionResult> Create([Bind("Id,Name,Website,Email,Phone,Address,Description,Logo,Industry,FoundedDate,CompanySizeId")] Company company)
         {
+            // ModelState.Remove("CompanySize");
+            
             if (ModelState.IsValid)
             {
                 await _unitOfWork.Companies.AddAsync(company);

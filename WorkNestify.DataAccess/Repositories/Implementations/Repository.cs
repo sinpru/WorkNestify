@@ -20,7 +20,7 @@ public class Repository<T> : IRepository<T> where T : class
     {
         IQueryable<T> query = _dbSet;
         query = query.Where(filter);
-        if (!string.IsNullOrWhiteSpace(includeProperties))
+        if (!string.IsNullOrEmpty(includeProperties))
         {
             foreach (var property in includeProperties
                          .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
@@ -28,7 +28,7 @@ public class Repository<T> : IRepository<T> where T : class
                 query = query.Include(property);
             }
         }
-        return await _dbSet.FirstOrDefaultAsync();
+        return await query.FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)

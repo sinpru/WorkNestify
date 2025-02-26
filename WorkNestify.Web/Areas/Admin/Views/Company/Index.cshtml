@@ -43,22 +43,22 @@
     <tbody>
 @foreach (var item in Model) {
         <tr>
-            <td>
+            <td class="align-middle">
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
-            <td>
+            <td class="align-middle">
                 @Html.DisplayFor(modelItem => item.Email)
             </td>
-            <td>
+            <td class="align-middle">
                 @Html.DisplayFor(modelItem => item.Phone)
             </td>
-            <td>
+            <td class="align-middle">
                 @Html.DisplayFor(modelItem => item.Address)
             </td>
-            <td>
+            <td class="align-middle">
                 @Html.DisplayFor(modelItem => item.Industry)
             </td>
-            <td>
+            <td class="align-middle">
                 @Html.DisplayFor(modelItem => item.CompanySize.Name)
             </td>
             <td class="d-flex flex-column gap-2">
