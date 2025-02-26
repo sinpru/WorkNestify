@@ -4,6 +4,9 @@
     ViewData["Title"] = "Edit Company Details";
 }
 
+<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/44.2.1/ckeditor5.css"/>
+<script src="https://cdn.ckeditor.com/ckeditor5/44.2.1/ckeditor5.umd.js"></script>
+
 <div class="d-flex justify-content-between align-items-center">
     <h1 class="display-4">@ViewData["Title"]</h1>
 
@@ -12,79 +15,93 @@
     </a>
 </div>
 
-<hr />
+<hr/>
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Website" class="control-label"></label>
-                <input asp-for="Website" class="form-control" />
-                <span asp-validation-for="Website" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Phone" class="control-label"></label>
-                <input asp-for="Phone" class="form-control" />
-                <span asp-validation-for="Phone" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Address" class="control-label"></label>
-                <input asp-for="Address" class="form-control" />
-                <span asp-validation-for="Address" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Logo" class="control-label"></label>
-                <input asp-for="Logo" class="form-control" />
-                <span asp-validation-for="Logo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Industry" class="control-label"></label>
-                <input asp-for="Industry" class="form-control" />
-                <span asp-validation-for="Industry" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="FoundedDate" class="control-label"></label>
-                <input asp-for="FoundedDate" class="form-control" />
-                <span asp-validation-for="FoundedDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreatedDate" class="control-label"></label>
-                <input asp-for="CreatedDate" class="form-control" />
-                <span asp-validation-for="CreatedDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ModifiedDate" class="control-label"></label>
-                <input asp-for="ModifiedDate" class="form-control" />
-                <span asp-validation-for="ModifiedDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CompanySizeId" class="control-label"></label>
-                <select asp-for="CompanySizeId" class="form-control" asp-items="ViewBag.CompanySizeId"></select>
-                <span asp-validation-for="CompanySizeId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+<form asp-action="Edit" class="row">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <!-- Left Column -->
+    <div class="col-md-6 mb-2">
+        <div class="form-group">
+            <label asp-for="Name" class="form-label">Company Name</label>
+            <input asp-for="Name" class="form-control" placeholder="Enter company name" required/>
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Website" class="form-label">Website URL</label>
+            <input asp-for="Website" class="form-control" placeholder="https://example.com"/>
+            <span asp-validation-for="Website" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email" class="form-label">Email Address</label>
+            <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com" required/>
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Phone" class="form-label">Phone Number</label>
+            <input asp-for="Phone" class="form-control" placeholder="+1 234 567 890"/>
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Address" class="form-label">Address</label>
+            <input asp-for="Address" class="form-control" placeholder="Enter company address"/>
+            <span asp-validation-for="Address" class="text-danger"></span>
+        </div>
     </div>
-</div>
+
+    <!-- Right Column -->
+    <div class="col-md-6 mb-2">
+        <div class="form-group">
+            <label asp-for="Logo" class="form-label">Logo URL</label>
+            <input asp-for="Logo" type="url" class="form-control" placeholder="https://example.com/logo.png"/>
+            <span asp-validation-for="Logo" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Industry" class="form-label">Industry</label>
+            <input asp-for="Industry" class="form-control" placeholder="e.g., Tech, Retail"/>
+            <span asp-validation-for="Industry" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="FoundedDate" class="form-label">Founded Date</label>
+            <input asp-for="FoundedDate" type="date" class="form-control" required/>
+            <span asp-validation-for="FoundedDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="CompanySizeId" class="form-label">Company Size</label>
+            <select asp-for="CompanySizeId" class="form-select" asp-items="ViewBag.CompanySizeId" required>
+                <option value="" disabled selected>Select a Size</option>
+            </select>
+            <span asp-validation-for="CompanySizeId" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-md-12 mb-2">
+        <div class="form-group">
+            <label asp-for="Description" class="form-label">Company Description</label>
+            <textarea asp-for="Description" id="editor" class="form-control">@Model.Description</textarea>
+            <div id="editor-word-count" class="small text-muted mt-1"></div>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="form-group d-flex justify-content-between mt-2">
+            <a class="btn btn-outline-secondary d-flex align-items-center" asp-action="Index">
+                <i class="fs-4 bi-x-lg me-1"></i> Cancel
+            </a>
+
+            <button type="submit" class="btn btn-primary d-flex align-items-center">
+                <i class="fs-4 bi-check-circle me-1"></i> Save
+            </button>
+        </div>
+    </div>
+</form>
+
+<script src="~/js/ImportCKEditor.js"></script>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
