@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
 using WorkNestify.DataAccess.Entities.Companies;
@@ -13,25 +12,23 @@ using WorkNestify.DataAccess.Repositories.Interfaces;
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class CompanyController : Controller
+    public class CompanyReviewController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ApplicationDbContext _context;
 
-        public CompanyController(IUnitOfWork unitOfWork, ApplicationDbContext context)
+        public CompanyReviewController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _context = context;
         }
 
-        // GET: Admin/Company
+        // GET: Admin/CompanyReview
         public async Task<IActionResult> Index()
         {
-            var companies = await _unitOfWork.Companies.GetAllAsync(includeProperties: "CompanySize");
-            return View(companies);
+            var companyReviews = await _unitOfWork.CompanyReviews.GetAllAsync(includeProperties: "Company");
+            return View(companyReviews);
         }
 
-        // GET: Admin/Company/Details/5
+        // GET: Admin/CompanyReview/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -39,44 +36,42 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
+            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company");
             
-            if (company == null)
+            if (companyReview == null)
             {
                 return NotFound();
             }
 
-            return View(company);
+            return View(companyReview);
         }
 
-        // GET: Admin/Company/Create
+        // GET: Admin/CompanyReview/Create
         public IActionResult Create()
         {
-            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
+            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address");
             return View();
         }
 
-        // POST: Admin/Company/Create
+        // POST: Admin/CompanyReview/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Website,Email,Phone,Address,Description,Logo,Industry,FoundedDate,CompanySizeId")] Company company)
+        public async Task<IActionResult> Create([Bind("Id,Content,Rating,CompanyId")] CompanyReview companyReview)
         {
-            // ModelState.Remove("CompanySize");
-            
             if (ModelState.IsValid)
             {
-                await _unitOfWork.Companies.AddAsync(company);
+                await _unitOfWork.CompanyReviews.AddAsync(companyReview);
                 await _unitOfWork.SaveAsync();
                 return RedirectToAction(nameof(Index));
             }
             
-            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
-            return View(company);
+            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address", companyReview.CompanyId);
+            return View(companyReview);
         }
 
-        // GET: Admin/Company/Edit/5
+        // GET: Admin/CompanyReview/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -84,25 +79,25 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
+            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company");
             
-            if (company == null)
+            if (companyReview == null)
             {
                 return NotFound();
             }
             
-            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
-            return View(company);
+            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address", companyReview.CompanyId);
+            return View(companyReview);
         }
 
-        // POST: Admin/Company/Edit/5
+        // POST: Admin/CompanyReview/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Website,Email,Phone,Address,Description,Logo,Industry,FoundedDate,CreatedDate,ModifiedDate,CompanySizeId")] Company company)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Content,Rating,CompanyId")] CompanyReview companyReview)
         {
-            if (id != company.Id)
+            if (id != companyReview.Id)
             {
                 return NotFound();
             }
@@ -111,12 +106,12 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             {
                 try
                 {
-                    await _unitOfWork.Companies.UpdateAsync(company);
+                    await _unitOfWork.CompanyReviews.UpdateAsync(companyReview);
                     await _unitOfWork.SaveAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!await CompanyExists(company.Id))
+                    if (!await CompanyReviewExists(companyReview.Id))
                     {
                         return NotFound();
                     }
@@ -128,11 +123,11 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
             
-            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
-            return View(company);
+            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address", companyReview.CompanyId);
+            return View(companyReview);
         }
 
-        // GET: Admin/Company/Delete/5
+        // GET: Admin/CompanyReview/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -140,35 +135,35 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
+            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company");
             
-            if (company == null)
+            if (companyReview == null)
             {
                 return NotFound();
             }
 
-            return View(company);
+            return View(companyReview);
         }
 
-        // POST: Admin/Company/Delete/5
+        // POST: Admin/CompanyReview/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
+            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company");
             
-            if (company != null)
+            if (companyReview != null)
             {
-                _unitOfWork.Companies.Remove(company);
+                _unitOfWork.CompanyReviews.Remove(companyReview);
                 await _unitOfWork.SaveAsync();
             }
             
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task<bool> CompanyExists(int id)
+        private async Task<bool> CompanyReviewExists(int id)
         {
-            return await _unitOfWork.Companies.GetAsync(c => c.Id == id) != null;
+            return await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id) != null;
         }
     }
 }

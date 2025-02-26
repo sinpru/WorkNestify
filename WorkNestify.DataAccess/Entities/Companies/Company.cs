@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using WorkNestify.DataAccess.Entities.Jobs;
 using WorkNestify.DataAccess.Entities.Users;
 
@@ -56,11 +57,12 @@ namespace WorkNestify.DataAccess.Entities.Companies
 
         // Foreign Key to CompanySize
         [Required]
-        [Display(Name = "Company Size")]
         public int CompanySizeId { get; set; }
 
         [ForeignKey(nameof(CompanySizeId))]
-        public CompanySize CompanySize { get; set; }
+        [Display(Name = "Company Size")]
+        [BindNever]
+        public CompanySize? CompanySize { get; set; }
 
         // Navigation Properties
         public ICollection<CompanyReview> CompanyReviews { get; set; } = new HashSet<CompanyReview>();

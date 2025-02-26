@@ -215,13 +215,24 @@ const editorConfig = {
     }
 };
 
-ClassicEditor.create(document.querySelector('#editor'), editorConfig)
+const editorElement = document.querySelector('#editor');
+
+if (editorElement) {
+ClassicEditor
+    .create(document.querySelector('#editor'), editorConfig)
     .then(editor => {
         const wordCount = editor.plugins.get('WordCount');
         document.querySelector('#editor-word-count').appendChild(wordCount.wordCountContainer);
+        
+        editor.setData(editorElement.value);
 
+        document.querySelector("form").addEventListener("submit", function () {
+            editorElement.value = editor.getData();
+        });
+        
         return editor;
     })
     .catch(error => {
         console.error(error);
-    });
+    }); 
+}

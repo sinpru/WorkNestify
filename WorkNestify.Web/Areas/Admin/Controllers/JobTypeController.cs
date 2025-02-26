@@ -6,29 +6,29 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
-using WorkNestify.DataAccess.Entities.Companies;
+using WorkNestify.DataAccess.Entities.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class CompanySizeController : Controller
+    public class JobTypeController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public CompanySizeController(IUnitOfWork unitOfWork)
+        public JobTypeController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
         }
 
-        // GET: Admin/CompanySize
+        // GET: Admin/JobType
         public async Task<IActionResult> Index()
         {
-            var companySizes = await _unitOfWork.CompanySizes.GetAllAsync();
-            return View(companySizes);
+            var jobTypes = await _unitOfWork.JobTypes.GetAllAsync();
+            return View(jobTypes);
         }
 
-        // GET: Admin/CompanySize/Details/5
+        // GET: Admin/JobType/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -36,14 +36,14 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var companySize = await _unitOfWork.CompanySizes.GetAsync(cs => cs.Id == id);
+            var jobType = await _unitOfWork.JobTypes.GetAsync(jt => jt.Id == id);
             
-            if (companySize == null)
+            if (jobType == null)
             {
                 return NotFound();
             }
 
-            return View(companySize);
+            return View(jobType);
         }
     }
 }
