@@ -19,9 +19,11 @@ namespace WorkNestify.DataAccess.Entities.Jobs
         public string Description { get; set; }
 
         [Required]
+        [Display(Name = "Location")]
         public string Location { get; set; }
 
         [Required]
+        [Display(Name = "Salary")]
         public double Salary { get; set; }
 
         [Display(Name = "Start Date")]
@@ -31,45 +33,47 @@ namespace WorkNestify.DataAccess.Entities.Jobs
         public DateTime? EndDate { get; set; }
 
         [Required]
+        [Display(Name = "Created Date")]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         [Required]
+        [Display(Name = "Modified Date")]
         public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
 
         [Required]
-        [Display(Name = "Job Type")]
         public int JobTypeId { get; set; }
 
         [ForeignKey(nameof(JobTypeId))]
-        public JobType JobType { get; set; }
+        [Display(Name = "Job Type")]
+        public JobType? JobType { get; set; }
 
         [Required]
-        [Display(Name = "Job Status")]
-        public int JobStatusId { get; set; }
+        public int JobStatusId { get; set; } = 3;
 
         [ForeignKey(nameof(JobStatusId))]
-        public JobStatus JobStatus { get; set; }
+        [Display(Name = "Job Status")]
+        public JobStatus? JobStatus { get; set; }
 
         [Required]
-        [Display(Name = "Job Level")]
         public int JobLevelId { get; set; }
 
         [ForeignKey(nameof(JobLevelId))]
-        public JobLevel JobLevel { get; set; }
+        [Display(Name = "Job Level")]
+        public JobLevel? JobLevel { get; set; }
 
         [Required]
-        [Display(Name = "Job Category")]
         public int JobCategoryId { get; set; }
 
         [ForeignKey(nameof(JobCategoryId))]
-        public JobCategory JobCategory { get; set; }
+        [Display(Name = "Job Category")]
+        public JobCategory? JobCategory { get; set; }
 
         [Required]
-        [Display(Name = "Company")]
         public int CompanyId { get; set; }
 
         [ForeignKey(nameof(CompanyId))]
-        public Company Company { get; set; }
+        [Display(Name = "Company")]
+        public Company? Company { get; set; }
 
         public ICollection<JobApplication> JobApplications { get; set; } = new HashSet<JobApplication>();
     }

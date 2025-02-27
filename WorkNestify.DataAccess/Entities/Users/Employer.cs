@@ -7,10 +7,9 @@ namespace WorkNestify.DataAccess.Entities.Users;
 public class Employer : ApplicationUser
 {
     [Required]
-    [Display(Name = "Company ID")]
-    public int CompanyID { get; set; }
+    public int CompanyId { get; set; }
 
-    [ForeignKey(nameof(CompanyID))]
+    [ForeignKey(nameof(CompanyId))]
     [Display(Name = "Company")]
-    public Company Company { get; set; } = null!;
+    public Company? Company { get; set; } = null!;
 }

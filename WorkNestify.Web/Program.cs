@@ -1,3 +1,4 @@
+using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
@@ -41,26 +42,6 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
-// External Authentication
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-    })
-    .AddCookie()
-    .AddGoogle(googleOptions =>
-    {
-        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
-        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
-    })
-    .AddFacebook(facebookOptions =>
-    {
-        facebookOptions.AppId = builder.Configuration["Authentication:Facebook:AppId"]!;
-        facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"]!;
-    });
-
-
-
 // Repository Structure Implementation
 // Companies
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
@@ -83,6 +64,35 @@ builder.Services.AddScoped<IEmployerRepository, EmployerRepository>();
 builder.Services.AddScoped<IJobSeekerRepository, JobSeekerRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+// External Authentication
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+    })
+    .AddCookie()
+    .AddGoogle(googleOptions =>
+    {
+        googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
+        googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+    })
+    .AddFacebook(facebookOptions =>
+    {
+        facebookOptions.AppId = builder.Configuration["Authentication:Facebook:AppId"]!;
+        facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"]!;
+    });
+
+// External Services
+var cloudinaryAccount = new Account(
+    builder.Configuration["Services:Cloudinary:CloudName"],
+    builder.Configuration["Services:Cloudinary:ApiKey"],
+    builder.Configuration["Services:Cloudinary:ApiSecret"]);
+
+Cloudinary cloudinary = new Cloudinary(cloudinaryAccount);
+cloudinary.Api.Secure = true;
+
+builder.Services.AddSingleton(cloudinary);
 
 // Add Razor Pages
 builder.Services.AddRazorPages();

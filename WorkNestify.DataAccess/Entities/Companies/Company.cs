@@ -38,7 +38,7 @@ namespace WorkNestify.DataAccess.Entities.Companies
         public string Description { get; set; }
 
         [Display(Name = "Logo URL")]
-        public string Logo { get; set; }
+        public string? Logo { get; set; }
 
         [Required]
         [Display(Name = "Industry")]
@@ -54,8 +54,7 @@ namespace WorkNestify.DataAccess.Entities.Companies
         [Required]
         [Display(Name = "Modified Date")]
         public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
-
-        // Foreign Key to CompanySize
+        
         [Required]
         public int CompanySizeId { get; set; }
 
@@ -63,8 +62,7 @@ namespace WorkNestify.DataAccess.Entities.Companies
         [Display(Name = "Company Size")]
         [BindNever]
         public CompanySize? CompanySize { get; set; }
-
-        // Navigation Properties
+        
         public ICollection<CompanyReview> CompanyReviews { get; set; } = new HashSet<CompanyReview>();
         public ICollection<Employer> Employers { get; set; } = new HashSet<Employer>();
         public ICollection<Job> Jobs { get; set; } = new HashSet<Job>();

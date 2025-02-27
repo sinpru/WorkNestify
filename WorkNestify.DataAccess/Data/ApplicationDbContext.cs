@@ -200,6 +200,6 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .HasOne(cr => cr.Company)
             .WithMany()
             .HasForeignKey(cr => cr.CompanyId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }
