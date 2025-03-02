@@ -12,9 +12,9 @@ public class CloudinaryService
     public CloudinaryService(IConfiguration configuration)
     {
         var account = new Account(
-            configuration["Cloudinary:CloudName"],
-            configuration["Cloudinary:ApiKey"],
-            configuration["Cloudinary:ApiSecret"]
+            configuration["Services:Cloudinary:CloudName"],
+            configuration["Services:Cloudinary:ApiKey"],
+            configuration["Services:Cloudinary:ApiSecret"]
         );
         _cloudinary = new Cloudinary(account);
     }
