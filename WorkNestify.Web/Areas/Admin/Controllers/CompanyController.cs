@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using WorkNestify.DataAccess.Entities.Companies;
+using WorkNestify.DataAccess.Entities.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Utilities.Services;
 
@@ -15,11 +16,13 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly CloudinaryService _cloudinary;
+        private readonly GhnService _ghnService;
 
-        public CompanyController(IUnitOfWork unitOfWork, CloudinaryService cloudinary)
+        public CompanyController(IUnitOfWork unitOfWork, CloudinaryService cloudinary, GhnService ghnService)
         {
             _unitOfWork = unitOfWork;
             _cloudinary = cloudinary;
+            _ghnService = ghnService;
         }
 
         // GET: Admin/Company
@@ -48,9 +51,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/Company/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
+            await PopulateDropdowns();
             return View();
         }
 
@@ -60,7 +63,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Id,Name,Website,Email,Phone,Address,Description,Logo,Industry,FoundedDate,CompanySizeId")]
+            [Bind("Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId")]
             Company company, IFormFile? file)
         {
             if (!ModelState.IsValid)
@@ -123,7 +126,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,
             [Bind(
-                "Id,Name,Website,Email,Phone,Address,Description,Logo,Industry,FoundedDate,CreatedDate,ModifiedDate,CompanySizeId")]
+                "Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId")]
             Company company, IFormFile? file)
         {
             if (id != company.Id)
@@ -247,6 +250,12 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         private async Task<bool> CompanyExists(int id)
         {
             return await _unitOfWork.Companies.GetAsync(c => c.Id == id) != null;
+        }
+
+        private async Task PopulateDropdowns(Company company = null)
+        {
+            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
+            ViewData["ProvinceId"] = new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name");
         }
     }
 }

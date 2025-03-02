@@ -21,7 +21,7 @@
                 @Html.DisplayNameFor(model => model.Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Location)
+                @Html.DisplayNameFor(model => model.StreetAddress)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Salary)
@@ -63,7 +63,7 @@
                 @Html.DisplayFor(modelItem => item.Title)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Location)
+                @Html.DisplayFor(modelItem => item.StreetAddress)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Salary)
@@ -93,7 +93,7 @@
                 @Html.DisplayFor(modelItem => item.JobCategory.Description)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Company.Address)
+                @Html.DisplayFor(modelItem => item.Company.StreetAddress)
             </td>
             <td class="d-flex flex-column gap-2">
                 <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>
