@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using WorkNestify.DataAccess.Entities.Jobs;
+using WorkNestify.DataAccess.Entities.Locations;
 using WorkNestify.DataAccess.Entities.Users;
 
 namespace WorkNestify.DataAccess.Entities.Companies
@@ -30,8 +31,8 @@ namespace WorkNestify.DataAccess.Entities.Companies
         public string Phone { get; set; }
 
         [Required]
-        [Display(Name = "Address")]
-        public string Address { get; set; }
+        [Display(Name = "Street Address")]
+        public string StreetAddress { get; set; }
 
         [Required]
         [Display(Name = "Company Description")]
@@ -62,6 +63,30 @@ namespace WorkNestify.DataAccess.Entities.Companies
         [Display(Name = "Company Size")]
         [BindNever]
         public CompanySize? CompanySize { get; set; }
+        
+        [Required]
+        public int ProvinceId { get; set; }
+        
+        [ForeignKey(nameof(ProvinceId))]
+        [Display(Name = "Province")]
+        [BindNever]
+        public Province? Province { get; set; }
+        
+        [Required]
+        public int DistrictId { get; set; }
+        
+        [ForeignKey(nameof(DistrictId))]
+        [Display(Name = "District")]
+        [BindNever]
+        public District? District { get; set; }
+        
+        [Required]
+        public int WardId { get; set; }
+        
+        [ForeignKey(nameof(WardId))]
+        [Display(Name = "Ward")]
+        [BindNever]
+        public Ward? Ward { get; set; }
         
         public ICollection<CompanyReview> CompanyReviews { get; set; } = new HashSet<CompanyReview>();
         public ICollection<Employer> Employers { get; set; } = new HashSet<Employer>();

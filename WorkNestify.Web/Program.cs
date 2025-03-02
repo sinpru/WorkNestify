@@ -1,4 +1,3 @@
-using CloudinaryDotNet;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
@@ -15,6 +14,7 @@ using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces.Users;
 using WorkNestify.Utilities;
+using WorkNestify.Utilities.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,15 +84,11 @@ builder.Services.AddAuthentication(options =>
     });
 
 // External Services
-var cloudinaryAccount = new Account(
-    builder.Configuration["Services:Cloudinary:CloudName"],
-    builder.Configuration["Services:Cloudinary:ApiKey"],
-    builder.Configuration["Services:Cloudinary:ApiSecret"]);
+// Cloudinary
+builder.Services.AddSingleton<CloudinaryService>();
 
-Cloudinary cloudinary = new Cloudinary(cloudinaryAccount);
-cloudinary.Api.Secure = true;
-
-builder.Services.AddSingleton(cloudinary);
+// GiaoHangNhanh
+builder.Services.AddHttpClient<GhnService>();
 
 // Add Razor Pages
 builder.Services.AddRazorPages();

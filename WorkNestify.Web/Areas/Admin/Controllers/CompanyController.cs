@@ -3,8 +3,10 @@ using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using WorkNestify.DataAccess.Entities.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces;
+using WorkNestify.Utilities.Services;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
@@ -12,9 +14,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
     public class CompanyController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly Cloudinary _cloudinary;
+        private readonly CloudinaryService _cloudinary;
 
-        public CompanyController(IUnitOfWork unitOfWork, Cloudinary cloudinary)
+        public CompanyController(IUnitOfWork unitOfWork, CloudinaryService cloudinary)
         {
             _unitOfWork = unitOfWork;
             _cloudinary = cloudinary;
@@ -71,27 +73,22 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             if (!string.IsNullOrEmpty(company.Logo) && file != null)
             {
                 ModelState.AddModelError("Logo", "Please provide either a URL or upload a file, not both.");
+                ViewData["CompanySizeId"] = new SelectList(await _unitOfWork.CompanySizes.GetAllAsync(), "Id", "Name");
                 return View(company);
             }
 
             // Handle File Upload to Cloudinary
             if (file != null)
             {
-                var uploadParams = new ImageUploadParams
+                string newLogoUrl = await _cloudinary.UploadImageAsync(file);
+                if (string.IsNullOrEmpty(newLogoUrl))
                 {
-                    File = new FileDescription(file.FileName, file.OpenReadStream()),
-                    Folder = "company_logos",
-                    Transformation = new Transformation().Width(500).Height(500).Crop("limit")
-                };
-
-                var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-                if (uploadResult.Error != null)
-                {
-                    ModelState.AddModelError("Logo", "File upload failed. Please try again.");
+                    ModelState.AddModelError("Logo", "Error uploading image to Cloudinary.");
+                    ViewData["CompanySizeId"] = new SelectList(await _unitOfWork.CompanySizes.GetAllAsync(), "Id", "Name");
                     return View(company);
                 }
 
-                company.Logo = uploadResult.SecureUrl.AbsoluteUri;
+                company.Logo = newLogoUrl;
             }
 
             await _unitOfWork.Companies.AddAsync(company);
@@ -144,54 +141,32 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                         return NotFound();
                     }
                     
-                    string existingLogoUrl = existingCompany?.Logo ?? string.Empty;
+                    string existingLogoUrl = existingCompany.Logo ?? string.Empty;
                     
                     if (file != null && file.Length > 0)
                     {
+                        // Delete old logo if it exists
                         if (!string.IsNullOrEmpty(existingLogoUrl))
                         {
-                            try
+                            bool isDeleted = await _cloudinary.DeleteImageAsync(existingLogoUrl);
+                            if (!isDeleted)
                             {
-                                // Extract PublicId from existing Cloudinary URL
-                                var uri = new Uri(existingLogoUrl);
-                                string publicId = Path.GetFileNameWithoutExtension(uri.AbsolutePath);
-
-                                // Delete the old image from Cloudinary
-                                var deleteParams = new DeletionParams(publicId);
-                                var deleteResult = await _cloudinary.DestroyAsync(deleteParams);
-
-                                if (deleteResult.Result != "ok")
-                                {
-                                    ModelState.AddModelError(string.Empty, "Failed to delete the old image from Cloudinary.");
-                                    ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
-                                    return View(company);
-                                }
-                            }
-                            catch (Exception ex)
-                            {
-                                ModelState.AddModelError(string.Empty, $"Error deleting the old image: {ex.Message}");
+                                ModelState.AddModelError("Logo", "Failed to delete the old image from Cloudinary.");
                                 ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
                                 return View(company);
                             }
                         }
-                    
-                        var uploadParams = new ImageUploadParams()
-                        {
-                            File = new FileDescription(file.FileName, file.OpenReadStream()),
-                            PublicId = $"companies/{Guid.NewGuid()}"
-                        };
 
-                        var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-                        if (uploadResult.Error != null)
+                        // Upload new logo
+                        string newLogoUrl = await _cloudinary.UploadImageAsync(file);
+                        if (string.IsNullOrEmpty(newLogoUrl))
                         {
-                            ModelState.AddModelError(string.Empty, "Error uploading image to Cloudinary.");
-                            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result,
-                                "Id", "Name");
+                            ModelState.AddModelError("Logo", "Error uploading image to Cloudinary.");
+                            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
                             return View(company);
                         }
 
-                        // Update company logo URL with Cloudinary URL
-                        company.Logo = uploadResult.SecureUrl.ToString();
+                        company.Logo = newLogoUrl;
                     }
 
                     // Ensure the user does not provide both file and URL
@@ -254,6 +229,14 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
             if (company != null)
             {
+                bool isDeleted = await _cloudinary.DeleteImageAsync(company.Logo ?? string.Empty);
+                if (!isDeleted)
+                {
+                    ModelState.AddModelError("Logo", "Failed to delete the old image from Cloudinary.");
+                    ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
+                    return View(company);
+                }
+                
                 _unitOfWork.Companies.Remove(company);
                 await _unitOfWork.SaveAsync();
             }

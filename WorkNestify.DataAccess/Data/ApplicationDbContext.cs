@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Entities.Companies;
 using WorkNestify.DataAccess.Entities.JobApplications;
 using WorkNestify.DataAccess.Entities.Jobs;
+using WorkNestify.DataAccess.Entities.Locations;
 using WorkNestify.DataAccess.Entities.Users;
 
 namespace WorkNestify.DataAccess.Data;
@@ -30,6 +31,11 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<JobApplication> JobApplications { get; set; }
     public DbSet<JobApplicationStatus> JobApplicationStatuses { get; set; }
     
+    // Locations
+    public DbSet<Ward> Wards { get; set; }
+    public DbSet<District> Districts { get; set; }
+    public DbSet<Province> Provinces { get; set; }
+    
     // Users
     public DbSet<JobSeeker> JobSeekers { get; set; }
     public DbSet<Employer> Employers { get; set; }
@@ -54,7 +60,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                     Website = "https://www.fpt-software.com",
                     Email = "contact@fpt-software.com",
                     Phone = "+84 24 7300 7300",
-                    Address = "Hanoi, Vietnam",
+                    StreetAddress = "Hanoi, Vietnam",
                     Description = "<p>FPT Software is a global technology and IT services provider headquartered in Vietnam.</p>",
                     Logo = "https://upload.wikimedia.org/wikipedia/commons/1/11/FPT_logo_2010.svg",
                     Industry = "Information Technology",
@@ -70,7 +76,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                     Website = "https://www.vng.com.vn",
                     Email = "support@vng.com.vn",
                     Phone = "+84 28 3962 3888",
-                    Address = "Ho Chi Minh City, Vietnam",
+                    StreetAddress = "Ho Chi Minh City, Vietnam",
                     Description = "<p>VNG is a leading technology company in Vietnam, known for its digital entertainment, cloud services, and fintech solutions.</p>",
                     Logo = "https://upload.wikimedia.org/wikipedia/commons/8/8f/VNG_Corp._logo.svg",
                     Industry = "Technology & Entertainment",
@@ -86,7 +92,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                     Website = "https://www.tiki.vn",
                     Email = "contact@tiki.vn",
                     Phone = "+84 1900 6035",
-                    Address = "Ho Chi Minh City, Vietnam",
+                    StreetAddress = "Ho Chi Minh City, Vietnam",
                     Description = "<p>Tiki is one of the biggest e-commerce platforms in Vietnam, offering a wide range of products and fast delivery services.</p>",
                     Logo = "https://upload.wikimedia.org/wikipedia/commons/4/43/Logo_Tiki_2023.png",
                     Industry = "E-commerce",
@@ -102,7 +108,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                     Website = "https://www.vinai.io",
                     Email = "info@vinai.io",
                     Phone = "+84 24 7108 7788",
-                    Address = "Hanoi, Vietnam",
+                    StreetAddress = "Hanoi, Vietnam",
                     Description = "<p>VinAI is an AI research lab established by Vingroup, focusing on artificial intelligence applications.</p>",
                     Logo = "https://www.vinai.io/wp-content/uploads/2021/12/logo-1.png",
                     Industry = "Artificial Intelligence",
