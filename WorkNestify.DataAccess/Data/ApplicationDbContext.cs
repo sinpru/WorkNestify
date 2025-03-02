@@ -154,6 +154,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             new JobCategory { Id = 10, Name = "Logistics & Supply Chain", Description = "Transportation, inventory management, and procurement" });
         
         // Relationships
+        // Job Relationships
         modelBuilder.Entity<Job>()
             .HasOne(j => j.JobType)
             .WithMany()
@@ -183,6 +184,26 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .WithMany()
             .HasForeignKey(j => j.CompanyId)
             .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<Job>()
+            .HasOne(j => j.Province)
+            .WithMany()
+            .HasForeignKey(j => j.ProvinceId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Job>()
+            .HasOne(j => j.District)
+            .WithMany()
+            .HasForeignKey(j => j.DistrictId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Job>()
+            .HasOne(j => j.Ward)
+            .WithMany()
+            .HasForeignKey(j => j.WardId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        // JobApplication Relationships
 
         modelBuilder.Entity<JobApplication>()
             .HasOne(ja => ja.JobSeeker)
@@ -202,9 +223,41 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .HasForeignKey(ja => ja.JobApplicationStatusId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // Company Relationships
+        modelBuilder.Entity<Company>()
+            .HasOne(c => c.CompanySize)
+            .WithMany()
+            .HasForeignKey(c => c.CompanySizeId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<Company>()
+            .HasOne(c => c.Province)
+            .WithMany()
+            .HasForeignKey(c => c.ProvinceId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Company>()
+            .HasOne(c => c.District)
+            .WithMany()
+            .HasForeignKey(c => c.DistrictId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Company>()
+            .HasOne(c => c.Ward)
+            .WithMany()
+            .HasForeignKey(c => c.WardId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        // CompanyReview Relationships
+        modelBuilder.Entity<CompanyReview>()
+            .HasOne(cr => cr.Reviewer)
+            .WithMany()
+            .HasForeignKey(cr => cr.ReviewerId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
         modelBuilder.Entity<CompanyReview>()
             .HasOne(cr => cr.Company)
-            .WithMany()
+            .WithMany(c => c.CompanyReviews)
             .HasForeignKey(cr => cr.CompanyId)
             .OnDelete(DeleteBehavior.Restrict);
     }
