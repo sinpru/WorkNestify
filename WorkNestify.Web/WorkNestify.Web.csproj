@@ -37,6 +37,7 @@
 
     <ItemGroup>
       <Folder Include="Areas\Employer\Controllers\" />
+      <Folder Include="Controllers\" />
       <Folder Include="wwwroot\assets\images\" />
     </ItemGroup>
 
