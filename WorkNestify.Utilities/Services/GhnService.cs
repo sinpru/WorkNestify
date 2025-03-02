@@ -1,6 +1,9 @@
 ﻿using System.Text;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using WorkNestify.DataAccess.Entities.Locations;
+using WorkNestify.Models.DTOs;
+using WorkNestify.Models.Models.GhnModels;
 
 namespace WorkNestify.Utilities.Services;
 
@@ -29,19 +32,49 @@ public class GhnService
         return await response.Content.ReadAsStringAsync();
     }
 
-    public async Task<string> GetProvincesAsync()
+    public async Task<List<Province>> GetProvincesAsync()
     {
-        return await PostAsync("master-data/province", new { });
+        var responseString = await PostAsync("master-data/province", new { });
+        var jsonResponse = JsonSerializer.Deserialize<GhnResponse<List<GhnProvince>>>(responseString, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        return jsonResponse?.Data?.Select(p => new Province
+        {
+            Id = p.ProvinceID,
+            Name = p.ProvinceName
+        }).ToList() ?? new List<Province>();
     }
 
-    public async Task<string> GetDistrictsAsync(int provinceId)
+    public async Task<List<District>> GetDistrictsAsync(int provinceId)
     {
-        return await PostAsync("master-data/district", new { province_id = provinceId });
+        var responseString = await PostAsync("master-data/district", new { province_id = provinceId });
+        var jsonResponse = JsonSerializer.Deserialize<GhnResponse<List<GhnDistrict>>>(responseString, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        return jsonResponse?.Data?.Select(d => new District
+        {
+            Id = d.DistrictID,
+            Name = d.DistrictName
+        }).ToList() ?? new List<District>();
     }
 
-    public async Task<string> GetWardsAsync(int districtId)
+    public async Task<List<Ward>> GetWardsAsync(int districtId)
     {
-        return await PostAsync("master-data/ward", new { district_id = districtId });
+        var responseString = await PostAsync("master-data/ward", new { district_id = districtId });
+        var jsonResponse = JsonSerializer.Deserialize<GhnResponse<List<GhnWard>>>(responseString, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+
+        return jsonResponse?.Data?.Select(w => new Ward
+        {
+            Id = w.WardID,
+            Name = w.WardName
+        }).ToList() ?? new List<Ward>();
     }
 
     public async Task<string> CalculateShippingFeeAsync(int fromDistrict, int toDistrict, int serviceId, int weight, int height, int width, int length)
