@@ -3,6 +3,7 @@ using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
+using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
 using WorkNestify.DataAccess.Repositories.Interfaces.Users;
 
 namespace WorkNestify.DataAccess.Repositories.Implementations;
@@ -26,6 +27,11 @@ public class UnitOfWork : IUnitOfWork
     // JobApplications
     public IJobApplicationRepository JobApplications { get; private set; }
     public IJobApplicationStatusRepository JobApplicationStatuses { get; private set; }
+    
+    // Locations
+    public IDistrictRepository Districts { get; private set; }
+    public IProvinceRepository Provinces { get; private set; }
+    public IWardRepository Wards { get; private set; }
 
     // Users
     public IEmployerRepository Employers { get; private set; }
@@ -42,6 +48,9 @@ public class UnitOfWork : IUnitOfWork
         IJobTypeRepository jobTypeRepository,
         IJobApplicationRepository jobApplicationRepository,
         IJobApplicationStatusRepository jobApplicationStatusRepository,
+        IDistrictRepository districtRepository,
+        IProvinceRepository provinceRepository,
+        IWardRepository wardRepository,
         IEmployerRepository employerRepository,
         IJobSeekerRepository jobSeekerRepository)
     {
@@ -56,6 +65,9 @@ public class UnitOfWork : IUnitOfWork
         JobTypes = jobTypeRepository;
         JobApplications = jobApplicationRepository;
         JobApplicationStatuses = jobApplicationStatusRepository;
+        Districts = districtRepository;
+        Provinces = provinceRepository;
+        Wards = wardRepository;
         Employers = employerRepository;
         JobSeekers = jobSeekerRepository;
     }
