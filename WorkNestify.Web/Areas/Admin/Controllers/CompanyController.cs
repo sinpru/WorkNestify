@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using WorkNestify.DataAccess.Entities.Companies;
 using WorkNestify.DataAccess.Entities.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces;
+using WorkNestify.Utilities;
 using WorkNestify.Utilities.Services;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
@@ -17,12 +18,14 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         private readonly IUnitOfWork _unitOfWork;
         private readonly CloudinaryService _cloudinary;
         private readonly GhnService _ghnService;
+        private readonly LocationManager _locationManager;
 
-        public CompanyController(IUnitOfWork unitOfWork, CloudinaryService cloudinary, GhnService ghnService)
+        public CompanyController(IUnitOfWork unitOfWork, CloudinaryService cloudinary, GhnService ghnService, LocationManager locationManager)
         {
             _unitOfWork = unitOfWork;
             _cloudinary = cloudinary;
             _ghnService = ghnService;
+            _locationManager = locationManager;
         }
 
         // GET: Admin/Company
@@ -57,18 +60,29 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             return View();
         }
 
+        /* TODO: FIX THE ISSUE WITH DistrictId NOT EXISTING IN THE DATABASE DUE TO IT BEING FETCH FROM API */
         // POST: Admin/Company/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId")]
+            [Bind("Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId,ProvinceId,DistrictId,WardId")]
             Company company, IFormFile? file)
         {
             if (!ModelState.IsValid)
             {
-                ViewData["CompanySizeId"] = new SelectList(await _unitOfWork.CompanySizes.GetAllAsync(), "Id", "Name");
+                await PopulateDropdowns();
+                return View(company);
+            }
+            
+            // Ensure the input locaiton exists
+            bool locationExists = await _locationManager.EnsureLocationExists(company.ProvinceId, company.DistrictId, company.WardId);
+
+            if (!locationExists)
+            {
+                ModelState.AddModelError("Location", "Invalid location data.");
+                await PopulateDropdowns();
                 return View(company);
             }
 
@@ -76,9 +90,11 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             if (!string.IsNullOrEmpty(company.Logo) && file != null)
             {
                 ModelState.AddModelError("Logo", "Please provide either a URL or upload a file, not both.");
-                ViewData["CompanySizeId"] = new SelectList(await _unitOfWork.CompanySizes.GetAllAsync(), "Id", "Name");
+                await PopulateDropdowns();
                 return View(company);
             }
+            
+            // Check if 
 
             // Handle File Upload to Cloudinary
             if (file != null)
@@ -87,7 +103,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 if (string.IsNullOrEmpty(newLogoUrl))
                 {
                     ModelState.AddModelError("Logo", "Error uploading image to Cloudinary.");
-                    ViewData["CompanySizeId"] = new SelectList(await _unitOfWork.CompanySizes.GetAllAsync(), "Id", "Name");
+                    await PopulateDropdowns();
                     return View(company);
                 }
 
@@ -126,7 +142,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,
             [Bind(
-                "Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId")]
+                "Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId,ProvinceId,DistrictId,WardId")]
             Company company, IFormFile? file)
         {
             if (id != company.Id)
