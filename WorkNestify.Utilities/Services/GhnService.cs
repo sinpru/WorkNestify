@@ -55,10 +55,12 @@ public class GhnService
             PropertyNameCaseInsensitive = true
         });
 
+        // TODO: Might have to do with new District doesn't have a provinceId
         return jsonResponse?.Data?.Select(d => new District
         {
             Id = d.DistrictID,
-            Name = d.DistrictName
+            Name = d.DistrictName,
+            ProvinceId = provinceId
         }).ToList() ?? new List<District>();
     }
 
@@ -72,8 +74,9 @@ public class GhnService
 
         return jsonResponse?.Data?.Select(w => new Ward
         {
-            Id = w.WardID,
-            Name = w.WardName
+            Code = w.WardCode,
+            Name = w.WardName,
+            DistrictId = districtId
         }).ToList() ?? new List<Ward>();
     }
 

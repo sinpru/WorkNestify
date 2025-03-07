@@ -81,9 +81,9 @@ namespace WorkNestify.DataAccess.Entities.Companies
         public District? District { get; set; }
         
         [Required]
-        public int WardId { get; set; }
+        public string WardCode { get; set; }
         
-        [ForeignKey(nameof(WardId))]
+        [ForeignKey(nameof(WardCode))]
         [Display(Name = "Ward")]
         [BindNever]
         public Ward? Ward { get; set; }

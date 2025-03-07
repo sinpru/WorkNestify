@@ -1,4 +1,5 @@
-﻿using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
+﻿using WorkNestify.DataAccess.Data;
+using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
@@ -8,6 +9,8 @@ namespace WorkNestify.DataAccess.Repositories.Interfaces;
 
 public interface IUnitOfWork : IDisposable
 {
+    ApplicationDbContext Context { get; }
+    
     // Companies
     ICompanyRepository Companies { get; }
     ICompanyReviewRepository CompanyReviews { get; }
@@ -33,5 +36,5 @@ public interface IUnitOfWork : IDisposable
     IEmployerRepository Employers { get; }
     IJobSeekerRepository JobSeekers { get; }
 
-    Task<int> SaveAsync();
+    Task SaveAsync();
 }

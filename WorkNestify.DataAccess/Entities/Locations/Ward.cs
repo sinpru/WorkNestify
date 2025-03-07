@@ -9,7 +9,7 @@ namespace WorkNestify.DataAccess.Entities.Locations;
 public class Ward
 {
     [Key]
-    public int Id { get; set; }
+    public String Code { get; set; }
     
     [Required]
     [Display(Name = "Ward")]

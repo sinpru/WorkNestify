@@ -67,7 +67,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId,ProvinceId,DistrictId,WardId")]
+            [Bind("Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId,ProvinceId,DistrictId,WardCode")]
             Company company, IFormFile? file)
         {
             if (!ModelState.IsValid)
@@ -77,7 +77,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
             
             // Ensure the input locaiton exists
-            bool locationExists = await _locationManager.EnsureLocationExists(company.ProvinceId, company.DistrictId, company.WardId);
+            bool locationExists = await _locationManager.EnsureLocationExists(company.ProvinceId, company.DistrictId, company.WardCode);
 
             if (!locationExists)
             {

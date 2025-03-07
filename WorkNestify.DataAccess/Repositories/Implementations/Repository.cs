@@ -1,7 +1,6 @@
 ﻿using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
-using WorkNestify.DataAccess.Entities.Locations;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 
 namespace WorkNestify.DataAccess.Repositories.Implementations;
@@ -50,34 +49,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     public async Task AddAsync(T entity)
     {
-        if (entity is Province)
-        {
-            await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Provinces ON");
-        }
-        else if (entity is District)
-        {
-            await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Districts ON");
-        }
-        else if (entity is Ward)
-        {
-            await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Wards ON");
-        }
-        
         await _dbSet.AddAsync(entity);
-        await _context.SaveChangesAsync();
-        
-        if (entity is Province)
-        {
-            await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Provinces OFF");
-        }
-        else if (entity is District)
-        {
-            await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Districts OFF");
-        }
-        else if (entity is Ward)
-        {
-            await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Wards OFF");
-        }
     }
 
     public void Remove(T entity)
