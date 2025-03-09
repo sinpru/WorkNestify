@@ -28,6 +28,10 @@ public class CloudinaryService
         };
 
         var uploadResult = await _cloudinary.UploadAsync(uploadParams);
+        if (uploadResult.StatusCode != System.Net.HttpStatusCode.OK)
+        {
+            throw new Exception($"Upload image failed: {uploadResult.Error?.Message}");
+        }
         return uploadResult.SecureUrl.AbsoluteUri;
     }
     
@@ -39,12 +43,23 @@ public class CloudinaryService
 
             // Extract PublicId from existing Cloudinary URL
             var uri = new Uri(existingLogoUrl);
-            string publicId = Path.GetFileNameWithoutExtension(uri.AbsolutePath);
+            string path = uri.AbsolutePath;
+            var segments = path.Split('/');
 
             // Delete the old image from Cloudinary
-            var deleteParams = new DeletionParams(publicId);
-            var deleteResult = await _cloudinary.DestroyAsync(deleteParams);
-            return deleteResult.Result == "ok";
+            int uploadIndex = Array.FindIndex(segments, s => s == "upload");
+            if (uploadIndex >= 0 && uploadIndex + 2 < segments.Length)
+            {
+                var publicIdSegments = segments.Skip(uploadIndex + 2);
+                string publicId = string.Join("/", publicIdSegments); 
+                publicId = Path.ChangeExtension(publicId, null);
+
+                var deleteParams = new DeletionParams(publicId);
+                var deleteResult = await _cloudinary.DestroyAsync(deleteParams);
+                return deleteResult.Result == "ok";
+            }
+            
+            return false;
         }
         catch
         {

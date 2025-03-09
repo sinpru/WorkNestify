@@ -20,7 +20,8 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         private readonly GhnService _ghnService;
         private readonly LocationManager _locationManager;
 
-        public CompanyController(IUnitOfWork unitOfWork, CloudinaryService cloudinary, GhnService ghnService, LocationManager locationManager)
+        public CompanyController(IUnitOfWork unitOfWork, CloudinaryService cloudinary, GhnService ghnService,
+            LocationManager locationManager)
         {
             _unitOfWork = unitOfWork;
             _cloudinary = cloudinary;
@@ -60,14 +61,14 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             return View();
         }
 
-        /* TODO: FIX THE ISSUE WITH DistrictId NOT EXISTING IN THE DATABASE DUE TO IT BEING FETCH FROM API */
         // POST: Admin/Company/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId,ProvinceId,DistrictId,WardCode")]
+            [Bind(
+                "Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId,ProvinceId,DistrictId,WardCode")]
             Company company, IFormFile? file)
         {
             if (!ModelState.IsValid)
@@ -75,9 +76,10 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 await PopulateDropdowns();
                 return View(company);
             }
-            
+
             // Ensure the input locaiton exists
-            bool locationExists = await _locationManager.EnsureLocationExists(company.ProvinceId, company.DistrictId, company.WardCode);
+            bool locationExists =
+                await _locationManager.EnsureLocationExists(company.ProvinceId, company.DistrictId, company.WardCode);
 
             if (!locationExists)
             {
@@ -93,7 +95,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 await PopulateDropdowns();
                 return View(company);
             }
-            
+
             // Check if 
 
             // Handle File Upload to Cloudinary
@@ -131,7 +133,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
+            await PopulateDropdowns(company);
             return View(company);
         }
 
@@ -142,7 +144,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,
             [Bind(
-                "Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId,ProvinceId,DistrictId,WardId")]
+                "Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId,ProvinceId,DistrictId,WardCode")]
             Company company, IFormFile? file)
         {
             if (id != company.Id)
@@ -150,75 +152,101 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    var existingCompany = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
-                    if (existingCompany == null)
-                    {
-                        return NotFound();
-                    }
-                    
-                    string existingLogoUrl = existingCompany.Logo ?? string.Empty;
-                    
-                    if (file != null && file.Length > 0)
-                    {
-                        // Delete old logo if it exists
-                        if (!string.IsNullOrEmpty(existingLogoUrl))
-                        {
-                            bool isDeleted = await _cloudinary.DeleteImageAsync(existingLogoUrl);
-                            if (!isDeleted)
-                            {
-                                ModelState.AddModelError("Logo", "Failed to delete the old image from Cloudinary.");
-                                ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
-                                return View(company);
-                            }
-                        }
+                await PopulateDropdowns();
+                return View(company);
+            }
 
-                        // Upload new logo
-                        string newLogoUrl = await _cloudinary.UploadImageAsync(file);
-                        if (string.IsNullOrEmpty(newLogoUrl))
+            var existingCompany = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
+            if (existingCompany == null)
+            {
+                return NotFound();
+            }
+
+            // Ensure the input location exists
+            bool locationExists =
+                await _locationManager.EnsureLocationExists(company.ProvinceId, company.DistrictId, company.WardCode);
+            if (!locationExists)
+            {
+                ModelState.AddModelError("Location", "Invalid location data.");
+                await PopulateDropdowns();
+                return View(company);
+            }
+
+            // Ensure only one input is used for logo
+            if (!string.IsNullOrEmpty(company.Logo) && file != null)
+            {
+                ModelState.AddModelError("Logo", "Please provide either a URL or upload a file, not both.");
+                await PopulateDropdowns();
+                return View(company);
+            }
+
+            try
+            {
+                string existingLogoUrl = existingCompany.Logo ?? string.Empty;
+
+                // Handle File Upload to Cloudinary
+                if (file != null && file.Length > 0)
+                {
+                    // Delete old logo if it exists
+                    if (!string.IsNullOrEmpty(existingLogoUrl))
+                    {
+                        bool isDeleted = await _cloudinary.DeleteImageAsync(existingLogoUrl);
+                        if (!isDeleted)
                         {
-                            ModelState.AddModelError("Logo", "Error uploading image to Cloudinary.");
-                            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
+                            ModelState.AddModelError("Logo", "Failed to delete the old image from Cloudinary.");
+                            await PopulateDropdowns();
                             return View(company);
                         }
-
-                        company.Logo = newLogoUrl;
                     }
 
-                    // Ensure the user does not provide both file and URL
-                    if (!string.IsNullOrEmpty(company.Logo) && file != null)
+                    // Upload new logo
+                    string newLogoUrl = await _cloudinary.UploadImageAsync(file);
+                    if (string.IsNullOrEmpty(newLogoUrl))
                     {
-                        ModelState.AddModelError("Logo", "Please provide either a file or a URL, not both.");
-                        ViewData["CompanySizeId"] =
-                            new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
+                        ModelState.AddModelError("Logo", "Error uploading image to Cloudinary.");
+                        await PopulateDropdowns();
                         return View(company);
                     }
 
-                    existingCompany = company;
-
-                    await _unitOfWork.Companies.UpdateAsync(existingCompany);
-                    await _unitOfWork.SaveAsync();
+                    company.Logo = newLogoUrl;
                 }
-                catch (DbUpdateConcurrencyException)
+                else if (string.IsNullOrEmpty(company.Logo))
                 {
-                    if (!await CompanyExists(company.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    // If no new file and logo URL is empty, keep existing logo
+                    company.Logo = existingLogoUrl;
                 }
 
-                return RedirectToAction(nameof(Index));
+                // Update only the changed properties
+                existingCompany.Name = company.Name;
+                existingCompany.Website = company.Website;
+                existingCompany.Email = company.Email;
+                existingCompany.Phone = company.Phone;
+                existingCompany.StreetAddress = company.StreetAddress;
+                existingCompany.Description = company.Description;
+                existingCompany.Logo = company.Logo;
+                existingCompany.Industry = company.Industry;
+                existingCompany.FoundedDate = company.FoundedDate;
+                existingCompany.CompanySizeId = company.CompanySizeId;
+                existingCompany.ProvinceId = company.ProvinceId;
+                existingCompany.DistrictId = company.DistrictId;
+                existingCompany.WardCode = company.WardCode;
+
+                await _unitOfWork.Companies.UpdateAsync(existingCompany);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await CompanyExists(company.Id))
+                {
+                    return NotFound();
+                }
+
+                throw;
             }
 
-            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
-            return View(company);
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Admin/Company/Delete/5
@@ -244,21 +272,24 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
 
-            if (company != null)
+            if (company == null)
             {
-                bool isDeleted = await _cloudinary.DeleteImageAsync(company.Logo ?? string.Empty);
+                return NotFound();
+            }
+
+            if (!string.IsNullOrEmpty(company.Logo))
+            {
+                bool isDeleted = await _cloudinary.DeleteImageAsync(company.Logo);
                 if (!isDeleted)
                 {
-                    ModelState.AddModelError("Logo", "Failed to delete the old image from Cloudinary.");
-                    ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
-                    return View(company);
+                    TempData["Warning"] = "Company deleted, but the logo could not be removed from Cloudinary.";
                 }
-                
-                _unitOfWork.Companies.Remove(company);
-                await _unitOfWork.SaveAsync();
             }
+            
+            _unitOfWork.Companies.Remove(company);
+            await _unitOfWork.SaveAsync();
 
             return RedirectToAction(nameof(Index));
         }
@@ -272,6 +303,12 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         {
             ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
             ViewData["ProvinceId"] = new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name");
+
+            if (company != null)
+            {
+                ViewData["DistrictId"] = new SelectList(await _ghnService.GetDistrictsAsync(company.ProvinceId), "Id", "Name");
+                ViewData["WardCode"] = new SelectList(await _ghnService.GetWardsAsync(company.DistrictId), "Code", "Name");
+            }
         }
     }
 }
