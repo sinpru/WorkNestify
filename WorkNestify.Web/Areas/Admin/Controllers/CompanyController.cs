@@ -36,6 +36,25 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             return View(companies);
         }
 
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var companyList = _unitOfWork.Companies.GetAllAsync(includeProperties: "CompanySize").Result;
+            return Json(new
+            {
+                data = companyList.Select(c => new
+                {
+                    c.Name,
+                    c.Email,
+                    c.Phone,
+                    c.StreetAddress,
+                    c.Industry,
+                    CompanySize = c.CompanySize?.Name,
+                    c.Id // Include Id for actions
+                })
+            });
+        }
+
         // GET: Admin/Company/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -83,7 +102,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
             if (!locationExists)
             {
-                ModelState.AddModelError("Location", "Invalid location data.");
+                TempData["Warning"] = "Invalid location data.";
                 await PopulateDropdowns();
                 return View(company);
             }
@@ -91,7 +110,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             // Ensure only one input is used
             if (!string.IsNullOrEmpty(company.Logo) && file != null)
             {
-                ModelState.AddModelError("Logo", "Please provide either a URL or upload a file, not both.");
+                TempData["Warning"] = "Please provide either a URL or upload a file, not both.";
                 await PopulateDropdowns();
                 return View(company);
             }
@@ -104,7 +123,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 string newLogoUrl = await _cloudinary.UploadImageAsync(file);
                 if (string.IsNullOrEmpty(newLogoUrl))
                 {
-                    ModelState.AddModelError("Logo", "Error uploading image to Cloudinary.");
+                    TempData["Warning"] = "Error uploading image to Cloudinary.";
                     await PopulateDropdowns();
                     return View(company);
                 }
@@ -169,7 +188,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 await _locationManager.EnsureLocationExists(company.ProvinceId, company.DistrictId, company.WardCode);
             if (!locationExists)
             {
-                ModelState.AddModelError("Location", "Invalid location data.");
+                TempData["Warning"] = "Invalid location data.";
                 await PopulateDropdowns();
                 return View(company);
             }
@@ -177,7 +196,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             // Ensure only one input is used for logo
             if (!string.IsNullOrEmpty(company.Logo) && file != null)
             {
-                ModelState.AddModelError("Logo", "Please provide either a URL or upload a file, not both.");
+                TempData["Warning"] = "Please provide either a URL or upload a file, not both.";
                 await PopulateDropdowns();
                 return View(company);
             }
@@ -195,7 +214,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                         bool isDeleted = await _cloudinary.DeleteImageAsync(existingLogoUrl);
                         if (!isDeleted)
                         {
-                            ModelState.AddModelError("Logo", "Failed to delete the old image from Cloudinary.");
+                            TempData["Warning"] = "Failed to delete the old image from Cloudinary.";
                             await PopulateDropdowns();
                             return View(company);
                         }
@@ -205,7 +224,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                     string newLogoUrl = await _cloudinary.UploadImageAsync(file);
                     if (string.IsNullOrEmpty(newLogoUrl))
                     {
-                        ModelState.AddModelError("Logo", "Error uploading image to Cloudinary.");
+                        TempData["Warning"] = "Error uploading image to Cloudinary.";
                         await PopulateDropdowns();
                         return View(company);
                     }
@@ -287,7 +306,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                     TempData["Warning"] = "Company deleted, but the logo could not be removed from Cloudinary.";
                 }
             }
-            
+
             _unitOfWork.Companies.Remove(company);
             await _unitOfWork.SaveAsync();
 
@@ -299,15 +318,17 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             return await _unitOfWork.Companies.GetAsync(c => c.Id == id) != null;
         }
 
-        private async Task PopulateDropdowns(Company company = null)
+        private async Task PopulateDropdowns(Company? company = null)
         {
             ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
             ViewData["ProvinceId"] = new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name");
 
             if (company != null)
             {
-                ViewData["DistrictId"] = new SelectList(await _ghnService.GetDistrictsAsync(company.ProvinceId), "Id", "Name");
-                ViewData["WardCode"] = new SelectList(await _ghnService.GetWardsAsync(company.DistrictId), "Code", "Name");
+                ViewData["DistrictId"] =
+                    new SelectList(await _ghnService.GetDistrictsAsync(company.ProvinceId), "Id", "Name");
+                ViewData["WardCode"] =
+                    new SelectList(await _ghnService.GetWardsAsync(company.DistrictId), "Code", "Name");
             }
         }
     }
