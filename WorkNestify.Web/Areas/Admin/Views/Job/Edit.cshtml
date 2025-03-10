@@ -2,17 +2,10 @@
 
 @{
     ViewData["Title"] = "Edit Job Details";
+    ViewData["IndexAction"] = "Index";
 }
 
-<div class="d-flex justify-content-between align-items-center">
-    <h1 class="display-4">@ViewData["Title"]</h1>
-
-    <a class="btn btn-primary d-flex align-items-center" asp-action="Index">
-        <i class="fs-4 bi-arrow-left me-1"></i> Back to List
-    </a>
-</div>
-
-<hr />
+<partial name="_ManagementNavigationPartial"/>
 
 @if (TempData["Warning"] != null)
 {
