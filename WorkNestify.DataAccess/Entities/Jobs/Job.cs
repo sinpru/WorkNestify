@@ -43,67 +43,75 @@ namespace WorkNestify.DataAccess.Entities.Jobs
         public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
 
         [Required]
+        [Display(Name = "Job Type")]
         public int JobTypeId { get; set; }
 
         [ForeignKey(nameof(JobTypeId))]
-        [Display(Name = "Job Type")]
         [BindNever]
+        [Display(Name = "Job Type")]
         public JobType? JobType { get; set; }
 
         [Required]
+        [Display(Name = "Job Status")]
         public int JobStatusId { get; set; } = 3;
 
         [ForeignKey(nameof(JobStatusId))]
-        [Display(Name = "Job Status")]
         [BindNever]
+        [Display(Name = "Job Status")]
         public JobStatus? JobStatus { get; set; }
 
         [Required]
+        [Display(Name = "Job Level")]
         public int JobLevelId { get; set; }
 
         [ForeignKey(nameof(JobLevelId))]
-        [Display(Name = "Job Level")]
         [BindNever]
+        [Display(Name = "Job Level")]
         public JobLevel? JobLevel { get; set; }
 
         [Required]
+        [Display(Name = "Job Category")]
         public int JobCategoryId { get; set; }
 
         [ForeignKey(nameof(JobCategoryId))]
-        [Display(Name = "Job Category")]
         [BindNever]
+        [Display(Name = "Job Category")]
         public JobCategory? JobCategory { get; set; }
 
         [Required]
+        [Display(Name = "Company")]
         public int CompanyId { get; set; }
 
         [ForeignKey(nameof(CompanyId))]
-        [Display(Name = "Company")]
         [BindNever]
+        [Display(Name = "Company")]
         public Company? Company { get; set; }
         
         [Required]
+        [Display(Name = "Province")]
         public int ProvinceId { get; set; }
         
         [ForeignKey(nameof(ProvinceId))]
-        [Display(Name = "Province")]
         [BindNever]
+        [Display(Name = "Province")]
         public Province? Province { get; set; }
         
         [Required]
+        [Display(Name = "District")]
         public int DistrictId { get; set; }
         
         [ForeignKey(nameof(DistrictId))]
-        [Display(Name = "District")]
         [BindNever]
+        [Display(Name = "District")]
         public District? District { get; set; }
         
         [Required]
+        [Display(Name = "Ward")]
         public string WardCode { get; set; }
         
         [ForeignKey(nameof(WardCode))]
-        [Display(Name = "Ward")]
         [BindNever]
+        [Display(Name = "Ward")]
         public Ward? Ward { get; set; }
 
         public ICollection<JobApplication> JobApplications { get; set; } = new HashSet<JobApplication>();

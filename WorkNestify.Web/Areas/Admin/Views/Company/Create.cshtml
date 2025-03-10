@@ -4,9 +4,6 @@
     ViewData["Title"] = "Register New Company";
 }
 
-<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/44.2.1/ckeditor5.css"/>
-<script src="https://cdn.ckeditor.com/ckeditor5/44.2.1/ckeditor5.umd.js"></script>
-
 <div class="d-flex justify-content-between align-items-center">
     <h1 class="display-4">@ViewData["Title"]</h1>
 
@@ -16,6 +13,14 @@
 </div>
 
 <hr/>
+
+@if (TempData["Warning"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @TempData["Warning"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
 
 <form class="row" enctype="multipart/form-data" asp-action="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -80,7 +85,7 @@
 
         <div class="form-group mb-2">
             <label asp-for="WardCode" class="form-label">Ward</label>
-            <select asp-for="WardCode" class="form-select" asp-items="ViewBag.WardCode" required>
+            <select asp-for="WardCode" class="form-select" asp-items="ViewBag.WardCode">
                 <option value="" disabled selected>Select Ward</option>
             </select>
             <span asp-validation-for="WardCode" class="text-danger"></span>
@@ -132,4 +137,5 @@
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
     @{ await Html.RenderPartialAsync("_FormScriptsPartial"); }
+    <script src="~/js/FileInputToggle.js" asp-append-version="true"></script>
 }

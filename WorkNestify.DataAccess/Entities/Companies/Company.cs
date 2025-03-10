@@ -57,34 +57,34 @@ namespace WorkNestify.DataAccess.Entities.Companies
         public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
         
         [Required]
+        [Display(Name = "Company Size")]
         public int CompanySizeId { get; set; }
 
         [ForeignKey(nameof(CompanySizeId))]
-        [Display(Name = "Company Size")]
         [BindNever]
         public CompanySize? CompanySize { get; set; }
         
         [Required]
+        [Display(Name = "Province")]
         public int ProvinceId { get; set; }
         
         [ForeignKey(nameof(ProvinceId))]
-        [Display(Name = "Province")]
         [BindNever]
         public Province? Province { get; set; }
         
         [Required]
+        [Display(Name = "District")]
         public int DistrictId { get; set; }
         
         [ForeignKey(nameof(DistrictId))]
-        [Display(Name = "District")]
         [BindNever]
         public District? District { get; set; }
         
         [Required]
+        [Display(Name = "Ward")]
         public string WardCode { get; set; }
         
         [ForeignKey(nameof(WardCode))]
-        [Display(Name = "Ward")]
         [BindNever]
         public Ward? Ward { get; set; }
         

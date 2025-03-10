@@ -1,11 +1,7 @@
-using CloudinaryDotNet;
-using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using WorkNestify.DataAccess.Entities.Companies;
-using WorkNestify.DataAccess.Entities.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Utilities;
 using WorkNestify.Utilities.Services;
@@ -50,7 +46,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                     c.StreetAddress,
                     c.Industry,
                     CompanySize = c.CompanySize?.Name,
-                    c.Id // Include Id for actions
+                    c.Id
                 })
             });
         }
@@ -87,7 +83,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             [Bind(
-                "Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId,ProvinceId,DistrictId,WardCode")]
+                "Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId,ProvinceId,DistrictId,WardCode")]
             Company company, IFormFile? file)
         {
             if (!ModelState.IsValid)
@@ -96,7 +92,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return View(company);
             }
 
-            // Ensure the input locaiton exists
+            // Ensure the input location exists
             bool locationExists =
                 await _locationManager.EnsureLocationExists(company.ProvinceId, company.DistrictId, company.WardCode);
 
