@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "Delete Company";
     ViewData["IndexAction"] = "Index";
+    ViewData["Name"] = @Model?.Name;
+    ViewData["Id"] = @Model?.Id;
 }
 
 <partial name="_ManagementNavigationPartial"/>
@@ -100,35 +102,4 @@
     }
 </div>
 
-<div class="d-flex justify-content-between mt-4">
-    <a class="btn btn-outline-secondary d-flex align-items-center" asp-action="Index">
-        <i class="fs-4 bi-x-lg me-1"></i> Cancel
-    </a>
-
-    <!-- Delete Button with Confirmation Modal -->
-    <button type="button" class="btn btn-danger d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
-        <i class="fs-4 bi-trash3 me-1"></i> Delete
-    </button>
-</div>
-
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-danger" id="confirmDeleteModalLabel">Confirm Deletion</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete <strong>@Model.Name</strong>? This action cannot be undone.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form asp-action="Delete">
-                    <input type="hidden" asp-for="Id" />
-                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="_DeletePartial"/>
