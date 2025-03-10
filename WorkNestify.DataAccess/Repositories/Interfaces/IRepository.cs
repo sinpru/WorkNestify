@@ -9,4 +9,5 @@ public interface IRepository<T> where T : class
     Task AddAsync(T entity);
     void Remove(T entity);
     void RemoveRange(IEnumerable<T> entities);
+    Task<int> CountAsync(Expression<Func<T, bool>>? filter = null);
 }

@@ -1,8 +1,11 @@
-﻿using WorkNestify.DataAccess.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using WorkNestify.DataAccess.Data;
+using WorkNestify.DataAccess.Entities.Locations;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
+using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
 using WorkNestify.DataAccess.Repositories.Interfaces.Users;
 
 namespace WorkNestify.DataAccess.Repositories.Implementations;
@@ -10,6 +13,8 @@ namespace WorkNestify.DataAccess.Repositories.Implementations;
 public class UnitOfWork : IUnitOfWork
 {
     private readonly ApplicationDbContext _context;
+    
+    public ApplicationDbContext Context => _context;
 
     // Companies
     public ICompanyRepository Companies { get; private set; }
@@ -26,6 +31,11 @@ public class UnitOfWork : IUnitOfWork
     // JobApplications
     public IJobApplicationRepository JobApplications { get; private set; }
     public IJobApplicationStatusRepository JobApplicationStatuses { get; private set; }
+    
+    // Locations
+    public IDistrictRepository Districts { get; private set; }
+    public IProvinceRepository Provinces { get; private set; }
+    public IWardRepository Wards { get; private set; }
 
     // Users
     public IEmployerRepository Employers { get; private set; }
@@ -42,6 +52,9 @@ public class UnitOfWork : IUnitOfWork
         IJobTypeRepository jobTypeRepository,
         IJobApplicationRepository jobApplicationRepository,
         IJobApplicationStatusRepository jobApplicationStatusRepository,
+        IDistrictRepository districtRepository,
+        IProvinceRepository provinceRepository,
+        IWardRepository wardRepository,
         IEmployerRepository employerRepository,
         IJobSeekerRepository jobSeekerRepository)
     {
@@ -56,13 +69,66 @@ public class UnitOfWork : IUnitOfWork
         JobTypes = jobTypeRepository;
         JobApplications = jobApplicationRepository;
         JobApplicationStatuses = jobApplicationStatusRepository;
+        Districts = districtRepository;
+        Provinces = provinceRepository;
+        Wards = wardRepository;
         Employers = employerRepository;
         JobSeekers = jobSeekerRepository;
     }
 
-    public async Task<int> SaveAsync()
+    public async Task SaveAsync()
     {
-        return await _context.SaveChangesAsync();
+        try
+        {
+            // Save Provinces
+            var provincesToAdd = _context.ChangeTracker.Entries<Province>()
+                .Where(e => e.State == EntityState.Added)
+                .ToList();
+            if (provincesToAdd.Any())
+            {
+                await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Provinces ON");
+                await _context.SaveChangesAsync();
+                await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Provinces OFF");
+            }
+
+            // Save Districts
+            var districtsToAdd = _context.ChangeTracker.Entries<District>()
+                .Where(e => e.State == EntityState.Added)
+                .ToList();
+            if (districtsToAdd.Any())
+            {
+                await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Districts ON");
+                await _context.SaveChangesAsync();
+                await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Districts OFF");
+            }
+
+            // Save Wards
+            var wardsToAdd = _context.ChangeTracker.Entries<Ward>()
+                .Where(e => e.State == EntityState.Added)
+                .ToList();
+            if (wardsToAdd.Any())
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            // Save remaining changes
+            if (_context.ChangeTracker.HasChanges())
+            {
+                await _context.SaveChangesAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"SaveAsync Error: {ex.Message}");
+            // Log entity states for debugging
+            foreach (var entry in _context.ChangeTracker.Entries())
+            {
+                Console.WriteLine($"Entity: {entry.Entity}, State: {entry.State}");
+            }
+            await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Provinces OFF");
+            await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Districts OFF");
+            throw;
+        }
     }
 
     public void Dispose()

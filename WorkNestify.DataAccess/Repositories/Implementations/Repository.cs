@@ -61,4 +61,11 @@ public class Repository<T> : IRepository<T> where T : class
     {
         _dbSet.RemoveRange(entities);
     }
+
+    public async Task<int> CountAsync(Expression<Func<T, bool>>? filter)
+    {
+        return filter == null
+            ? await _dbSet.CountAsync()
+            : await _dbSet.CountAsync(filter);
+    }
 }

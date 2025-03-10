@@ -41,7 +41,7 @@
                 @Html.DisplayFor(modelItem => item.Rating)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Company.Address)
+                @Html.DisplayFor(modelItem => item.Company.StreetAddress)
             </td>
             <td class="d-flex flex-column gap-2">
                 <a class="btn btn-primary" asp-action="Edit" asp-route-id="@item.Id">Edit</a>

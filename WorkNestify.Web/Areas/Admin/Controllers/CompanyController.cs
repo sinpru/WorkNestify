@@ -1,14 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
-using WorkNestify.DataAccess.Data;
 using WorkNestify.DataAccess.Entities.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces;
+using WorkNestify.Utilities;
+using WorkNestify.Utilities.Services;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
@@ -16,12 +12,17 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
     public class CompanyController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly ApplicationDbContext _context;
+        private readonly CloudinaryService _cloudinary;
+        private readonly GhnService _ghnService;
+        private readonly LocationManager _locationManager;
 
-        public CompanyController(IUnitOfWork unitOfWork, ApplicationDbContext context)
+        public CompanyController(IUnitOfWork unitOfWork, CloudinaryService cloudinary, GhnService ghnService,
+            LocationManager locationManager)
         {
             _unitOfWork = unitOfWork;
-            _context = context;
+            _cloudinary = cloudinary;
+            _ghnService = ghnService;
+            _locationManager = locationManager;
         }
 
         // GET: Admin/Company
@@ -29,6 +30,25 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         {
             var companies = await _unitOfWork.Companies.GetAllAsync(includeProperties: "CompanySize");
             return View(companies);
+        }
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var companyList = _unitOfWork.Companies.GetAllAsync(includeProperties: "CompanySize").Result;
+            return Json(new
+            {
+                data = companyList.Select(c => new
+                {
+                    c.Name,
+                    c.Email,
+                    c.Phone,
+                    c.StreetAddress,
+                    c.Industry,
+                    CompanySize = c.CompanySize?.Name,
+                    c.Id
+                })
+            });
         }
 
         // GET: Admin/Company/Details/5
@@ -40,7 +60,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
 
             var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
-            
+
             if (company == null)
             {
                 return NotFound();
@@ -50,9 +70,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/Company/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
+            await PopulateDropdowns();
             return View();
         }
 
@@ -61,19 +81,56 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Website,Email,Phone,Address,Description,Logo,Industry,FoundedDate,CompanySizeId")] Company company)
+        public async Task<IActionResult> Create(
+            [Bind(
+                "Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId,ProvinceId,DistrictId,WardCode")]
+            Company company, IFormFile? file)
         {
-            // ModelState.Remove("CompanySize");
-            
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                await _unitOfWork.Companies.AddAsync(company);
-                await _unitOfWork.SaveAsync();
-                return RedirectToAction(nameof(Index));
+                await PopulateDropdowns();
+                return View(company);
             }
-            
-            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
-            return View(company);
+
+            // Ensure the input location exists
+            bool locationExists =
+                await _locationManager.EnsureLocationExists(company.ProvinceId, company.DistrictId, company.WardCode);
+
+            if (!locationExists)
+            {
+                TempData["Warning"] = "Invalid location data.";
+                await PopulateDropdowns();
+                return View(company);
+            }
+
+            // Ensure only one input is used
+            if (!string.IsNullOrEmpty(company.Logo) && file != null)
+            {
+                TempData["Warning"] = "Please provide either a URL or upload a file, not both.";
+                await PopulateDropdowns();
+                return View(company);
+            }
+
+            // Check if 
+
+            // Handle File Upload to Cloudinary
+            if (file != null)
+            {
+                string newLogoUrl = await _cloudinary.UploadImageAsync(file);
+                if (string.IsNullOrEmpty(newLogoUrl))
+                {
+                    TempData["Warning"] = "Error uploading image to Cloudinary.";
+                    await PopulateDropdowns();
+                    return View(company);
+                }
+
+                company.Logo = newLogoUrl;
+            }
+
+            await _unitOfWork.Companies.AddAsync(company);
+            await _unitOfWork.SaveAsync();
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Admin/Company/Edit/5
@@ -85,13 +142,13 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
 
             var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
-            
+
             if (company == null)
             {
                 return NotFound();
             }
-            
-            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
+
+            await PopulateDropdowns(company);
             return View(company);
         }
 
@@ -100,36 +157,111 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Website,Email,Phone,Address,Description,Logo,Industry,FoundedDate,CreatedDate,ModifiedDate,CompanySizeId")] Company company)
+        public async Task<IActionResult> Edit(int id,
+            [Bind(
+                "Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId,ProvinceId,DistrictId,WardCode")]
+            Company company, IFormFile? file)
         {
             if (id != company.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    await _unitOfWork.Companies.UpdateAsync(company);
-                    await _unitOfWork.SaveAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!await CompanyExists(company.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
+                await PopulateDropdowns();
+                return View(company);
             }
-            
-            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
-            return View(company);
+
+            var existingCompany = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
+            if (existingCompany == null)
+            {
+                return NotFound();
+            }
+
+            // Ensure the input location exists
+            bool locationExists =
+                await _locationManager.EnsureLocationExists(company.ProvinceId, company.DistrictId, company.WardCode);
+            if (!locationExists)
+            {
+                TempData["Warning"] = "Invalid location data.";
+                await PopulateDropdowns();
+                return View(company);
+            }
+
+            // Ensure only one input is used for logo
+            if (!string.IsNullOrEmpty(company.Logo) && file != null)
+            {
+                TempData["Warning"] = "Please provide either a URL or upload a file, not both.";
+                await PopulateDropdowns();
+                return View(company);
+            }
+
+            try
+            {
+                string existingLogoUrl = existingCompany.Logo ?? string.Empty;
+
+                // Handle File Upload to Cloudinary
+                if (file != null && file.Length > 0)
+                {
+                    // Delete old logo if it exists
+                    if (!string.IsNullOrEmpty(existingLogoUrl))
+                    {
+                        bool isDeleted = await _cloudinary.DeleteImageAsync(existingLogoUrl);
+                        if (!isDeleted)
+                        {
+                            TempData["Warning"] = "Failed to delete the old image from Cloudinary.";
+                            await PopulateDropdowns();
+                            return View(company);
+                        }
+                    }
+
+                    // Upload new logo
+                    string newLogoUrl = await _cloudinary.UploadImageAsync(file);
+                    if (string.IsNullOrEmpty(newLogoUrl))
+                    {
+                        TempData["Warning"] = "Error uploading image to Cloudinary.";
+                        await PopulateDropdowns();
+                        return View(company);
+                    }
+
+                    company.Logo = newLogoUrl;
+                }
+                else if (string.IsNullOrEmpty(company.Logo))
+                {
+                    // If no new file and logo URL is empty, keep existing logo
+                    company.Logo = existingLogoUrl;
+                }
+
+                // Update only the changed properties
+                existingCompany.Name = company.Name;
+                existingCompany.Website = company.Website;
+                existingCompany.Email = company.Email;
+                existingCompany.Phone = company.Phone;
+                existingCompany.StreetAddress = company.StreetAddress;
+                existingCompany.Description = company.Description;
+                existingCompany.Logo = company.Logo;
+                existingCompany.Industry = company.Industry;
+                existingCompany.FoundedDate = company.FoundedDate;
+                existingCompany.CompanySizeId = company.CompanySizeId;
+                existingCompany.ProvinceId = company.ProvinceId;
+                existingCompany.DistrictId = company.DistrictId;
+                existingCompany.WardCode = company.WardCode;
+
+                await _unitOfWork.Companies.UpdateAsync(existingCompany);
+                await _unitOfWork.SaveAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!await CompanyExists(company.Id))
+                {
+                    return NotFound();
+                }
+
+                throw;
+            }
+
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: Admin/Company/Delete/5
@@ -141,7 +273,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
 
             var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
-            
+
             if (company == null)
             {
                 return NotFound();
@@ -155,20 +287,45 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
-            
-            if (company != null)
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
+
+            if (company == null)
             {
-                _unitOfWork.Companies.Remove(company);
-                await _unitOfWork.SaveAsync();
+                return NotFound();
             }
-            
+
+            if (!string.IsNullOrEmpty(company.Logo))
+            {
+                bool isDeleted = await _cloudinary.DeleteImageAsync(company.Logo);
+                if (!isDeleted)
+                {
+                    TempData["Warning"] = "Company deleted, but the logo could not be removed from Cloudinary.";
+                }
+            }
+
+            _unitOfWork.Companies.Remove(company);
+            await _unitOfWork.SaveAsync();
+
             return RedirectToAction(nameof(Index));
         }
 
         private async Task<bool> CompanyExists(int id)
         {
             return await _unitOfWork.Companies.GetAsync(c => c.Id == id) != null;
+        }
+
+        private async Task PopulateDropdowns(Company? company = null)
+        {
+            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
+            ViewData["ProvinceId"] = new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name");
+
+            if (company != null)
+            {
+                ViewData["DistrictId"] =
+                    new SelectList(await _ghnService.GetDistrictsAsync(company.ProvinceId), "Id", "Name");
+                ViewData["WardCode"] =
+                    new SelectList(await _ghnService.GetWardsAsync(company.DistrictId), "Code", "Name");
+            }
         }
     }
 }

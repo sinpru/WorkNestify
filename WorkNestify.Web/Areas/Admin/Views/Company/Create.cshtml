@@ -4,9 +4,6 @@
     ViewData["Title"] = "Register New Company";
 }
 
-<link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/44.2.1/ckeditor5.css"/>
-<script src="https://cdn.ckeditor.com/ckeditor5/44.2.1/ckeditor5.umd.js"></script>
-
 <div class="d-flex justify-content-between align-items-center">
     <h1 class="display-4">@ViewData["Title"]</h1>
 
@@ -17,73 +14,109 @@
 
 <hr/>
 
-<form asp-action="Create" class="row">
+@if (TempData["Warning"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @TempData["Warning"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<form class="row" enctype="multipart/form-data" asp-action="Create">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <!-- Left Column -->
     <div class="col-md-6 mb-2">
-        <div class="form-group">
-            <label asp-for="Name" class="form-label">Company Name</label>
+        <div class="form-group mb-2">
+            <label asp-for="Name" class="form-label"></label>
             <input asp-for="Name" class="form-control" placeholder="Enter company name" required/>
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
 
-        <div class="form-group">
-            <label asp-for="Website" class="form-label">Website URL</label>
+        <div class="form-group mb-2">
+            <label asp-for="Website" class="form-label"></label>
             <input asp-for="Website" class="form-control" placeholder="https://example.com"/>
             <span asp-validation-for="Website" class="text-danger"></span>
         </div>
 
-        <div class="form-group">
-            <label asp-for="Email" class="form-label">Email Address</label>
+        <div class="form-group mb-2">
+            <label asp-for="Email" class="form-label"></label>
             <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com" required/>
             <span asp-validation-for="Email" class="text-danger"></span>
         </div>
 
-        <div class="form-group">
-            <label asp-for="Phone" class="form-label">Phone Number</label>
+        <div class="form-group mb-2">
+            <label asp-for="Phone" class="form-label"></label>
             <input asp-for="Phone" class="form-control" placeholder="+1 234 567 890"/>
             <span asp-validation-for="Phone" class="text-danger"></span>
         </div>
 
-        <div class="form-group">
-            <label asp-for="Address" class="form-label">Address</label>
-            <input asp-for="Address" class="form-control" placeholder="Enter company address"/>
-            <span asp-validation-for="Address" class="text-danger"></span>
-        </div>
-    </div>
-
-    <!-- Right Column -->
-    <div class="col-md-6 mb-2">
-        <div class="form-group">
-            <label asp-for="Logo" class="form-label">Logo URL</label>
-            <input asp-for="Logo" type="url" class="form-control" placeholder="https://example.com/logo.png"/>
-            <span asp-validation-for="Logo" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="Industry" class="form-label">Industry</label>
-            <input asp-for="Industry" class="form-control" placeholder="e.g., Tech, Retail"/>
-            <span asp-validation-for="Industry" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <label asp-for="FoundedDate" class="form-label">Founded Date</label>
-            <input asp-for="FoundedDate" type="date" class="form-control" required/>
-            <span asp-validation-for="FoundedDate" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
+        <div class="form-group mb-2">
             <label asp-for="CompanySizeId" class="form-label">Company Size</label>
             <select asp-for="CompanySizeId" class="form-select" asp-items="ViewBag.CompanySizeId" required>
                 <option value="" disabled selected>Select a Size</option>
             </select>
             <span asp-validation-for="CompanySizeId" class="text-danger"></span>
         </div>
+
+        <div class="form-group mb-2">
+            <label asp-for="Industry" class="form-label"></label>
+            <input asp-for="Industry" class="form-control" placeholder="e.g., Tech, Retail"/>
+            <span asp-validation-for="Industry" class="text-danger"></span>
+        </div>
+    </div>
+
+    <!-- Right Column -->
+    <div class="col-md-6 mb-2">
+        <div class="form-group mb-2">
+            <label asp-for="ProvinceId" class="form-label">Province</label>
+            <select asp-for="ProvinceId" class="form-select" asp-items="ViewBag.ProvinceId" required>
+                <option value="" disabled selected>Select Province</option>
+            </select>
+            <span asp-validation-for="ProvinceId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-2">
+            <label asp-for="DistrictId" class="form-label">District</label>
+            <select asp-for="DistrictId" class="form-select" asp-items="ViewBag.DistrictId" required>
+                <option value="" disabled selected>Select District</option>
+            </select>
+            <span asp-validation-for="DistrictId" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-2">
+            <label asp-for="WardCode" class="form-label">Ward</label>
+            <select asp-for="WardCode" class="form-select" asp-items="ViewBag.WardCode">
+                <option value="" disabled selected>Select Ward</option>
+            </select>
+            <span asp-validation-for="WardCode" class="text-danger"></span>
+        </div>
+        
+        <div class="form-group mb-2">
+            <label asp-for="StreetAddress" class="form-label"></label>
+            <input asp-for="StreetAddress" class="form-control" placeholder="Enter company address"/>
+            <span asp-validation-for="StreetAddress" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-2">
+            <label asp-for="FoundedDate" class="form-label"></label>
+            <input asp-for="FoundedDate" type="date" class="form-control" required/>
+            <span asp-validation-for="FoundedDate" class="text-danger"></span>
+        </div>
+
+        <div class="form-group mb-2">
+            <label asp-for="Logo" class="form-label"></label>
+            <div class="input-group">
+                <button id="toggleMode" class="btn btn-outline-secondary" type="button" onclick="fileInputToggle()">File</button>
+                <input id="logoUrl" asp-for="Logo" type="url" class="form-control" placeholder="https://example.com/logo.png"/>
+                <input id="logoFile" name="file" type="file" class="form-control d-none" accept="image/*"/>
+            </div>
+            <span asp-validation-for="Logo" class="text-danger"></span>
+        </div>
     </div>
     
     <div class="col-md-12 mb-2">
         <div class="form-group">
-            <label asp-for="Description" class="form-label">Company Description</label>
+            <label asp-for="Description" class="form-label"></label>
             <textarea asp-for="Description" id="editor" class="form-control"></textarea>
             <div id="editor-word-count" class="small text-muted mt-1"></div>
             <span asp-validation-for="Description" class="text-danger"></span>
@@ -101,8 +134,8 @@
     </div>
 </form>
 
-<script src="~/js/ImportCKEditor.js"></script>
-
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    @{ await Html.RenderPartialAsync("_FormScriptsPartial"); }
+    <script src="~/js/FileInputToggle.js" asp-append-version="true"></script>
 }

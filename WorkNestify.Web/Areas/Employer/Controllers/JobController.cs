@@ -59,7 +59,7 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Title,Description,Location,Salary,StartDate,EndDate,CreatedDate,ModifiedDate,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,CompanyId")] Job job)
+        public async Task<IActionResult> Create([Bind("Id,Title,Description,Location,Salary,StartDate,EndDate,JobTypeId,JobLevelId,JobCategoryId")] Job job)
         {
             if (ModelState.IsValid)
             {
@@ -98,7 +98,7 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Location,Salary,StartDate,EndDate,CreatedDate,ModifiedDate,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,CompanyId")] Job job)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Title,Description,Location,Salary,StartDate,EndDate,JobStatusId,JobLevelId,JobCategoryId")] Job job)
         {
             if (id != job.Id)
             {
@@ -173,10 +173,8 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
         
         private void PopulateDropdowns(Job job = null)
         {
-            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address", job?.CompanyId);
             ViewData["JobCategoryId"] = new SelectList(_unitOfWork.JobCategories.GetAllAsync().Result, "Id", "Name", job?.JobCategoryId);
             ViewData["JobLevelId"] = new SelectList(_unitOfWork.JobLevels.GetAllAsync().Result, "Id", "Name", job?.JobLevelId);
-            ViewData["JobStatusId"] = new SelectList(_unitOfWork.JobStatuses.GetAllAsync().Result, "Id", "Name", job?.JobStatusId);
             ViewData["JobTypeId"] = new SelectList(_unitOfWork.JobTypes.GetAllAsync().Result, "Id", "Name", job?.JobTypeId);
         }
         

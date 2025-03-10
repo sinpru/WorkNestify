@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Entities.Companies;
 using WorkNestify.DataAccess.Entities.JobApplications;
 using WorkNestify.DataAccess.Entities.Jobs;
+using WorkNestify.DataAccess.Entities.Locations;
 using WorkNestify.DataAccess.Entities.Users;
 
 namespace WorkNestify.DataAccess.Data;
@@ -30,6 +31,11 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<JobApplication> JobApplications { get; set; }
     public DbSet<JobApplicationStatus> JobApplicationStatuses { get; set; }
     
+    // Locations
+    public DbSet<Ward> Wards { get; set; }
+    public DbSet<District> Districts { get; set; }
+    public DbSet<Province> Provinces { get; set; }
+    
     // Users
     public DbSet<JobSeeker> JobSeekers { get; set; }
     public DbSet<Employer> Employers { get; set; }
@@ -44,74 +50,6 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             new CompanySize { Id = 1, Name = "Small" },
             new CompanySize { Id = 2, Name = "Medium" },
             new CompanySize { Id = 3, Name = "Large" });
-        
-        // Seed Data for Company
-        modelBuilder.Entity<Company>().HasData(
-                new Company
-                {
-                    Id = 1,
-                    Name = "FPT Software",
-                    Website = "https://www.fpt-software.com",
-                    Email = "contact@fpt-software.com",
-                    Phone = "+84 24 7300 7300",
-                    Address = "Hanoi, Vietnam",
-                    Description = "<p>FPT Software is a global technology and IT services provider headquartered in Vietnam.</p>",
-                    Logo = "https://upload.wikimedia.org/wikipedia/commons/1/11/FPT_logo_2010.svg",
-                    Industry = "Information Technology",
-                    FoundedDate = new DateTime(1999, 9, 13),
-                    CreatedDate = DateTime.UtcNow,
-                    ModifiedDate = DateTime.UtcNow,
-                    CompanySizeId = 3 // Large
-                },
-                new Company
-                {
-                    Id = 2,
-                    Name = "VNG Corporation",
-                    Website = "https://www.vng.com.vn",
-                    Email = "support@vng.com.vn",
-                    Phone = "+84 28 3962 3888",
-                    Address = "Ho Chi Minh City, Vietnam",
-                    Description = "<p>VNG is a leading technology company in Vietnam, known for its digital entertainment, cloud services, and fintech solutions.</p>",
-                    Logo = "https://upload.wikimedia.org/wikipedia/commons/8/8f/VNG_Corp._logo.svg",
-                    Industry = "Technology & Entertainment",
-                    FoundedDate = new DateTime(2004, 9, 9),
-                    CreatedDate = DateTime.UtcNow,
-                    ModifiedDate = DateTime.UtcNow,
-                    CompanySizeId = 3
-                },
-                new Company
-                {
-                    Id = 3,
-                    Name = "Tiki.vn",
-                    Website = "https://www.tiki.vn",
-                    Email = "contact@tiki.vn",
-                    Phone = "+84 1900 6035",
-                    Address = "Ho Chi Minh City, Vietnam",
-                    Description = "<p>Tiki is one of the biggest e-commerce platforms in Vietnam, offering a wide range of products and fast delivery services.</p>",
-                    Logo = "https://upload.wikimedia.org/wikipedia/commons/4/43/Logo_Tiki_2023.png",
-                    Industry = "E-commerce",
-                    FoundedDate = new DateTime(2010, 3, 3),
-                    CreatedDate = DateTime.UtcNow,
-                    ModifiedDate = DateTime.UtcNow,
-                    CompanySizeId = 2
-                },
-                new Company
-                {
-                    Id = 4,
-                    Name = "VinAI Research",
-                    Website = "https://www.vinai.io",
-                    Email = "info@vinai.io",
-                    Phone = "+84 24 7108 7788",
-                    Address = "Hanoi, Vietnam",
-                    Description = "<p>VinAI is an AI research lab established by Vingroup, focusing on artificial intelligence applications.</p>",
-                    Logo = "https://www.vinai.io/wp-content/uploads/2021/12/logo-1.png",
-                    Industry = "Artificial Intelligence",
-                    FoundedDate = new DateTime(2019, 6, 10),
-                    CreatedDate = DateTime.UtcNow,
-                    ModifiedDate = DateTime.UtcNow,
-                    CompanySizeId = 1
-                }
-            );
         
         // Seed Data for JobType
         modelBuilder.Entity<JobType>().HasData(
@@ -148,36 +86,14 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             new JobCategory { Id = 10, Name = "Logistics & Supply Chain", Description = "Transportation, inventory management, and procurement" });
         
         // Relationships
-        modelBuilder.Entity<Job>()
-            .HasOne(j => j.JobType)
-            .WithMany()
-            .HasForeignKey(j => j.JobTypeId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Job>()
-            .HasOne(j => j.JobStatus)
-            .WithMany()
-            .HasForeignKey(j => j.JobStatusId)
-            .OnDelete(DeleteBehavior.Restrict);
-        
-        modelBuilder.Entity<Job>()
-            .HasOne(j => j.JobLevel)
-            .WithMany()
-            .HasForeignKey(j => j.JobLevelId)
-            .OnDelete(DeleteBehavior.Restrict);
-        
-        modelBuilder.Entity<Job>()
-            .HasOne(j => j.JobCategory)
-            .WithMany()
-            .HasForeignKey(j => j.JobCategoryId)
-            .OnDelete(DeleteBehavior.Restrict);
-
+        // Job Relationships
         modelBuilder.Entity<Job>()
             .HasOne(j => j.Company)
-            .WithMany()
+            .WithMany(c => c.Jobs)
             .HasForeignKey(j => j.CompanyId)
             .OnDelete(DeleteBehavior.Cascade);
 
+        // JobApplication Relationships
         modelBuilder.Entity<JobApplication>()
             .HasOne(ja => ja.JobSeeker)
             .WithMany(js => js.JobApplications)
@@ -186,20 +102,58 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
         modelBuilder.Entity<JobApplication>()
             .HasOne(ja => ja.Job)
-            .WithMany()
+            .WithMany(j => j.JobApplications)
             .HasForeignKey(ja => ja.JobId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        modelBuilder.Entity<JobApplication>()
-            .HasOne(ja => ja.JobApplicationStatus)
-            .WithMany()
-            .HasForeignKey(ja => ja.JobApplicationStatusId)
-            .OnDelete(DeleteBehavior.Restrict);
-
+        // CompanyReview Relationships
         modelBuilder.Entity<CompanyReview>()
             .HasOne(cr => cr.Company)
-            .WithMany()
+            .WithMany(c => c.CompanyReviews)
             .HasForeignKey(cr => cr.CompanyId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // Locations Relationships
+        modelBuilder.Entity<Ward>()
+            .HasOne(w => w.District)
+            .WithMany(d => d.Wards)
+            .HasForeignKey(w => w.DistrictId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        // Configure DeleteBehavior only, no FK redefinition
+        modelBuilder.Entity<Company>()
+            .HasOne(c => c.Province)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Company>()
+            .HasOne(c => c.District)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Company>()
+            .HasOne(c => c.Ward)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<District>()
+            .HasOne(d => d.Province)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Job>()
+            .HasOne(j => j.Province)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Job>()
+            .HasOne(j => j.District)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<Job>()
+            .HasOne(j => j.Ward)
+            .WithMany()
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

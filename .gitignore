@@ -56,3 +56,6 @@ ehthumbs.db
 
 # Entity Framework Migrations
 *.designer.cs
+
+# LibMan-installed libraries
+wwwroot/lib/
