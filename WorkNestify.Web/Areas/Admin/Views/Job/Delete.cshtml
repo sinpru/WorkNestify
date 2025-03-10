@@ -5,6 +5,7 @@
     ViewData["IndexAction"] = "Index";
     ViewData["Name"] = @Model?.Title;
     ViewData["Id"] = @Model?.Id;
+    ViewData["Description"] = @Model?.Description;
 }
 
 <partial name="_ManagementNavigationPartial"/>
@@ -66,16 +67,5 @@
 
 <hr />
 
-<div class="col-md-12">
-    <h4>Description</h4>
-    @if (!string.IsNullOrEmpty(Model.Description))
-    {
-        <div>@Html.Raw(Model.Description)</div>
-    }
-    else
-    {
-        <p class="text-muted">No description available</p>
-    }
-</div>
-
+<partial name="_DescriptionPartial"/>
 <partial name="_DeletePartial"/>

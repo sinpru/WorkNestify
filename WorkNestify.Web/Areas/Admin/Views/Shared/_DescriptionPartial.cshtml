@@ -1,0 +1,15 @@
+@{
+    string? description = ViewData["Description"] as string;
+}
+
+<div class="col-md-12">
+    <h4>Description</h4>
+    @if (!string.IsNullOrEmpty(description))
+    {
+        <div>@Html.Raw(description)</div>
+    }
+    else
+    {
+        <p class="text-muted">No description available</p>
+    }
+</div>

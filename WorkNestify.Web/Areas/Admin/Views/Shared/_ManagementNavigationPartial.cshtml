@@ -1,6 +1,7 @@
 @{
     string title = ViewData["Title"] as string ?? "Page Title";
     string? createAction = ViewData["CreateAction"] as string;
+    string? createText = ViewData["CreateText"] as string;
     string? editAction = ViewData["EditAction"] as string;
     string? indexAction = ViewData["IndexAction"] as string;
     string? id = ViewData["Id"]?.ToString();
@@ -12,7 +13,7 @@
         @if (!string.IsNullOrEmpty(createAction))
         {
             <a class="btn btn-primary d-flex align-items-center" asp-action="@createAction">
-                <i class="fs-4 bi-plus-lg me-1"></i> Create Job
+                <i class="fs-4 bi-plus-lg me-1"></i> @createText
             </a>
         }
         @if (!string.IsNullOrEmpty(editAction) && !string.IsNullOrEmpty(id))

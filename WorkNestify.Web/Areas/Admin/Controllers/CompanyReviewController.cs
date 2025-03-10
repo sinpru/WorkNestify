@@ -44,7 +44,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         // GET: Admin/CompanyReview/Create
         public IActionResult Create()
         {
-            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address");
+            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Name");
             return View();
         }
 
@@ -53,7 +53,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Content,Rating,CompanyId")] CompanyReview companyReview)
+        public async Task<IActionResult> Create([Bind("ReviewerId,CompanyId,Content,Rating")] CompanyReview companyReview)
         {
             if (ModelState.IsValid)
             {
@@ -62,7 +62,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
             
-            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address", companyReview.CompanyId);
+            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Name");
             return View(companyReview);
         }
 
@@ -81,7 +81,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
             
-            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address", companyReview.CompanyId);
+            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Name");
             return View(companyReview);
         }
 
@@ -90,7 +90,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Content,Rating,CompanyId")] CompanyReview companyReview)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ReviewerId,CompanyId,Content,Rating")] CompanyReview companyReview)
         {
             if (id != companyReview.Id)
             {
@@ -118,7 +118,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
             
-            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address", companyReview.CompanyId);
+            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Name");
             return View(companyReview);
         }
 

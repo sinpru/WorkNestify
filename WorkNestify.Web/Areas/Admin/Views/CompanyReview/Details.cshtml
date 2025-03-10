@@ -1,36 +1,54 @@
 @model WorkNestify.DataAccess.Entities.Companies.CompanyReview
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Review Details";
+    ViewData["EditAction"] = "Edit";
+    ViewData["IndexAction"] = "Index";
+    ViewData["Id"] = @Model?.Id;
+    ViewData["Description"] = @Model?.Content;
 }
 
-<h1>Details</h1>
+<partial name="_ManagementNavigationPartial"/>
 
-<div>
-    <h4>CompanyReview</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Content)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Content)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Rating)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Rating)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Company)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Company.StreetAddress)
-        </dd>
-    </dl>
+<div class="container mt-4">
+    <!-- Left Column: Company & Reviewer Info -->
+    <div class="col-md-4 text-center">
+        <h4>Company Review</h4>
+        <p><strong>Company:</strong> @(Model.Company?.Name ?? "Not specified")</p>
+        <p><strong>Reviewer:</strong> @(Model.Reviewer?.FullName ?? "Not specified")</p> 
+    </div>
+    
+    <!-- Right Column: Detailed Information -->
+    <div>
+        <h4>Review Information</h4>
+        <hr/>
+        <dl class="row">
+            <dt class="col-sm-4">Rating</dt>
+            <dd class="col-sm-8">
+                @for (int i = 1; i <= 5; i++)
+                {
+                    if (i <= Math.Floor(Model.Rating))
+                    {
+                        <i class="bi bi-star-fill"></i>
+                    }
+                    else if (i == Math.Ceiling(Model.Rating) && Model.Rating % 1 != 0)
+                    {
+                        <i class="bi bi-star-half"></i>
+                    }
+                    else
+                    {
+                        <i class="bi bi-star"></i>
+                    }
+                }
+            </dd>
+
+            <dt class="col-sm-4">Created Date</dt>
+            <dd class="col-sm-8">@Model.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss")</dd>
+
+            <dt class="col-sm-4">Modified Date</dt>
+            <dd class="col-sm-8">@Model.ModifiedDate.ToString("dd/MM/yyyy HH:mm:ss")</dd>
+        </dl>
+    </div>
 </div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+
+<partial name="_DescriptionPartial"/>

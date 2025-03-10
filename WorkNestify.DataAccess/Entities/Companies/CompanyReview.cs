@@ -35,6 +35,7 @@ namespace WorkNestify.DataAccess.Entities.Companies
         public ApplicationUser? Reviewer { get; set; }
 
         [Required]
+        [Display(Name = "Company")]
         public int CompanyId { get; set; }
 
         [ForeignKey(nameof(CompanyId))]
