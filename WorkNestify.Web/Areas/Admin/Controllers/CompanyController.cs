@@ -26,10 +26,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/Company
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var companies = await _unitOfWork.Companies.GetAllAsync(includeProperties: "CompanySize");
-            return View(companies);
+            return View();
         }
 
         [HttpGet]

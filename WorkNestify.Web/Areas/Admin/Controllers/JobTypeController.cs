@@ -1,12 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using WorkNestify.DataAccess.Data;
-using WorkNestify.DataAccess.Entities.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
@@ -22,10 +14,24 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/JobType
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var jobTypes = await _unitOfWork.JobTypes.GetAllAsync();
-            return View(jobTypes);
+            return View();
+        }
+        
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var jobTypesList = _unitOfWork.JobTypes
+                .GetAllAsync().Result;
+            return Json(new
+            {
+                data = jobTypesList.Select(jt => new
+                {
+                    jt.Id,
+                    jt.Name
+                })
+            });
         }
 
         // GET: Admin/JobType/Details/5

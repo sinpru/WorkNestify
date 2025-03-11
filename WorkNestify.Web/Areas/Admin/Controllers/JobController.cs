@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Entities.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces;
@@ -38,11 +37,11 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var jobList = _unitOfWork.Jobs
+            var jobsList = _unitOfWork.Jobs
                 .GetAllAsync(includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType").Result;
             return Json(new
             {
-                data = jobList.Select(j => new
+                data = jobsList.Select(j => new
                 {
                     j.Id,
                     j.Title,

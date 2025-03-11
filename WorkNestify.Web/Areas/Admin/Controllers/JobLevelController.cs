@@ -1,29 +1,39 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
-using WorkNestify.DataAccess.Entities.Jobs;
+using WorkNestify.DataAccess.Repositories.Interfaces;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class JobLevelController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public JobLevelController(ApplicationDbContext context)
+        public JobLevelController(IUnitOfWork unitOfWork)
         {
-            _context = context;
+            _unitOfWork = unitOfWork;
         }
 
         // GET: Admin/JobLevel
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.JobLevels.ToListAsync());
+            return View();
+        }
+        
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var jobLevelsList = _unitOfWork.JobLevels
+                .GetAllAsync().Result;
+            return Json(new
+            {
+                data = jobLevelsList.Select(jl => new
+                {
+                    jl.Id,
+                    jl.Name
+                })
+            });
         }
 
         // GET: Admin/JobLevel/Details/5
@@ -34,8 +44,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var jobLevel = await _context.JobLevels
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var jobLevel = await _unitOfWork.JobLevels
+                .GetAsync(jl => jl.Id == id); 
+                
             if (jobLevel == null)
             {
                 return NotFound();

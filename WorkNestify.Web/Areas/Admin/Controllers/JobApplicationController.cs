@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using WorkNestify.DataAccess.Data;
 using WorkNestify.DataAccess.Entities.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 
@@ -22,13 +17,27 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/JobApplication
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var jobApplications = await _unitOfWork.JobApplications
-                .GetAllAsync(includeProperties: "Job," +
-                                                "JobSeeker," +
-                                                "JobApplicationStatus");
-            return View(jobApplications);
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var jobApplicationsList = _unitOfWork.JobApplications
+                .GetAllAsync(includeProperties: "Job,JobSeeker,JobApplicationStatus").Result;
+            return Json(new
+            {
+                data = jobApplicationsList.Select(ja => new
+                {
+                    ja.Id,
+                    Job = ja.Job.Title,
+                    JobSeeker = ja.JobSeeker.FullName,
+                    JobApplicationStatus = ja.JobApplicationStatus.Name,
+                    ja.ApplicationDate
+                })
+            });
         }
 
         // GET: Admin/JobApplication/Details/5

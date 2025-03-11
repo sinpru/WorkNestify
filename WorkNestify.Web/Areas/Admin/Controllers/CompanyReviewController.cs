@@ -17,10 +17,27 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/CompanyReview
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var companyReviews = await _unitOfWork.CompanyReviews.GetAllAsync(includeProperties: "Company");
-            return View(companyReviews);
+            return View();
+        }
+        
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var reviewsList = _unitOfWork.CompanyReviews
+                .GetAllAsync(includeProperties: "Company,Reviewer").Result;
+            return Json(new
+            {
+                data = reviewsList.Select(cr => new
+                {
+                    cr.Id,
+                    Company = cr.Company?.Name ?? cr.Company?.StreetAddress,
+                    cr.Reviewer?.FullName,
+                    cr.Rating,
+                    CreatedDate = cr.CreatedDate.ToString("o")
+                })
+            });
         }
 
         // GET: Admin/CompanyReview/Details/5
@@ -55,7 +72,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ReviewerId,CompanyId,Content,Rating")] CompanyReview companyReview)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 await _unitOfWork.CompanyReviews.AddAsync(companyReview);
                 await _unitOfWork.SaveAsync();

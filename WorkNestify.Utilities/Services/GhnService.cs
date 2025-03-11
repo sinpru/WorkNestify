@@ -54,8 +54,7 @@ public class GhnService
         {
             PropertyNameCaseInsensitive = true
         });
-
-        // TODO: Might have to do with new District doesn't have a provinceId
+        
         return jsonResponse?.Data?.Select(d => new District
         {
             Id = d.DistrictID,
