@@ -30,7 +30,7 @@ public interface IUnitOfWork : IDisposable
     IWardRepository Wards { get; }
     
     // Users
-    IApplicationUserRepository ApplicationUserRepository { get; }
+    IApplicationUserRepository ApplicationUser { get; }
 
     Task SaveAsync();
 }

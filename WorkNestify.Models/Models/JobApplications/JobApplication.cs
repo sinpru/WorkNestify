@@ -12,16 +12,14 @@ namespace WorkNestify.Models.Models.JobApplications
         [Key]
         public int Id { get; set; }
         
-        [Required]
         [Display(Name = "Resume")]
-        public string Resume { get; set; }
+        public string? Resume { get; set; }
         
         [Display(Name = "Cover Letter")]
         public string? CoverLetter { get; set; }
-
-        [Required]
+        
         [Display(Name = "Application Date")]
-        public DateTime ApplicationDate { get; set; } = DateTime.UtcNow;
+        public DateTime? ApplicationDate { get; set; } = DateTime.UtcNow;
 
         [Display(Name = "Modified Date")]
         public DateTime? ModifiedDate { get; set; } = DateTime.UtcNow;
@@ -44,7 +42,7 @@ namespace WorkNestify.Models.Models.JobApplications
         [BindNever]
         public Job? Job { get; set; }
 
-        [Display(Name = "Job Application Status")]
+        [Display(Name = "Status")]
         public string Status { get; set; } = JobApplicationStatuses.Pending;
     }
 }

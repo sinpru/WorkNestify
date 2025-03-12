@@ -34,7 +34,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult GetAll()
         {
-            var companyList = _unitOfWork.Companies.GetAllAsync(includeProperties: "CompanySize").Result;
+            var companyList = _unitOfWork.Companies.GetAllAsync().Result;
             return Json(new
             {
                 data = companyList.Select(c => new
@@ -58,7 +58,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
 
             if (company == null)
             {
@@ -110,8 +110,6 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return View(company);
             }
 
-            // Check if 
-
             // Handle File Upload to Cloudinary
             if (file != null)
             {
@@ -140,7 +138,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
 
             if (company == null)
             {
@@ -271,7 +269,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
 
             if (company == null)
             {

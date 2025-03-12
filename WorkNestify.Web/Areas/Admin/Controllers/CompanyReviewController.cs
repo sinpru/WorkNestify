@@ -26,7 +26,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         public IActionResult GetAll()
         {
             var reviewsList = _unitOfWork.CompanyReviews
-                .GetAllAsync(includeProperties: "Company,Reviewer").Result;
+                .GetAllAsync(includeProperties: "Company,ApplicationUser").Result;
             return Json(new
             {
                 data = reviewsList.Select(cr => new
@@ -48,7 +48,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company");
+            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company,ApplicationUser");
             
             if (companyReview == null)
             {
@@ -91,7 +91,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company");
+            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company,ApplicationUser");
             
             if (companyReview == null)
             {
@@ -147,7 +147,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company");
+            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company,ApplicationUser");
             
             if (companyReview == null)
             {
@@ -162,7 +162,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company");
+            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company,ApplicationUser");
             
             if (companyReview != null)
             {

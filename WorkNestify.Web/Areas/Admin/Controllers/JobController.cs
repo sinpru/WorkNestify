@@ -24,22 +24,16 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/Job
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var jobs = await _unitOfWork.Jobs
-                .GetAllAsync(includeProperties: "Company," +
-                                                "JobCategory," +
-                                                "JobLevel," +
-                                                "JobStatus," +
-                                                "JobType");
-            return View(jobs);
+            return View();
         }
 
         [HttpGet]
         public IActionResult GetAll()
         {
             var jobsList = _unitOfWork.Jobs
-                .GetAllAsync(includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType").Result;
+                .GetAllAsync(includeProperties: "Company,JobCategory").Result;
             return Json(new
             {
                 data = jobsList.Select(j => new
@@ -66,8 +60,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
 
             var job = await _unitOfWork.Jobs
-                .GetAsync(j => j.Id == id,
-                    includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType");
+                .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
 
             if (job == null)
             {
@@ -128,8 +121,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
 
             var job = await _unitOfWork.Jobs
-                .GetAsync(j => j.Id == id,
-                    includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType");
+                .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
 
             if (job == null)
             {
@@ -200,8 +192,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
 
             var job = await _unitOfWork.Jobs
-                .GetAsync(j => j.Id == id,
-                    includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType");
+                .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
 
             if (job == null)
             {
@@ -217,8 +208,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var job = await _unitOfWork.Jobs
-                .GetAsync(j => j.Id == id,
-                    includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType");
+                .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
 
             if (job != null)
             {
@@ -238,9 +228,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         {
             ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Name");
             ViewData["JobCategoryId"] = new SelectList(_unitOfWork.JobCategories.GetAllAsync().Result, "Id", "Name");
-            ViewData["JobLevelId"] = new SelectList(JobLevels.AllLevels);
-            ViewData["JobStatusId"] = new SelectList(JobStatuses.AllStatuses);
-            ViewData["JobTypeId"] = new SelectList(JobTypes.AllTypes);
+            ViewData["Level"] = new SelectList(JobLevels.AllLevels);
+            ViewData["Status"] = new SelectList(JobStatuses.AllStatuses);
+            ViewData["Type"] = new SelectList(JobTypes.AllTypes);
             ViewData["ProvinceId"] = new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name");
 
             if (job != null && job.ProvinceId != 0)

@@ -50,31 +50,14 @@
                                     <span class="d-none d-sm-inline">Company Reviews</span>
                                 </a>
                             </li>
-                            <li>
-                                <a class="nav-link px-0 ms-2 text-light" asp-area="Admin" asp-controller="CompanySize" asp-action="Index">
-                                    <span class="d-none d-sm-inline">Company Sizes</span>
-                                </a>
-                            </li>
                         </ul>
                     </li>
 
                     <!-- Job Applications -->
                     <li>
-                        <a href="#job-applications" data-bs-toggle="collapse" class="nav-link px-0 align-middle text-light">
+                        <a class="nav-link px-0 align-middle text-light" asp-area="Admin" asp-controller="JobApplication" asp-action="Index">
                             <i class="fs-4 bi-file-earmark-text"></i> <span class="ms-1 d-none d-sm-inline">Job Applications</span>
                         </a>
-                        <ul class="collapse nav flex-column ms-1" id="job-applications" data-bs-parent="#menu">
-                            <li class="w-100">
-                                <a class="nav-link px-0 ms-2 text-light" asp-area="Admin" asp-controller="JobApplication" asp-action="Index">
-                                    <span class="d-none d-sm-inline">Job Applications</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="nav-link px-0 ms-2 text-light" asp-area="Admin" asp-controller="JobApplicationStatus" asp-action="Index">
-                                    <span class="d-none d-sm-inline">Job Application Statuses</span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
 
                     <!-- Jobs -->
@@ -93,40 +76,13 @@
                                     <span class="d-none d-sm-inline">Job Categories</span>
                                 </a>
                             </li>
-                            <li>
-                                <a class="nav-link px-0 ms-2 text-light" asp-area="Admin" asp-controller="JobLevel" asp-action="Index">
-                                    <span class="d-none d-sm-inline">Job Levels</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="nav-link px-0 ms-2 text-light" asp-area="Admin" asp-controller="JobStatus" asp-action="Index">
-                                    <span class="d-none d-sm-inline">Job Statuses</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="nav-link px-0 ms-2 text-light" asp-area="Admin" asp-controller="JobType" asp-action="Index">
-                                    <span class="d-none d-sm-inline">Job Types</span>
-                                </a>
-                            </li>
                         </ul>
                     </li>
 
                     <li>
-                        <a href="#users" data-bs-toggle="collapse" class="nav-link px-0 align-middle text-light">
-                            <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Users</span>
+                        <a class="nav-link px-0 align-middle text-light" asp-area="Admin" asp-controller="">
+                            <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Users Management</span>
                         </a>
-                        <ul class="collapse nav flex-column ms-1" id="users" data-bs-parent="#menu">
-                            <li class="w-100">
-                                <a href="#" class="nav-link px-0 ms-2 text-light">
-                                    <span class="d-none d-sm-inline">Job Seekers</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="nav-link px-0 ms-2 text-light" asp-area="Admin" asp-controller="Employer" asp-action="Index">
-                                    <span class="d-none d-sm-inline">Employers</span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                 </ul>
                 <hr>

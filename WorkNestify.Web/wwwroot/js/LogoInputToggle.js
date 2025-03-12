@@ -1,4 +1,4 @@
-function fileInputToggle() {
+function logoInputToggle() {
     let urlInput = document.getElementById('logoUrl');
     let fileInput = document.getElementById('logoFile');
     let toggleButton = document.getElementById('toggleMode');

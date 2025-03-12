@@ -34,7 +34,7 @@ public class UnitOfWork : IUnitOfWork
     public IWardRepository Wards { get; private set; }
 
     // Users
-    public IApplicationUserRepository ApplicationUserRepository { get; }
+    public IApplicationUserRepository ApplicationUser { get; }
 
     public UnitOfWork(ApplicationDbContext context,
         ICompanyRepository companyRepository,
@@ -45,7 +45,7 @@ public class UnitOfWork : IUnitOfWork
         IDistrictRepository districtRepository,
         IProvinceRepository provinceRepository,
         IWardRepository wardRepository,
-        IApplicationUserRepository applicationUserRepository)
+        IApplicationUserRepository applicationUser)
     {
         _context = context;
         Companies = companyRepository;
@@ -56,6 +56,7 @@ public class UnitOfWork : IUnitOfWork
         Districts = districtRepository;
         Provinces = provinceRepository;
         Wards = wardRepository;
+        ApplicationUser = applicationUser;
     }
 
     public async Task SaveAsync()

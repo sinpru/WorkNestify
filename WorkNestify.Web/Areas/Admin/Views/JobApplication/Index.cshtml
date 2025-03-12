@@ -46,6 +46,12 @@
                     { data: 'job' },
                     { data: 'status' },
                     {
+                        data: 'applicationDate',
+                        render: function (data) {
+                            return new Date(data).toLocaleDateString();
+                        }
+                    },
+                    {
                         data: 'id',
                         render: function (data) {
                             return `<div class="btn-group" role="group">
@@ -57,12 +63,6 @@
                         orderable: false,
                         searchable: false
                     },
-                    {
-                        data: 'applicationDate',
-                        render: function (data) {
-                            return new Date(data).toLocaleDateString();
-                        }
-                    }
                 ],
                 responsive: true,
                 dom: 'Bfrtip',
@@ -70,7 +70,7 @@
                     'copy', 'csv', 'excel', 'pdf', 'print'
                 ],
                 language: {
-                    emptyTable: "No jobs found"
+                    emptyTable: "No job applications found"
                 }
             });
         });
