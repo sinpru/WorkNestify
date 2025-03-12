@@ -1,6 +1,6 @@
 ﻿using WorkNestify.DataAccess.Data;
-using WorkNestify.DataAccess.Entities.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
+using WorkNestify.Models.Models.Companies;
 
 namespace WorkNestify.DataAccess.Repositories.Implementations.Companies;
 

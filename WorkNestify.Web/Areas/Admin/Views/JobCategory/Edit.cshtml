@@ -1,4 +1,4 @@
-@model WorkNestify.DataAccess.Entities.Jobs.JobCategory
+@model WorkNestify.Models.Models.Jobs.JobCategory
 
 @{
     ViewData["Title"] = "Edit Job Category Details";
@@ -49,5 +49,5 @@
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
-    @{ await Html.RenderPartialAsync("_FormScriptsPartial")}
+    @{ await Html.RenderPartialAsync("_FormScriptsPartial"); }
 }

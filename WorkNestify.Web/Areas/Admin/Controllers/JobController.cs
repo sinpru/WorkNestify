@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using WorkNestify.DataAccess.Entities.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces;
+using WorkNestify.Models.Models.Jobs;
+using WorkNestify.Services;
 using WorkNestify.Utilities;
-using WorkNestify.Utilities.Services;
+using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
@@ -48,9 +49,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                     Company = j.Company?.Name ?? j.Company?.StreetAddress, // Prefer Name if available
                     j.StreetAddress,
                     j.Salary,
-                    JobType = j.JobType?.Name,
-                    JobStatus = j.JobStatus?.Name,
-                    JobCategory = j.JobCategory?.Description,
+                    j.Type,
+                    j.Status,
+                    JobCategory = j.JobCategory?.Name,
                     CreatedDate = j.CreatedDate.ToString("o") // ISO 8601 for JavaScript
                 })
             });
@@ -237,9 +238,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         {
             ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Name");
             ViewData["JobCategoryId"] = new SelectList(_unitOfWork.JobCategories.GetAllAsync().Result, "Id", "Name");
-            ViewData["JobLevelId"] = new SelectList(_unitOfWork.JobLevels.GetAllAsync().Result, "Id", "Name");
-            ViewData["JobStatusId"] = new SelectList(_unitOfWork.JobStatuses.GetAllAsync().Result, "Id", "Name");
-            ViewData["JobTypeId"] = new SelectList(_unitOfWork.JobTypes.GetAllAsync().Result, "Id", "Name");
+            ViewData["JobLevelId"] = new SelectList(JobLevels.AllLevels);
+            ViewData["JobStatusId"] = new SelectList(JobStatuses.AllStatuses);
+            ViewData["JobTypeId"] = new SelectList(JobTypes.AllTypes);
             ViewData["ProvinceId"] = new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name");
 
             if (job != null && job.ProvinceId != 0)

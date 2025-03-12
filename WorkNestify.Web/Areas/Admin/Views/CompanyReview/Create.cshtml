@@ -1,4 +1,4 @@
-@model WorkNestify.DataAccess.Entities.Companies.CompanyReview
+@model WorkNestify.Models.Models.Companies.CompanyReview
 
 @{
     ViewData["Title"] = "Review a Company";
@@ -9,7 +9,7 @@
 
 <form asp-action="Create" class="row">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input asp-for="ReviewerId" type="hidden" value=""/>
+    <input asp-for="ApplicationUserId" type="hidden" value=""/>
     
     <div class="col-md-6">
         <div class="form-group">

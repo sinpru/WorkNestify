@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using WorkNestify.DataAccess.Entities.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces;
+using WorkNestify.Models.Models.Jobs;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {

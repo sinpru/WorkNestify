@@ -8,7 +8,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkNestify.DataAccess", "W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkNestify.Utilities", "WorkNestify.Utilities\WorkNestify.Utilities.csproj", "{01158ED2-70F5-4069-96B3-C9C8D6EC5F57}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkNestify.Tests", "WorkNestify.Tests\WorkNestify.Tests.csproj", "{193CDEE3-A8B8-4BBD-AE08-00C0C9C2AC9B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkNestify.Services", "WorkNestify.Services\WorkNestify.Services.csproj", "{989E7AFC-DA52-4D7B-B432-CEC3EEED93B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,9 +32,9 @@ Global
 		{01158ED2-70F5-4069-96B3-C9C8D6EC5F57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{01158ED2-70F5-4069-96B3-C9C8D6EC5F57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{01158ED2-70F5-4069-96B3-C9C8D6EC5F57}.Release|Any CPU.Build.0 = Release|Any CPU
-		{193CDEE3-A8B8-4BBD-AE08-00C0C9C2AC9B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{193CDEE3-A8B8-4BBD-AE08-00C0C9C2AC9B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{193CDEE3-A8B8-4BBD-AE08-00C0C9C2AC9B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{193CDEE3-A8B8-4BBD-AE08-00C0C9C2AC9B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{989E7AFC-DA52-4D7B-B432-CEC3EEED93B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{989E7AFC-DA52-4D7B-B432-CEC3EEED93B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{989E7AFC-DA52-4D7B-B432-CEC3EEED93B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{989E7AFC-DA52-4D7B-B432-CEC3EEED93B8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,4 +1,4 @@
-@model IEnumerable<WorkNestify.DataAccess.Entities.Companies.Company>
+@model IEnumerable<WorkNestify.Models.Models.Companies.Company>
 
 @{
     ViewData["Title"] = "Companies Management";
@@ -35,7 +35,7 @@
             @Html.DisplayNameFor(model => model.Industry)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.CompanySize)
+            @Html.DisplayNameFor(model => model.Size)
         </th>
         <th>
             Actions
@@ -61,7 +61,7 @@
                     { data: 'phone' },
                     { data: 'streetAddress' },
                     { data: 'industry' },
-                    { data: 'companySize' },
+                    { data: 'size' },
                     {
                         data: 'id',
                         render: function (data) {

@@ -1,4 +1,4 @@
-@model IEnumerable<WorkNestify.DataAccess.Entities.JobApplications.JobApplication>
+@model IEnumerable<WorkNestify.Models.Models.JobApplications.JobApplication>
 
 @{
     ViewData["Title"] = "Job Applications Management";
@@ -12,13 +12,13 @@
     <thead>
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.JobSeeker)
+            @Html.DisplayNameFor(model => model.ApplicationUser)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.Job)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.JobApplicationStatus)
+            @Html.DisplayNameFor(model => model.Status)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.ApplicationDate)
@@ -42,9 +42,9 @@
                     dataSrc: 'data'
                 },
                 columns: [
-                    { data: 'jobSeeker' },
+                    { data: 'applicationUser' },
                     { data: 'job' },
-                    { data: 'jobApplicationStatus' },
+                    { data: 'status' },
                     {
                         data: 'id',
                         render: function (data) {

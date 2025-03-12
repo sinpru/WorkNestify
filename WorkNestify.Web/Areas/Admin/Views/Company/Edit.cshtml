@@ -1,4 +1,4 @@
-@model WorkNestify.DataAccess.Entities.Companies.Company
+@model WorkNestify.Models.Models.Companies.Company
 
 @{
     ViewData["Title"] = "Edit Company Details";
@@ -46,11 +46,11 @@
         </div>
 
         <div class="form-group mb-2">
-            <label asp-for="CompanySizeId" class="form-label">Company Size</label>
-            <select asp-for="CompanySizeId" class="form-select" asp-items="ViewBag.CompanySizeId" required>
+            <label asp-for="Size" class="form-label">Company Size</label>
+            <select asp-for="Size" class="form-select" asp-items="ViewBag.Size" required>
                 <option value="" disabled>Select a Size</option>
             </select>
-            <span asp-validation-for="CompanySizeId" class="text-danger"></span>
+            <span asp-validation-for="Size" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-2">

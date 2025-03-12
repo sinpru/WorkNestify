@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using WorkNestify.DataAccess.Entities.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces;
+using WorkNestify.Models.Models.JobApplications;
+using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
@@ -32,9 +33,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 data = jobApplicationsList.Select(ja => new
                 {
                     ja.Id,
-                    Job = ja.Job.Title,
-                    JobSeeker = ja.JobSeeker.FullName,
-                    JobApplicationStatus = ja.JobApplicationStatus.Name,
+                    ApplicationUser = ja.ApplicationUser?.UserName,
+                    Job = ja.Job?.Title,
+                    ja.Status,
                     ja.ApplicationDate
                 })
             });
@@ -72,7 +73,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,CoverLetter,ApplicationDate,ModifiedDate,JobSeekerId,JobId,JobApplicationStatusId")] JobApplication jobApplication)
+        public async Task<IActionResult> Create([Bind("Id,CoverLetter,ApplicationDate,ModifiedDate,JobSeekerId,JobId,Status")] JobApplication jobApplication)
         {
             if (ModelState.IsValid)
             {
@@ -111,7 +112,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,CoverLetter,ApplicationDate,ModifiedDate,JobSeekerId,JobId,JobApplicationStatusId")] JobApplication jobApplication)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,CoverLetter,ApplicationDate,ModifiedDate,ApplicationUserId,JobId,Status")] JobApplication jobApplication)
         {
             if (id != jobApplication.Id)
             {
@@ -189,8 +190,8 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         private void PopulateDropdown(JobApplication jobApplication = null)
         {
             ViewData["JobId"] = new SelectList(_unitOfWork.Jobs.GetAllAsync().Result, "Id", "Description", jobApplication.JobId);
-            ViewData["JobApplicationStatusId"] = new SelectList(_unitOfWork.JobApplicationStatuses.GetAllAsync().Result, "Id", "Name", jobApplication.JobApplicationStatusId);
-            ViewData["JobSeekerId"] = new SelectList(_unitOfWork.JobSeekers.GetAllAsync().Result, "Id", "Id", jobApplication.JobSeekerId);
+            ViewData["Status"] = new SelectList(JobApplicationStatuses.AllStatuses);
+            ViewData["ApplicationUserId"] = new SelectList(_unitOfWork.ApplicationUserRepository.GetAllAsync().Result, "Id", "Id");
         }
     }
 }

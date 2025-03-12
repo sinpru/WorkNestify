@@ -1,4 +1,4 @@
-@model WorkNestify.DataAccess.Entities.Jobs.Job
+@model WorkNestify.Models.Models.Jobs.Job
 
 @{
     ViewData["Title"] = "Edit Job Details";
@@ -41,27 +41,27 @@
         </div>
 
         <div class="form-group mb-2">
-            <label asp-for="JobTypeId" class="form-label"></label>
-            <select asp-for="JobTypeId" class="form-select" asp-items="ViewBag.JobTypeId" required>
+            <label asp-for="Type" class="form-label"></label>
+            <select asp-for="Type" class="form-select" asp-items="ViewBag.Type" required>
                 <option value="" disabled>Select Job Type</option>
             </select>
-            <span asp-validation-for="JobTypeId" class="text-danger"></span>
+            <span asp-validation-for="Type" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-2">
-            <label asp-for="JobStatusId" class="form-label"></label>
-            <select asp-for="JobStatusId" class="form-select" asp-items="ViewBag.JobStatusId" required>
+            <label asp-for="Status" class="form-label"></label>
+            <select asp-for="Status" class="form-select" asp-items="ViewBag.Status" required>
                 <option value="" disabled>Select Job Status</option>
             </select>
-            <span asp-validation-for="JobStatusId" class="text-danger"></span>
+            <span asp-validation-for="Status" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-2">
-            <label asp-for="JobLevelId" class="form-label"></label>
-            <select asp-for="JobLevelId" class="form-select" asp-items="ViewBag.JobLevelId" required>
+            <label asp-for="Level" class="form-label"></label>
+            <select asp-for="Level" class="form-select" asp-items="ViewBag.Level" required>
                 <option value="" disabled>Select Job Level</option>
             </select>
-            <span asp-validation-for="JobLevelId" class="text-danger"></span>
+            <span asp-validation-for="Level" class="text-danger"></span>
         </div>
 
         <div class="form-group mb-2">

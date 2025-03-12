@@ -1,4 +1,4 @@
-@model WorkNestify.DataAccess.Entities.Companies.CompanyReview
+@model WorkNestify.Models.Models.Companies.CompanyReview
 
 @{
     ViewData["Title"] = "Delete Review";
@@ -22,7 +22,7 @@
     <div class="col-md-4 text-center">
         <h4>Company Review</h4>
         <p><strong>Company:</strong> @(Model.Company?.Name ?? "Not specified")</p>
-        <p><strong>Reviewer:</strong> @(Model.Reviewer?.FullName ?? "Not specified")</p>
+        <p><strong>Reviewer:</strong> @(Model.ApplicationUser?.FullName ?? "Not specified")</p>
     </div>
 
     <!-- Right Column: Detailed Information -->

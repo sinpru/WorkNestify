@@ -5,6 +5,8 @@ using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
 using WorkNestify.DataAccess.Repositories.Interfaces.Users;
 
+// using WorkNestify.DataAccess.Repositories.Interfaces.Users;
+
 namespace WorkNestify.DataAccess.Repositories.Interfaces;
 
 public interface IUnitOfWork : IDisposable
@@ -14,18 +16,13 @@ public interface IUnitOfWork : IDisposable
     // Companies
     ICompanyRepository Companies { get; }
     ICompanyReviewRepository CompanyReviews { get; }
-    ICompanySizeRepository CompanySizes { get; }
     
     // Jobs
     IJobRepository Jobs { get; }
     IJobCategoryRepository JobCategories { get; }
-    IJobLevelRepository JobLevels { get; }
-    IJobStatusRepository JobStatuses { get; }
-    IJobTypeRepository JobTypes { get; }
     
     // JobApplications
     IJobApplicationRepository JobApplications { get; }
-    IJobApplicationStatusRepository JobApplicationStatuses { get; }
     
     // Locations
     IDistrictRepository Districts { get; }
@@ -33,8 +30,7 @@ public interface IUnitOfWork : IDisposable
     IWardRepository Wards { get; }
     
     // Users
-    IEmployerRepository Employers { get; }
-    IJobSeekerRepository JobSeekers { get; }
+    IApplicationUserRepository ApplicationUserRepository { get; }
 
     Task SaveAsync();
 }

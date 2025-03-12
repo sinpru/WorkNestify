@@ -1,4 +1,4 @@
-@model IEnumerable<WorkNestify.DataAccess.Entities.Jobs.Job>
+@model IEnumerable<WorkNestify.Models.Models.Jobs.Job>
 
 @{
     ViewData["Title"] = "Jobs Management";
@@ -32,10 +32,10 @@
                 @Html.DisplayNameFor(model => model.Salary)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.JobType)
+                @Html.DisplayNameFor(model => model.Type)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.JobStatus)
+                @Html.DisplayNameFor(model => model.Status)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.JobCategory)
@@ -71,8 +71,8 @@
                             return '$' + data.toLocaleString(); // Format as currency
                         }
                     },
-                    { data: 'jobType' },
-                    { data: 'jobStatus' },
+                    { data: 'type' },
+                    { data: 'status' },
                     { data: 'jobCategory' },
                     {
                         data: 'createdDate',

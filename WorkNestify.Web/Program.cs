@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using WorkNestify.DataAccess.DbInitializer;
 using WorkNestify.DataAccess.Repositories.Implementations;
 using WorkNestify.DataAccess.Repositories.Implementations.Companies;
 using WorkNestify.DataAccess.Repositories.Implementations.JobApplications;
@@ -15,30 +16,31 @@ using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
 using WorkNestify.DataAccess.Repositories.Interfaces.Users;
+using WorkNestify.Models.Models.Users;
+using WorkNestify.Services;
 using WorkNestify.Utilities;
-using WorkNestify.Utilities.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Add Razor Pages
+builder.Services.AddRazorPages();
+
 // Database connection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Internal Services
-// Register EmailSender
 builder.Services.AddTransient<IEmailSender, EmailSender>();
-
-// LocationManager
 builder.Services.AddScoped<LocationManager>();
 
 // Setting up Identity 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>()
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddDefaultTokenProviders()
-    .AddSignInManager<SignInManager<IdentityUser>>();
+    .AddSignInManager<SignInManager<ApplicationUser>>();
 
 // Configure application cookies
 builder.Services.ConfigureApplicationCookie(options =>
@@ -48,22 +50,20 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
+// DbInitializer
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
+
 // Repository Structure Implementation
 // Companies
 builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
 builder.Services.AddScoped<ICompanyReviewRepository, CompanyReviewRepository>();
-builder.Services.AddScoped<ICompanySizeRepository, CompanySizeRepository>();
 
 // Jobs
 builder.Services.AddScoped<IJobRepository, JobRepository>();
 builder.Services.AddScoped<IJobCategoryRepository, JobCategoryRepository>();
-builder.Services.AddScoped<IJobLevelRepository, JobLevelRepository>();
-builder.Services.AddScoped<IJobStatusRepository, JobStatusRepository>();
-builder.Services.AddScoped<IJobTypeRepository, JobTypeRepository>();
 
 // JobApplications
 builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
-builder.Services.AddScoped<IJobApplicationStatusRepository, JobApplicationStatusRepository>();
 
 // Locations
 builder.Services.AddScoped<IDistrictRepository, DistrictRepository>();
@@ -71,8 +71,7 @@ builder.Services.AddScoped<IProvinceRepository, ProvinceRepository>();
 builder.Services.AddScoped<IWardRepository, WardRepository>();
 
 // Users
-builder.Services.AddScoped<IEmployerRepository, EmployerRepository>();
-builder.Services.AddScoped<IJobSeekerRepository, JobSeekerRepository>();
+builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
@@ -101,17 +100,10 @@ builder.Services.AddSingleton<CloudinaryService>();
 // GiaoHangNhanh
 builder.Services.AddHttpClient<GhnService>();
 
-// Add Razor Pages
-builder.Services.AddRazorPages();
-
 var app = builder.Build();
 
-// Seed Roles and Admin
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    await DbInitializer.SeedRolesAndAdminAsync(services);
-}
+// Roles & admin account
+SeedDatabase();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -138,3 +130,12 @@ app.MapControllerRoute(
     pattern: "{area=JobSeeker}/{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+void SeedDatabase()
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
+        dbInitializer.Initialize();
+    }
+}

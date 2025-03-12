@@ -1,4 +1,4 @@
-@model WorkNestify.DataAccess.Entities.Companies.Company
+@model WorkNestify.Models.Models.Companies.Company
 
 @{
     ViewData["Title"] = "Company Details";
@@ -23,7 +23,7 @@
         }
         <h4 class="mt-3">@Model.Name</h4>
         <p><strong>Industry:</strong> @Model.Industry</p>
-        <p><strong>Company Size:</strong> @(Model.CompanySize?.Name ?? "Not specified")</p>
+        <p><strong>Company Size:</strong> @(Model.Size)</p>
     </div>
 
     <!-- Right Column: Detailed Information -->
@@ -56,11 +56,11 @@
             </dd>
 
             <dt class="col-sm-4">Phone</dt>
-            <dd class="col-sm-8">@(Model.Phone ?? "Not provided")</dd>
+            <dd class="col-sm-8">@(Model.Phone)</dd>
 
             <dt class="col-sm-4">Address</dt>
             <dd class="col-sm-8">
-                @(Model.StreetAddress ?? "Not provided")
+                @(Model.StreetAddress)
                 @if (Model.Province != null || Model.District != null || Model.Ward != null)
                 {
                     <br />

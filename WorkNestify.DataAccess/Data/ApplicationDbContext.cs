@@ -1,15 +1,15 @@
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using WorkNestify.DataAccess.Entities.Companies;
-using WorkNestify.DataAccess.Entities.JobApplications;
-using WorkNestify.DataAccess.Entities.Jobs;
-using WorkNestify.DataAccess.Entities.Locations;
-using WorkNestify.DataAccess.Entities.Users;
+using WorkNestify.Models.Models.Companies;
+using WorkNestify.Models.Models.JobApplications;
+using WorkNestify.Models.Models.Jobs;
+using WorkNestify.Models.Models.Locations;
+using WorkNestify.Models.Models.Users;
+using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.DataAccess.Data;
 
-public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
@@ -17,19 +17,14 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
     // Companies
     public DbSet<Company> Companies { get; set; }
-    public DbSet<CompanySize> CompanySizes { get; set; }
     public DbSet<CompanyReview> CompanyReviews { get; set; }
 
     // Jobs
     public DbSet<Job> Jobs { get; set; }
-    public DbSet<JobType> JobTypes { get; set; }
-    public DbSet<JobLevel> JobLevels { get; set; }
-    public DbSet<JobStatus> JobStatuses { get; set; }
     public DbSet<JobCategory> JobCategories { get; set; }
 
     // Job Applications
     public DbSet<JobApplication> JobApplications { get; set; }
-    public DbSet<JobApplicationStatus> JobApplicationStatuses { get; set; }
 
     // Locations
     public DbSet<Ward> Wards { get; set; }
@@ -37,60 +32,11 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Province> Provinces { get; set; }
 
     // Users
-    public DbSet<JobSeeker> JobSeekers { get; set; }
-    public DbSet<Employer> Employers { get; set; }
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-
-        // Seed Data for CompanySize
-        modelBuilder.Entity<CompanySize>().HasData(
-            new CompanySize { Id = 1, Name = "Small" },
-            new CompanySize { Id = 2, Name = "Medium" },
-            new CompanySize { Id = 3, Name = "Large" });
-
-        // Seed Data for JobType
-        modelBuilder.Entity<JobType>().HasData(
-            new JobType { Id = 1, Name = "Full-Time" },
-            new JobType { Id = 2, Name = "Part-Time" },
-            new JobType { Id = 3, Name = "Freelance" },
-            new JobType { Id = 4, Name = "Remote" });
-
-        // Seed Data for JobStatus
-        modelBuilder.Entity<JobStatus>().HasData(
-            new JobStatus { Id = 1, Name = "Open" },
-            new JobStatus { Id = 2, Name = "Closed" },
-            new JobStatus { Id = 3, Name = "Pending" },
-            new JobStatus { Id = 4, Name = "Expired" });
-
-        // Seed Data for JobLevel
-        modelBuilder.Entity<JobLevel>().HasData(
-            new JobLevel
-            {
-                Id = 1, Name = "Intern",
-                Description =
-                    "An entry-level position for individuals who are gaining work experience in their field, typically through an internship program."
-            },
-            new JobLevel
-            {
-                Id = 2, Name = "Fresher",
-                Description =
-                    "A recent graduate or someone who is new to the job market, with limited professional experience."
-            },
-            new JobLevel
-            {
-                Id = 3, Name = "Junior",
-                Description =
-                    "A role for individuals with some experience in their field, typically 1-3 years, and who require supervision and guidance."
-            },
-            new JobLevel
-            {
-                Id = 4, Name = "Senior",
-                Description =
-                    "An experienced professional with significant expertise in the field, typically with over 5 years of experience, often responsible for leading teams or projects."
-            });
 
         // Seed Data for JobCategory
         modelBuilder.Entity<JobCategory>().HasData(
@@ -177,7 +123,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                 Logo = "https://upload.wikimedia.org/wikipedia/commons/1/11/FPT_logo_2010.svg",
                 Industry = "Information technology, telecommunications, education",
                 FoundedDate = new DateTime(1988, 09, 13),
-                CompanySizeId = 3,
+                Size = CompanySizes.Large,
                 ProvinceId = 201,
                 DistrictId = 1485,
                 WardCode = "1A0602"
@@ -194,7 +140,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                 Logo = "https://static-gcdn.basecdn.net/landing/base.vn/image/v2/logo/base.png",
                 Industry = "Software as a Service (SaaS)",
                 FoundedDate = new DateTime(2016, 8, 1),
-                CompanySizeId = 1,
+                Size = CompanySizes.Small,
                 ProvinceId = 201,
                 DistrictId = 1493,
                 WardCode = "1A0706"
@@ -211,7 +157,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                 Logo = "https://logo.kiotviet.vn/KiotViet-Logo-Horizontal.svg",
                 Industry = "Retail Technology, POS Systems",
                 FoundedDate = new DateTime(2014, 5, 15),
-                CompanySizeId = 1,
+                Size = CompanySizes.Small,
                 ProvinceId = 202,
                 DistrictId = 1455,
                 WardCode = "21402"
@@ -228,7 +174,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                 Logo = "https://upload.wikimedia.org/wikipedia/commons/9/97/The_Coffee_House_logo.svg",
                 Industry = "Food & Beverage, Coffee Retail",
                 FoundedDate = new DateTime(2014, 7, 1),
-                CompanySizeId = 2,
+                Size = CompanySizes.Medium,
                 ProvinceId = 202,
                 DistrictId = 1444,
                 WardCode = "20304"
@@ -245,7 +191,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                 Logo = "https://www.foody.vn/style/images/logo/foody-vn.png",
                 Industry = "Food Delivery, E-commerce",
                 FoundedDate = new DateTime(2012, 6, 5),
-                CompanySizeId = 2,
+                Size = CompanySizes.Medium,
                 ProvinceId = 202,
                 DistrictId = 1442,
                 WardCode = "20109"
@@ -262,7 +208,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
                 Logo = "https://digiworld.com.vn/assets/site/homes/logo/Artboard-1.png",
                 Industry = "Technology, Distribution",
                 FoundedDate = new DateTime(1997, 9, 1),
-                CompanySizeId = 3,
+                Size = CompanySizes.Large,
                 ProvinceId = 201,
                 DistrictId = 1486,
                 WardCode = "1A0407"
@@ -278,9 +224,9 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
         // JobApplication Relationships
         modelBuilder.Entity<JobApplication>()
-            .HasOne(ja => ja.JobSeeker)
+            .HasOne(ja => ja.ApplicationUser)
             .WithMany(js => js.JobApplications)
-            .HasForeignKey(ja => ja.JobSeekerId)
+            .HasForeignKey(ja => ja.ApplicationUserId)
             .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<JobApplication>()
@@ -301,42 +247,6 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             .HasOne(w => w.District)
             .WithMany(d => d.Wards)
             .HasForeignKey(w => w.DistrictId)
-            .OnDelete(DeleteBehavior.Restrict);
-
-        // Configure DeleteBehavior only, no FK redefinition
-        modelBuilder.Entity<Company>()
-            .HasOne(c => c.Province)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Company>()
-            .HasOne(c => c.District)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Company>()
-            .HasOne(c => c.Ward)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<District>()
-            .HasOne(d => d.Province)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Job>()
-            .HasOne(j => j.Province)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Job>()
-            .HasOne(j => j.District)
-            .WithMany()
-            .OnDelete(DeleteBehavior.Restrict);
-
-        modelBuilder.Entity<Job>()
-            .HasOne(j => j.Ward)
-            .WithMany()
             .OnDelete(DeleteBehavior.Restrict);
     }
 }

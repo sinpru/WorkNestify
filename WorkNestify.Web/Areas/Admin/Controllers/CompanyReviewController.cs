@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using WorkNestify.DataAccess.Entities.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces;
+using WorkNestify.Models.Models.Companies;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
@@ -33,7 +33,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 {
                     cr.Id,
                     Company = cr.Company?.Name ?? cr.Company?.StreetAddress,
-                    cr.Reviewer?.FullName,
+                    Reviewer = cr.ApplicationUser?.FullName,
                     cr.Rating,
                     CreatedDate = cr.CreatedDate.ToString("o")
                 })

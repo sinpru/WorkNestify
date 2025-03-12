@@ -1,4 +1,4 @@
-@model WorkNestify.DataAccess.Entities.Jobs.Job
+@model WorkNestify.Models.Models.Jobs.Job
 
 @{
     ViewData["Title"] = "Create";
@@ -53,16 +53,16 @@
                 <span asp-validation-for="ModifiedDate" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="JobTypeId" class="control-label"></label>
-                <select asp-for="JobTypeId" class ="form-control" asp-items="ViewBag.JobTypeId"></select>
+                <label asp-for="Type" class="control-label"></label>
+                <select asp-for="Type" class ="form-control" asp-items="ViewBag.Type"></select>
             </div>
             <div class="form-group">
-                <label asp-for="JobStatusId" class="control-label"></label>
-                <select asp-for="JobStatusId" class ="form-control" asp-items="ViewBag.JobStatusId"></select>
+                <label asp-for="Status" class="control-label"></label>
+                <select asp-for="Status" class ="form-control" asp-items="ViewBag.Status"></select>
             </div>
             <div class="form-group">
-                <label asp-for="JobLevelId" class="control-label"></label>
-                <select asp-for="JobLevelId" class ="form-control" asp-items="ViewBag.JobLevelId"></select>
+                <label asp-for="Level" class="control-label"></label>
+                <select asp-for="Level" class ="form-control" asp-items="ViewBag.Level"></select>
             </div>
             <div class="form-group">
                 <label asp-for="JobCategoryId" class="control-label"></label>

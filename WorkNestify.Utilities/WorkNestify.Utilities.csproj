@@ -19,8 +19,4 @@
       </PackageReference>
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\WorkNestify.DataAccess\WorkNestify.DataAccess.csproj" />
-    </ItemGroup>
-
 </Project>

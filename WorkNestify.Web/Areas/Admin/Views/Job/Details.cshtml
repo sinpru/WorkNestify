@@ -1,4 +1,4 @@
-@model WorkNestify.DataAccess.Entities.Jobs.Job
+@model WorkNestify.Models.Models.Jobs.Job
 
 @{
     ViewData["Title"] = "Job Details";
@@ -16,8 +16,8 @@
         <h4>@Model.Title</h4>
         <p><strong>Company:</strong> @(Model.Company?.Name ?? "Not specified")</p>
         <p><strong>Salary:</strong> @(Model.Salary.ToString("C", new System.Globalization.CultureInfo("en-US")) ?? "Not provided")</p>
-        <p><strong>Job Type:</strong> @(Model.JobType?.Name ?? "Not specified")</p>
-        <p><strong>Status:</strong> @(Model.JobStatus?.Name ?? "Not specified")</p>
+        <p><strong>Job Type:</strong> @(Model.Type)</p>
+        <p><strong>Status:</strong> @(Model.Status)</p>
     </div>
 
     <!-- Right Column: Detailed Information -->
@@ -29,7 +29,7 @@
             <dd class="col-sm-8">@(Model.JobCategory?.Description ?? "Not specified")</dd>
 
             <dt class="col-sm-4">Level</dt>
-            <dd class="col-sm-8">@(Model.JobLevel?.Description ?? "Not specified")</dd>
+            <dd class="col-sm-8">@(Model.Level)</dd>
 
             <dt class="col-sm-4">Location</dt>
             <dd class="col-sm-8">

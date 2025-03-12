@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
-using WorkNestify.DataAccess.Entities.Locations;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
 using WorkNestify.DataAccess.Repositories.Interfaces.Users;
+// using WorkNestify.DataAccess.Repositories.Interfaces.Users;
+using WorkNestify.Models.Models.Locations;
 
 namespace WorkNestify.DataAccess.Repositories.Implementations;
 
@@ -19,18 +20,13 @@ public class UnitOfWork : IUnitOfWork
     // Companies
     public ICompanyRepository Companies { get; private set; }
     public ICompanyReviewRepository CompanyReviews { get; private set; }
-    public ICompanySizeRepository CompanySizes { get; private set; }
 
     // Jobs
     public IJobRepository Jobs { get; private set; }
     public IJobCategoryRepository JobCategories { get; private set; }
-    public IJobLevelRepository JobLevels { get; private set; }
-    public IJobStatusRepository JobStatuses { get; private set; }
-    public IJobTypeRepository JobTypes { get; private set; }
 
     // JobApplications
     public IJobApplicationRepository JobApplications { get; private set; }
-    public IJobApplicationStatusRepository JobApplicationStatuses { get; private set; }
     
     // Locations
     public IDistrictRepository Districts { get; private set; }
@@ -38,42 +34,28 @@ public class UnitOfWork : IUnitOfWork
     public IWardRepository Wards { get; private set; }
 
     // Users
-    public IEmployerRepository Employers { get; private set; }
-    public IJobSeekerRepository JobSeekers { get; private set; }
+    public IApplicationUserRepository ApplicationUserRepository { get; }
 
     public UnitOfWork(ApplicationDbContext context,
         ICompanyRepository companyRepository,
         ICompanyReviewRepository companyReviewRepository,
-        ICompanySizeRepository companySizeRepository,
         IJobRepository jobRepository,
         IJobCategoryRepository jobCategoryRepository,
-        IJobLevelRepository jobLevelRepository,
-        IJobStatusRepository jobStatusRepository,
-        IJobTypeRepository jobTypeRepository,
         IJobApplicationRepository jobApplicationRepository,
-        IJobApplicationStatusRepository jobApplicationStatusRepository,
         IDistrictRepository districtRepository,
         IProvinceRepository provinceRepository,
         IWardRepository wardRepository,
-        IEmployerRepository employerRepository,
-        IJobSeekerRepository jobSeekerRepository)
+        IApplicationUserRepository applicationUserRepository)
     {
         _context = context;
         Companies = companyRepository;
         CompanyReviews = companyReviewRepository;
-        CompanySizes = companySizeRepository;
         Jobs = jobRepository;
         JobCategories = jobCategoryRepository;
-        JobLevels = jobLevelRepository;
-        JobStatuses = jobStatusRepository;
-        JobTypes = jobTypeRepository;
         JobApplications = jobApplicationRepository;
-        JobApplicationStatuses = jobApplicationStatusRepository;
         Districts = districtRepository;
         Provinces = provinceRepository;
         Wards = wardRepository;
-        Employers = employerRepository;
-        JobSeekers = jobSeekerRepository;
     }
 
     public async Task SaveAsync()

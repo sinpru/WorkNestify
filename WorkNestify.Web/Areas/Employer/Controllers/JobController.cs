@@ -6,8 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
-using WorkNestify.DataAccess.Entities.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces;
+using WorkNestify.Models.Models.Jobs;
+using WorkNestify.Utilities.Constants;
+using SelectList = Microsoft.AspNetCore.Mvc.Rendering.SelectList;
 
 namespace WorkNestify.Web.Areas.Employer.Controllers
 {
@@ -173,9 +175,9 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
         
         private void PopulateDropdowns(Job job = null)
         {
-            ViewData["JobCategoryId"] = new SelectList(_unitOfWork.JobCategories.GetAllAsync().Result, "Id", "Name", job?.JobCategoryId);
-            ViewData["JobLevelId"] = new SelectList(_unitOfWork.JobLevels.GetAllAsync().Result, "Id", "Name", job?.JobLevelId);
-            ViewData["JobTypeId"] = new SelectList(_unitOfWork.JobTypes.GetAllAsync().Result, "Id", "Name", job?.JobTypeId);
+            ViewData["JobCategoryId"] = new SelectList(_unitOfWork.JobCategories.GetAllAsync().Result, "Id", "Name");
+            ViewData["Level"] = new SelectList(JobLevels.AllLevels);
+            ViewData["Type"] = new SelectList(JobTypes.AllTypes);
         }
         
         private void PopulateDateFields(Job job = null)

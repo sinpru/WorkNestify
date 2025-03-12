@@ -1,4 +1,4 @@
-@model IEnumerable<WorkNestify.DataAccess.Entities.Companies.CompanyReview>
+@model IEnumerable<WorkNestify.Models.Models.Companies.CompanyReview>
 
 @{
     ViewData["Title"] = "Company Reviews Management";
@@ -23,7 +23,7 @@
                 @Html.DisplayNameFor(model => model.Company)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Reviewer)
+                @Html.DisplayNameFor(model => model.ApplicationUser)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Rating)

@@ -21,6 +21,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\WorkNestify.Models\WorkNestify.Models.csproj" />
+      <ProjectReference Include="..\WorkNestify.Utilities\WorkNestify.Utilities.csproj" />
     </ItemGroup>
 
 </Project>
