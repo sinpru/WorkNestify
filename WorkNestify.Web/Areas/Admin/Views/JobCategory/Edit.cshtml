@@ -1,41 +1,53 @@
-@model WorkNestify.DataAccess.Entities.Jobs.JobCategory
+@model WorkNestify.Models.Models.Jobs.JobCategory
 
 @{
     ViewData["Title"] = "Edit Job Category Details";
+    ViewData["IndexAction"] = "Index";
 }
 
-<div class="d-flex justify-content-between align-items-center">
-    <h1 class="display-4">@ViewData["Title"]</h1>
+<partial name="_ManagementNavigationPartial"/>
 
-    <a class="btn btn-primary d-flex align-items-center" asp-action="Index">
-        <i class="fs-4 bi-arrow-left me-1"></i> Back to List
-    </a>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Description" class="control-label"></label>
-                <input asp-for="Description" class="form-control" />
-                <span asp-validation-for="Description" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+@if (TempData["Warning"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @TempData["Warning"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-</div>
+}
+
+<form class="row" asp-action="Edit">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id"/>
+
+    <div class="col-md-12 mb-2">
+        <div class="form-group mb-2">
+            <label asp-for="Name" class="form-label"></label>
+            <input asp-for="Name" class="form-control"/>
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="col-md-12 mb-2">
+        <div class="form-group mb-2">
+            <label asp-for="Description" class="form-label"></label>
+            <textarea asp-for="Description" id="editor" class="form-control"></textarea>
+            <div id="editor-word-count" class="small text-muted mt-1"></div>
+            <span asp-validation-for="Description" class="text-danger"></span>
+        </div>
+
+        <div class="form-group d-flex justify-content-between mt-2">
+            <a class="btn btn-outline-secondary d-flex align-items-center" asp-action="Index">
+                <i class="fs-4 bi-x-lg me-1"></i> Cancel
+            </a>
+
+            <button type="submit" class="btn btn-primary d-flex align-items-center">
+                <i class="fs-4 bi-check-circle me-1"></i> Save
+            </button>
+        </div>
+    </div>
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+    @{ await Html.RenderPartialAsync("_FormScriptsPartial"); }
 }

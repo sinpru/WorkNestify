@@ -1,57 +1,73 @@
-@model WorkNestify.DataAccess.Entities.JobApplications.JobApplication
+@model WorkNestify.Models.Models.JobApplications.JobApplication
 
 @{
-    ViewData["Title"] = "Create New Job Application";
+    ViewData["Title"] = "Register Job Application";
+    ViewData["IndexAction"] = "Index";
 }
 
-<div class="d-flex justify-content-between align-items-center">
-    <h1 class="display-4">@ViewData["Title"]</h1>
+<partial name="_ManagementNavigationPartial"/>
 
-    <a class="btn btn-primary d-flex align-items-center" asp-action="Index">
-        <i class="fs-4 bi-arrow-left me-1"></i> Back to List
-    </a>
-</div>
-
-<hr />
-
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="CoverLetter" class="control-label"></label>
-                <input asp-for="CoverLetter" class="form-control" />
-                <span asp-validation-for="CoverLetter" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ApplicationDate" class="control-label"></label>
-                <input asp-for="ApplicationDate" class="form-control" />
-                <span asp-validation-for="ApplicationDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ModifiedDate" class="control-label"></label>
-                <input asp-for="ModifiedDate" class="form-control" />
-                <span asp-validation-for="ModifiedDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="JobSeekerId" class="control-label"></label>
-                <select asp-for="JobSeekerId" class ="form-control" asp-items="ViewBag.JobSeekerId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="JobId" class="control-label"></label>
-                <select asp-for="JobId" class ="form-control" asp-items="ViewBag.JobId"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="JobApplicationStatusId" class="control-label"></label>
-                <select asp-for="JobApplicationStatusId" class ="form-control" asp-items="ViewBag.JobApplicationStatusId"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+@if (TempData["Warning"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @TempData["Warning"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
-</div>
+}
+
+<form class="row" enctype="multipart/form-data" asp-action="Create">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="col-md-6">
+        <div class="form-group mb-2">
+            <label asp-for="JobId" class="form-label"></label>
+            <select asp-for="JobId" class="form-control" asp-items="ViewBag.JobId" required>
+                <option value="" selected disabled>Select a Job</option>
+            </select>
+        </div>
+
+        <div class="form-group mb-2">
+            <label asp-for="ApplicationUserId" class="form-label"></label>
+            <select asp-for="ApplicationUserId" class="form-control" asp-items="ViewBag.ApplicationUserId" required>
+                <option value="" selected disabled>Select an User</option>
+            </select>
+        </div>
+
+        <div class="form-group mb-2">
+            <label asp-for="Status" class="form-label"></label>
+            <select asp-for="Status" class="form-control" asp-items="ViewBag.Status" required>
+                <option value="" selected disabled>Select a Status</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="form-group mb-2">
+            <label for="coverLetter" class="form-label">Cover Letter</label>
+            <input id="coverLetter" name="coverLetterFile" type="file" class="form-control"
+                   accept=".pdf,.doc,.docx,.odt,.rtf,.txt" required/>
+        </div>
+
+        <div class="form-group mb-2">
+            <label for="resume" class="form-label">Resume</label>
+            <input id="resume" name="resumeFile" type="file" class="form-control"
+                   accept=".pdf,.doc,.docx,.odt,.rtf,.txt" required/>
+        </div>
+    </div>
+
+    <div class="col-md-12 mb-2">
+        <div class="form-group d-flex justify-content-between mt-2">
+            <a class="btn btn-outline-secondary d-flex align-items-center" asp-action="Index">
+                <i class="fs-4 bi-x-lg me-1"></i> Cancel
+            </a>
+
+            <button type="submit" class="btn btn-primary d-flex align-items-center">
+                <i class="fs-4 bi-check-circle me-1"></i> Register Job Application
+            </button>
+        </div>
+    </div>
+</form>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

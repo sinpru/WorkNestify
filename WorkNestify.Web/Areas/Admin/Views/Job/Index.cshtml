@@ -1,18 +1,12 @@
-@model IEnumerable<WorkNestify.DataAccess.Entities.Jobs.Job>
+@model IEnumerable<WorkNestify.Models.Models.Jobs.Job>
 
 @{
     ViewData["Title"] = "Jobs Management";
+    ViewData["CreateAction"] = "Create";
+    ViewData["CreateText"] = "Register a job";
 }
 
-<div class="d-flex justify-content-between align-items-center">
-    <h1 class="display-4">@ViewData["Title"]</h1>
-
-    <a class="btn btn-primary d-flex align-items-center" asp-action="Create">
-        <i class="fs-4 bi-plus-lg me-1"></i> Create Job
-    </a>
-</div>
-
-<hr/>
+<partial name="_ManagementNavigationPartial"/>
 
 @if (TempData["Warning"] != null)
 {
@@ -22,7 +16,7 @@
     </div>
 }
 
-<table id="jobsTable" class="table table-striped table-hover display nowrap w-100">
+<table id="jobsTable" class="table table-striped table-hover nowrap w-100">
     <thead>
         <tr>
             <th>
@@ -38,10 +32,10 @@
                 @Html.DisplayNameFor(model => model.Salary)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.JobType)
+                @Html.DisplayNameFor(model => model.Type)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.JobStatus)
+                @Html.DisplayNameFor(model => model.Status)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.JobCategory)
@@ -77,8 +71,8 @@
                             return '$' + data.toLocaleString(); // Format as currency
                         }
                     },
-                    { data: 'jobType' },
-                    { data: 'jobStatus' },
+                    { data: 'type' },
+                    { data: 'status' },
                     { data: 'jobCategory' },
                     {
                         data: 'createdDate',

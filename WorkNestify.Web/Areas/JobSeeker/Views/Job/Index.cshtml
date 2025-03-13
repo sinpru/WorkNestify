@@ -1,4 +1,4 @@
-@model IEnumerable<WorkNestify.DataAccess.Entities.Jobs.Job>
+@model IEnumerable<WorkNestify.Models.Models.Jobs.Job>
 
 @{
     ViewData["Title"] = "Index";
@@ -37,13 +37,13 @@
                 @Html.DisplayNameFor(model => model.ModifiedDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.JobType)
+                @Html.DisplayNameFor(model => model.Type)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.JobStatus)
+                @Html.DisplayNameFor(model => model.Status)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.JobLevel)
+                @Html.DisplayNameFor(model => model.Level)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.JobCategory)
@@ -82,13 +82,13 @@
                 @Html.DisplayFor(modelItem => item.ModifiedDate)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.JobType.Name)
+                @Html.DisplayFor(modelItem => item.Type)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.JobStatus.Name)
+                @Html.DisplayFor(modelItem => item.Status)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.JobLevel.Description)
+                @Html.DisplayFor(modelItem => item.Level)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.JobCategory.Description)

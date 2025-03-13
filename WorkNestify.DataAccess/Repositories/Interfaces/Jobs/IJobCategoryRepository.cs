@@ -1,4 +1,4 @@
-using WorkNestify.DataAccess.Entities.Jobs;
+using WorkNestify.Models.Models.Jobs;
 
 namespace WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
 

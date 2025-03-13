@@ -1,4 +1,4 @@
-﻿using WorkNestify.DataAccess.Entities.Companies;
+﻿using WorkNestify.Models.Models.Companies;
 
 namespace WorkNestify.DataAccess.Repositories.Interfaces.Companies;
 

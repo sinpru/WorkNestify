@@ -1,6 +1,6 @@
 ﻿using WorkNestify.DataAccess.Data;
-using WorkNestify.DataAccess.Entities.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
+using WorkNestify.Models.Models.Jobs;
 
 namespace WorkNestify.DataAccess.Repositories.Implementations.Jobs;
 

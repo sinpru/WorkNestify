@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using WorkNestify.Utilities.Services;
+using WorkNestify.Services;
+
 
 namespace WorkNestify.Web.Controllers
 {

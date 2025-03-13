@@ -1,13 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using WorkNestify.DataAccess.Data;
-using WorkNestify.DataAccess.Entities.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces;
+using WorkNestify.Models.Models.Jobs;
+using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.Web.Areas.JobSeeker.Controllers
 {
@@ -191,9 +187,9 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
         {
             ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address", job?.CompanyId);
             ViewData["JobCategoryId"] = new SelectList(_unitOfWork.JobCategories.GetAllAsync().Result, "Id", "Name", job?.JobCategoryId);
-            ViewData["JobLevelId"] = new SelectList(_unitOfWork.JobLevels.GetAllAsync().Result, "Id", "Name", job?.JobLevelId);
-            ViewData["JobStatusId"] = new SelectList(_unitOfWork.JobStatuses.GetAllAsync().Result, "Id", "Name", job?.JobStatusId);
-            ViewData["JobTypeId"] = new SelectList(_unitOfWork.JobTypes.GetAllAsync().Result, "Id", "Name", job?.JobTypeId);
+            ViewData["Level"] = new SelectList(JobLevels.AllLevels);
+            ViewData["Status"] = new SelectList(JobStatuses.AllStatuses);
+            ViewData["Type"] = new SelectList(JobTypes.AllTypes);
         }
     }
 }

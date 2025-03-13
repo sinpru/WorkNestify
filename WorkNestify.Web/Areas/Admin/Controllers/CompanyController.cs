@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using WorkNestify.DataAccess.Entities.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces;
-using WorkNestify.Utilities;
-using WorkNestify.Utilities.Services;
+using WorkNestify.Models.Models.Companies;
+using WorkNestify.Services;
+using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
@@ -26,16 +26,15 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/Company
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var companies = await _unitOfWork.Companies.GetAllAsync(includeProperties: "CompanySize");
-            return View(companies);
+            return View();
         }
 
         [HttpGet]
         public IActionResult GetAll()
         {
-            var companyList = _unitOfWork.Companies.GetAllAsync(includeProperties: "CompanySize").Result;
+            var companyList = _unitOfWork.Companies.GetAllAsync().Result;
             return Json(new
             {
                 data = companyList.Select(c => new
@@ -45,7 +44,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                     c.Phone,
                     c.StreetAddress,
                     c.Industry,
-                    CompanySize = c.CompanySize?.Name,
+                    c.Size,
                     c.Id
                 })
             });
@@ -59,7 +58,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
 
             if (company == null)
             {
@@ -83,7 +82,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             [Bind(
-                "Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId,ProvinceId,DistrictId,WardCode")]
+                "Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,Size,ProvinceId,DistrictId,WardCode")]
             Company company, IFormFile? file)
         {
             if (!ModelState.IsValid)
@@ -110,8 +109,6 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 await PopulateDropdowns();
                 return View(company);
             }
-
-            // Check if 
 
             // Handle File Upload to Cloudinary
             if (file != null)
@@ -141,7 +138,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
 
             if (company == null)
             {
@@ -159,7 +156,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,
             [Bind(
-                "Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,CompanySizeId,ProvinceId,DistrictId,WardCode")]
+                "Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,Size,ProvinceId,DistrictId,WardCode")]
             Company company, IFormFile? file)
         {
             if (id != company.Id)
@@ -243,7 +240,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 existingCompany.Logo = company.Logo;
                 existingCompany.Industry = company.Industry;
                 existingCompany.FoundedDate = company.FoundedDate;
-                existingCompany.CompanySizeId = company.CompanySizeId;
+                existingCompany.Size = company.Size;
                 existingCompany.ProvinceId = company.ProvinceId;
                 existingCompany.DistrictId = company.DistrictId;
                 existingCompany.WardCode = company.WardCode;
@@ -272,7 +269,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id, includeProperties: "CompanySize");
+            var company = await _unitOfWork.Companies.GetAsync(c => c.Id == id);
 
             if (company == null)
             {
@@ -316,7 +313,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
         private async Task PopulateDropdowns(Company? company = null)
         {
-            ViewData["CompanySizeId"] = new SelectList(_unitOfWork.CompanySizes.GetAllAsync().Result, "Id", "Name");
+            ViewData["Size"] = new SelectList(CompanySizes.AllSizes);
             ViewData["ProvinceId"] = new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name");
 
             if (company != null)

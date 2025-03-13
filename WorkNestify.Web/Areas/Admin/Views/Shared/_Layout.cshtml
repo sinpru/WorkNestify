@@ -4,9 +4,9 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>@ViewData["Title"] - WorkNestify Admin</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/lib/bootswatch/lux/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="~/lib/animate.css/animate.min.css"/>
     <link rel="stylesheet" href="~/lib/datatables/dataTables.bootstrap5.min.css"/>
     <link rel="stylesheet" href="~/lib/datatables/buttons.bootstrap5.min.css"/>
     <link rel="stylesheet" href="~/lib/datatables/responsive.bootstrap5.min.css"/>
@@ -50,31 +50,14 @@
                                     <span class="d-none d-sm-inline">Company Reviews</span>
                                 </a>
                             </li>
-                            <li>
-                                <a class="nav-link px-0 ms-2 text-light" asp-area="Admin" asp-controller="CompanySize" asp-action="Index">
-                                    <span class="d-none d-sm-inline">Company Sizes</span>
-                                </a>
-                            </li>
                         </ul>
                     </li>
 
                     <!-- Job Applications -->
                     <li>
-                        <a href="#job-applications" data-bs-toggle="collapse" class="nav-link px-0 align-middle text-light">
+                        <a class="nav-link px-0 align-middle text-light" asp-area="Admin" asp-controller="JobApplication" asp-action="Index">
                             <i class="fs-4 bi-file-earmark-text"></i> <span class="ms-1 d-none d-sm-inline">Job Applications</span>
                         </a>
-                        <ul class="collapse nav flex-column ms-1" id="job-applications" data-bs-parent="#menu">
-                            <li class="w-100">
-                                <a class="nav-link px-0 ms-2 text-light" asp-area="Admin" asp-controller="JobApplication" asp-action="Index">
-                                    <span class="d-none d-sm-inline">Job Applications</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="nav-link px-0 ms-2 text-light" asp-area="Admin" asp-controller="JobApplicationStatus" asp-action="Index">
-                                    <span class="d-none d-sm-inline">Job Application Statuses</span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
 
                     <!-- Jobs -->
@@ -93,40 +76,13 @@
                                     <span class="d-none d-sm-inline">Job Categories</span>
                                 </a>
                             </li>
-                            <li>
-                                <a class="nav-link px-0 ms-2 text-light" asp-area="Admin" asp-controller="JobLevel" asp-action="Index">
-                                    <span class="d-none d-sm-inline">Job Levels</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="nav-link px-0 ms-2 text-light" asp-area="Admin" asp-controller="JobStatus" asp-action="Index">
-                                    <span class="d-none d-sm-inline">Job Statuses</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a class="nav-link px-0 ms-2 text-light" asp-area="Admin" asp-controller="JobType" asp-action="Index">
-                                    <span class="d-none d-sm-inline">Job Types</span>
-                                </a>
-                            </li>
                         </ul>
                     </li>
 
                     <li>
-                        <a href="#users" data-bs-toggle="collapse" class="nav-link px-0 align-middle text-light">
-                            <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Users</span>
+                        <a class="nav-link px-0 align-middle text-light" asp-area="Admin" asp-controller="User" asp-action="Index">
+                            <i class="fs-4 bi-people"></i> <span class="ms-1 d-none d-sm-inline">Users Management</span>
                         </a>
-                        <ul class="collapse nav flex-column ms-1" id="users" data-bs-parent="#menu">
-                            <li class="w-100">
-                                <a href="#" class="nav-link px-0 ms-2 text-light">
-                                    <span class="d-none d-sm-inline">Job Seekers</span>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="nav-link px-0 ms-2 text-light">
-                                    <span class="d-none d-sm-inline">Employers</span>
-                                </a>
-                            </li>
-                        </ul>
                     </li>
                 </ul>
                 <hr>
@@ -158,17 +114,6 @@
 
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="~/lib/datatables/dataTables.min.js"></script>
-<script src="~/lib/datatables/dataTables.bootstrap5.min.js"></script>
-<script src="~/lib/datatables/js/dataTables.buttons.min.js"></script>
-<script src="~/lib/datatables/js/buttons.html5.min.js"></script>
-<script src="~/lib/datatables/js/buttons.print.min.js"></script>
-<script src="~/lib/datatables/buttons.bootstrap5.min.js"></script>
-<script src="~/lib/datatables/dataTables.responsive.min.js"></script>
-<script src="~/lib/datatables/responsive.bootstrap5.min.js"></script>
-<script src="~/lib/jszip/jszip.min.js"></script>
-<script src="~/lib/pdfmake/pdfmake.min.js"></script>
-<script src="~/lib/pdfmake/vfs_fonts.min.js"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -1,18 +1,14 @@
-@model WorkNestify.DataAccess.Entities.Jobs.Job
+@model WorkNestify.Models.Models.Jobs.Job
 
 @{
     ViewData["Title"] = "Delete Job";
+    ViewData["IndexAction"] = "Index";
+    ViewData["Name"] = @Model?.Title;
+    ViewData["Id"] = @Model?.Id;
+    ViewData["Description"] = @Model?.Description;
 }
 
-<div class="d-flex justify-content-between align-items-center">
-    <h1 class="display-4">@ViewData["Title"]</h1>
-
-    <a class="btn btn-primary d-flex align-items-center" asp-action="Index">
-        <i class="fs-4 bi-arrow-left me-1"></i> Back to List
-    </a>
-</div>
-
-<hr/>
+<partial name="_ManagementNavigationPartial"/>
 
 <div class="alert alert-danger" role="alert">
     <h3 class="text-danger"><i class="bi bi-exclamation-triangle"></i> Warning</h3>
@@ -27,8 +23,8 @@
         <h4>@Model.Title</h4>
         <p><strong>Company:</strong> @(Model.Company?.Name ?? "Not specified")</p>
         <p><strong>Salary:</strong> @(Model.Salary.ToString("C", new System.Globalization.CultureInfo("en-US")) ?? "Not provided")</p>
-        <p><strong>Job Type:</strong> @(Model.JobType?.Name ?? "Not specified")</p>
-        <p><strong>Status:</strong> @(Model.JobStatus?.Name ?? "Not specified")</p>
+        <p><strong>Job Type:</strong> @(Model.Type ?? "Not specified")</p>
+        <p><strong>Status:</strong> @(Model.Status ?? "Not specified")</p>
     </div>
 
     <!-- Right Column: Detailed Information -->
@@ -40,7 +36,7 @@
             <dd class="col-sm-8">@(Model.JobCategory?.Description ?? "Not specified")</dd>
 
             <dt class="col-sm-4">Level</dt>
-            <dd class="col-sm-8">@(Model.JobLevel?.Description ?? "Not specified")</dd>
+            <dd class="col-sm-8">@(Model.Level)</dd>
 
             <dt class="col-sm-4">Location</dt>
             <dd class="col-sm-8">
@@ -71,47 +67,5 @@
 
 <hr />
 
-<div class="col-md-12">
-    <h4>Description</h4>
-    @if (!string.IsNullOrEmpty(Model.Description))
-    {
-        <div>@Html.Raw(Model.Description)</div>
-    }
-    else
-    {
-        <p class="text-muted">No description available</p>
-    }
-</div>
-
-<div class="d-flex justify-content-between mt-4">
-    <a class="btn btn-outline-secondary d-flex align-items-center" asp-action="Index">
-        <i class="fs-4 bi-x-lg me-1"></i> Cancel
-    </a>
-
-    <!-- Delete Button with Confirmation Modal -->
-    <button type="button" class="btn btn-danger d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
-        <i class="fs-4 bi-trash3 me-1"></i> Delete
-    </button>
-</div>
-
-<!-- Delete Confirmation Modal -->
-<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title text-danger" id="confirmDeleteModalLabel">Confirm Deletion</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete <strong>@Model.Title</strong>? This action cannot be undone.
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form asp-action="Delete">
-                    <input type="hidden" asp-for="Id" />
-                    <button type="submit" class="btn btn-danger">Confirm Delete</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+<partial name="_DescriptionPartial"/>
+<partial name="_DeletePartial"/>

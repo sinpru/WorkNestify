@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using WorkNestify.DataAccess.Entities.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces;
+using WorkNestify.Models.Models.Companies;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
@@ -17,10 +17,27 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/CompanyReview
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var companyReviews = await _unitOfWork.CompanyReviews.GetAllAsync(includeProperties: "Company");
-            return View(companyReviews);
+            return View();
+        }
+        
+        [HttpGet]
+        public IActionResult GetAll()
+        {
+            var reviewsList = _unitOfWork.CompanyReviews
+                .GetAllAsync(includeProperties: "Company,ApplicationUser").Result;
+            return Json(new
+            {
+                data = reviewsList.Select(cr => new
+                {
+                    cr.Id,
+                    Company = cr.Company?.Name ?? cr.Company?.StreetAddress,
+                    Reviewer = cr.ApplicationUser?.FullName,
+                    cr.Rating,
+                    CreatedDate = cr.CreatedDate.ToString("o")
+                })
+            });
         }
 
         // GET: Admin/CompanyReview/Details/5
@@ -31,7 +48,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company");
+            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company,ApplicationUser");
             
             if (companyReview == null)
             {
@@ -44,7 +61,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         // GET: Admin/CompanyReview/Create
         public IActionResult Create()
         {
-            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address");
+            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Name");
             return View();
         }
 
@@ -53,16 +70,16 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Content,Rating,CompanyId")] CompanyReview companyReview)
+        public async Task<IActionResult> Create([Bind("ReviewerId,CompanyId,Content,Rating")] CompanyReview companyReview)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 await _unitOfWork.CompanyReviews.AddAsync(companyReview);
                 await _unitOfWork.SaveAsync();
                 return RedirectToAction(nameof(Index));
             }
             
-            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address", companyReview.CompanyId);
+            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Name");
             return View(companyReview);
         }
 
@@ -74,14 +91,14 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company");
+            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company,ApplicationUser");
             
             if (companyReview == null)
             {
                 return NotFound();
             }
             
-            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address", companyReview.CompanyId);
+            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Name");
             return View(companyReview);
         }
 
@@ -90,7 +107,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Content,Rating,CompanyId")] CompanyReview companyReview)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,ReviewerId,CompanyId,Content,Rating")] CompanyReview companyReview)
         {
             if (id != companyReview.Id)
             {
@@ -118,7 +135,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return RedirectToAction(nameof(Index));
             }
             
-            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address", companyReview.CompanyId);
+            ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Name");
             return View(companyReview);
         }
 
@@ -130,7 +147,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company");
+            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company,ApplicationUser");
             
             if (companyReview == null)
             {
@@ -145,7 +162,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company");
+            var companyReview = await _unitOfWork.CompanyReviews.GetAsync(cr => cr.Id == id, includeProperties: "Company,ApplicationUser");
             
             if (companyReview != null)
             {

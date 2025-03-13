@@ -1,4 +1,4 @@
-using WorkNestify.DataAccess.Entities.Locations;
+using WorkNestify.Models.Models.Locations;
 
 namespace WorkNestify.DataAccess.Repositories.Interfaces.Locations;
 

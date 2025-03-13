@@ -1,18 +1,12 @@
-@model IEnumerable<WorkNestify.DataAccess.Entities.Companies.Company>
+@model IEnumerable<WorkNestify.Models.Models.Companies.Company>
 
 @{
     ViewData["Title"] = "Companies Management";
+    ViewData["CreateAction"] = "Create";
+    ViewData["CreateText"] = "Register a company";
 }
 
-<div class="d-flex justify-content-between align-items-center">
-    <h1 class="display-4">@ViewData["Title"]</h1>
-
-    <a class="btn btn-primary d-flex align-items-center" asp-action="Create">
-        <i class="fs-4 bi-plus-lg me-1"></i> Add Company
-    </a>
-</div>
-
-<hr/>
+<partial name="_ManagementNavigationPartial"/>
 
 @if (TempData["Warning"] != null)
 {
@@ -41,7 +35,7 @@
             @Html.DisplayNameFor(model => model.Industry)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.CompanySize)
+            @Html.DisplayNameFor(model => model.Size)
         </th>
         <th>
             Actions
@@ -67,7 +61,7 @@
                     { data: 'phone' },
                     { data: 'streetAddress' },
                     { data: 'industry' },
-                    { data: 'companySize' },
+                    { data: 'size' },
                     {
                         data: 'id',
                         render: function (data) {

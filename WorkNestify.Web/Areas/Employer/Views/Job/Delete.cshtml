@@ -1,4 +1,4 @@
-@model WorkNestify.DataAccess.Entities.Jobs.Job
+@model WorkNestify.Models.Models.Jobs.Job
 
 @{
     ViewData["Title"] = "Delete Job Entry";
@@ -66,22 +66,22 @@
             @Html.DisplayFor(model => model.ModifiedDate)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.JobType)
+            @Html.DisplayNameFor(model => model.Type)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.JobType.Name)
+            @Html.DisplayFor(model => model.Type)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.JobStatus)
+            @Html.DisplayNameFor(model => model.Status)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.JobStatus.Name)
+            @Html.DisplayFor(model => model.Status)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.JobLevel)
+            @Html.DisplayNameFor(model => model.Level)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.JobLevel.Description)
+            @Html.DisplayFor(model => model.Level)
         </dd>
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.JobCategory)

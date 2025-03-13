@@ -1,11 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.CodeAnalysis.Elfie.Serialization;
 using Microsoft.EntityFrameworkCore;
-using WorkNestify.DataAccess.Entities.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces;
-using WorkNestify.Utilities;
-using WorkNestify.Utilities.Services;
+using WorkNestify.Models.Models.Jobs;
+using WorkNestify.Services;
+using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
@@ -24,34 +23,28 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/Job
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var jobs = await _unitOfWork.Jobs
-                .GetAllAsync(includeProperties: "Company," +
-                                                "JobCategory," +
-                                                "JobLevel," +
-                                                "JobStatus," +
-                                                "JobType");
-            return View(jobs);
+            return View();
         }
 
         [HttpGet]
         public IActionResult GetAll()
         {
-            var jobList = _unitOfWork.Jobs
-                .GetAllAsync(includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType").Result;
+            var jobsList = _unitOfWork.Jobs
+                .GetAllAsync(includeProperties: "Company,JobCategory").Result;
             return Json(new
             {
-                data = jobList.Select(j => new
+                data = jobsList.Select(j => new
                 {
                     j.Id,
                     j.Title,
                     Company = j.Company?.Name ?? j.Company?.StreetAddress, // Prefer Name if available
                     j.StreetAddress,
                     j.Salary,
-                    JobType = j.JobType?.Name,
-                    JobStatus = j.JobStatus?.Name,
-                    JobCategory = j.JobCategory?.Description,
+                    j.Type,
+                    j.Status,
+                    JobCategory = j.JobCategory?.Name,
                     CreatedDate = j.CreatedDate.ToString("o") // ISO 8601 for JavaScript
                 })
             });
@@ -66,8 +59,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
 
             var job = await _unitOfWork.Jobs
-                .GetAsync(j => j.Id == id,
-                    includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType");
+                .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
 
             if (job == null)
             {
@@ -128,8 +120,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
 
             var job = await _unitOfWork.Jobs
-                .GetAsync(j => j.Id == id,
-                    includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType");
+                .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
 
             if (job == null)
             {
@@ -200,8 +191,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
 
             var job = await _unitOfWork.Jobs
-                .GetAsync(j => j.Id == id,
-                    includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType");
+                .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
 
             if (job == null)
             {
@@ -217,8 +207,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var job = await _unitOfWork.Jobs
-                .GetAsync(j => j.Id == id,
-                    includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType");
+                .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
 
             if (job != null)
             {
@@ -238,9 +227,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         {
             ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Name");
             ViewData["JobCategoryId"] = new SelectList(_unitOfWork.JobCategories.GetAllAsync().Result, "Id", "Name");
-            ViewData["JobLevelId"] = new SelectList(_unitOfWork.JobLevels.GetAllAsync().Result, "Id", "Name");
-            ViewData["JobStatusId"] = new SelectList(_unitOfWork.JobStatuses.GetAllAsync().Result, "Id", "Name");
-            ViewData["JobTypeId"] = new SelectList(_unitOfWork.JobTypes.GetAllAsync().Result, "Id", "Name");
+            ViewData["Level"] = new SelectList(JobLevels.AllLevels);
+            ViewData["Status"] = new SelectList(JobStatuses.AllStatuses);
+            ViewData["Type"] = new SelectList(JobTypes.AllTypes);
             ViewData["ProvinceId"] = new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name");
 
             if (job != null && job.ProvinceId != 0)

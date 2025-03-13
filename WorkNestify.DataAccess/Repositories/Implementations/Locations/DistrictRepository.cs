@@ -1,7 +1,6 @@
-using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
-using WorkNestify.DataAccess.Entities.Locations;
 using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
+using WorkNestify.Models.Models.Locations;
 
 namespace WorkNestify.DataAccess.Repositories.Implementations.Locations;
 
