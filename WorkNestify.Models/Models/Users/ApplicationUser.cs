@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Identity;
 using WorkNestify.Models.Models.Companies;
 using WorkNestify.Models.Models.JobApplications;
+using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.Models.Models.Users;
 
@@ -17,6 +18,10 @@ public class ApplicationUser : IdentityUser
     [Display(Name = "Created Date")]
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
     
+    [Required]
+    [Display(Name = "Modified Date")]
+    public DateTime ModifiedDate { get; set; } = DateTime.UtcNow;
+    
     [Display(Name = "Company")]
     public int? CompanyId { get; set; }
 
@@ -26,6 +31,8 @@ public class ApplicationUser : IdentityUser
     
     [Display(Name = "Resume")]
     public string ResumeUrl { get; set; } = string.Empty;
+
+    public string Role { get; set; } = Roles.JobSeeker;
     
     public ICollection<JobApplication> JobApplications { get; set; } = new HashSet<JobApplication>();
 }

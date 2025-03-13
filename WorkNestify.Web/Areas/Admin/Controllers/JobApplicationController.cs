@@ -1,8 +1,10 @@
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Models.Models.JobApplications;
+using WorkNestify.Models.Models.Users;
 using WorkNestify.Services;
 using WorkNestify.Utilities.Constants;
 
@@ -13,11 +15,16 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly CloudinaryService _cloudinary;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public JobApplicationController(IUnitOfWork unitOfWork, CloudinaryService cloudinary)
+        public JobApplicationController(
+            IUnitOfWork unitOfWork, 
+            CloudinaryService cloudinary,
+            UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _cloudinary = cloudinary;
+            _userManager = userManager;
         }
 
         // GET: Admin/JobApplication
@@ -65,9 +72,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/JobApplication/Create
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
-            PopulateDropdowns();
+            await PopulateDropdowns();
             return View();
         }
 
@@ -86,7 +93,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-                PopulateDropdowns();
+                await PopulateDropdowns();
                 return View(jobApplication);
             }
 
@@ -109,7 +116,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                     if (string.IsNullOrEmpty(resumeUrl))
                     {
                         TempData["Warning"] = "Error uploading resume";
-                        PopulateDropdowns();
+                        await PopulateDropdowns();
                         return View(jobApplication);
                     }
 
@@ -119,7 +126,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             catch (Exception)
             {
                 TempData["Warning"] = "Failed to upload files";
-                PopulateDropdowns();
+                await PopulateDropdowns();
                 return View(jobApplication);
             }
 
@@ -145,7 +152,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            PopulateDropdowns();
+            await PopulateDropdowns();
 
             // Pass existing CoverLetter and Resume URLs to the view via ViewBag
             ViewBag.ExistingCoverLetter = jobApplication.CoverLetter;
@@ -174,7 +181,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-                PopulateDropdowns();
+                await PopulateDropdowns();
                 ViewBag.ExistingCoverLetter = jobApplication.CoverLetter;
                 ViewBag.ExistingResume = jobApplication.Resume;
                 return View(jobApplication);
@@ -200,7 +207,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                         if (!coverLetterIsDeleted)
                         {
                             TempData["Warning"] = "Failed to delete the old cover letter";
-                            PopulateDropdowns(jobApplication);
+                            await PopulateDropdowns(jobApplication);
                             ViewBag.ExistingCoverLetter = existingCoverLetterUrl;
                             ViewBag.ExistingResume = existingResumeUrl;
                             return View(jobApplication);
@@ -211,7 +218,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                     if (string.IsNullOrEmpty(newCoverLetterUrl))
                     {
                         TempData["Warning"] = "Error uploading new cover letter";
-                        PopulateDropdowns(jobApplication);
+                        await PopulateDropdowns(jobApplication);
                         ViewBag.ExistingCoverLetter = existingCoverLetterUrl;
                         ViewBag.ExistingResume = existingResumeUrl;
                         return View(jobApplication);
@@ -233,7 +240,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                         if (!resumeIsDeleted)
                         {
                             TempData["Warning"] = "Failed to delete the old resume";
-                            PopulateDropdowns(jobApplication);
+                            await PopulateDropdowns(jobApplication);
                             ViewBag.ExistingCoverLetter = existingJobApplication.CoverLetter;
                             ViewBag.ExistingResume = existingResumeUrl;
                             return View(jobApplication);
@@ -244,7 +251,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                     if (string.IsNullOrEmpty(newResumeUrl))
                     {
                         TempData["Warning"] = "Error uploading new resume";
-                        PopulateDropdowns(jobApplication);
+                        await PopulateDropdowns(jobApplication);
                         ViewBag.ExistingCoverLetter = existingJobApplication.CoverLetter;
                         ViewBag.ExistingResume = existingResumeUrl;
                         return View(jobApplication);
@@ -268,7 +275,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 TempData["Warning"] = $"Failed to update job application: {ex.Message}";
-                PopulateDropdowns(jobApplication);
+                await PopulateDropdowns(jobApplication);
                 ViewBag.ExistingCoverLetter = jobApplication.CoverLetter;
                 ViewBag.ExistingResume = jobApplication.Resume;
                 return View(jobApplication);
@@ -320,12 +327,12 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             return await _unitOfWork.JobApplications.GetAsync(ja => ja.Id == id) != null;
         }
 
-        private void PopulateDropdowns(JobApplication jobApplication = null)
+        private async Task PopulateDropdowns(JobApplication jobApplication = null)
         {
             ViewData["JobId"] = new SelectList(_unitOfWork.Jobs.GetAllAsync().Result, "Id", "Title");
             ViewData["Status"] = new SelectList(JobApplicationStatuses.AllStatuses);
             ViewData["ApplicationUserId"] =
-                new SelectList(_unitOfWork.ApplicationUser.GetAllAsync().Result, "Id", "FullName");
+                new SelectList(await _userManager.Users.ToListAsync(), "Id", "FullName");
         }
     }
 }

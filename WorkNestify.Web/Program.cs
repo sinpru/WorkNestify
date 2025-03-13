@@ -9,13 +9,11 @@ using WorkNestify.DataAccess.Repositories.Implementations.Companies;
 using WorkNestify.DataAccess.Repositories.Implementations.JobApplications;
 using WorkNestify.DataAccess.Repositories.Implementations.Jobs;
 using WorkNestify.DataAccess.Repositories.Implementations.Locations;
-using WorkNestify.DataAccess.Repositories.Implementations.Users;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
-using WorkNestify.DataAccess.Repositories.Interfaces.Users;
 using WorkNestify.Models.Models.Users;
 using WorkNestify.Services;
 using WorkNestify.Utilities;
@@ -69,9 +67,6 @@ builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>(
 builder.Services.AddScoped<IDistrictRepository, DistrictRepository>();
 builder.Services.AddScoped<IProvinceRepository, ProvinceRepository>();
 builder.Services.AddScoped<IWardRepository, WardRepository>();
-
-// Users
-builder.Services.AddScoped<IApplicationUserRepository, ApplicationUserRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 

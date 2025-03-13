@@ -1,0 +1,91 @@
+@model IEnumerable<WorkNestify.Models.Models.Users.ApplicationUser>
+
+@{
+    ViewData["Title"] = "User Management";
+    ViewData["IndexAction"] = "Index";
+    ViewData["CreateAction"] = "Create";
+    ViewData["CreateText"] = "Add New User";
+}
+
+<partial name="_ManagementNavigationPartial"/>
+
+@if (TempData["Warning"] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @TempData["Warning"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<table id="usersTable" class="table table-striped table-hover nowrap w-100">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PhoneNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Role)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Company)
+            </th>
+            <th>
+                Jobs Count
+            </th>
+            <th>
+                Actions
+            </th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+@section Scripts
+{
+    @{ await Html.RenderPartialAsync("_DataTablesScriptsPartial"); }
+    <script asp-append-version="true">
+        $(document).ready(function () {
+            $('#usersTable').DataTable({
+                ajax: {
+                    url: '/Admin/User/GetAll',
+                    dataSrc: 'data'
+                },
+                columns: [
+                    { data: 'fullName' },
+                    { data: 'email' },
+                    { data: 'phoneNumber' },
+                    { data: 'role' },
+                    { data: 'company' },
+                    { data: 'jobApplication' },
+                    {
+                        data: 'id',
+                        render: function (data) {
+                            return `<div class="btn-group" role="group">
+                                <a href="/Admin/User/Edit/${data}" class="btn btn-primary"> <i class="bi bi-pencil-square me-2"></i>Edit</a>
+                                <a href="/Admin/User/Details/${data}" class="btn btn-info"> <i class="bi bi-info-circle me-2"></i>Details</a>
+                                <a href="/Admin/User/Delete/${data}" class="btn btn-danger"> <i class="bi bi-trash-fill me-2"></i>Delete</a>
+                                <a href="/Admin/User/ChangePassword/${data}" class="btn btn-warning"> <i class="bi bi-key-fill me-2"></i>Change Password</a>
+                            </div>`;
+                        },
+                        orderable: false,
+                        searchable: false
+                    }
+                ],
+                responsive: true,
+                dom: 'Bfrtip',
+                buttons: [
+                    'copy', 'csv', 'excel', 'pdf', 'print'
+                ],
+                language: {
+                    emptyTable: "No users found"
+                }
+            });
+        });
+    </script>
+}

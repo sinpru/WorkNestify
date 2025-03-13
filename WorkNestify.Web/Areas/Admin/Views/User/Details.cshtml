@@ -1,0 +1,61 @@
+@model WorkNestify.Models.Models.Users.ApplicationUser
+
+@{
+    ViewData["Title"] = "User Details";
+    ViewData["EditAction"] = "Edit";
+    ViewData["IndexAction"] = "Index";
+    ViewData["Id"] = Model?.Id;
+}
+
+<partial name="_ManagementNavigationPartial"/>
+
+<div class="row mt-4">
+    <!-- Left Column: User Highlights -->
+    <div class="col-md-4">
+        <h4>@Model.FullName</h4>
+        <p><strong>Email:</strong> @(Model.Email ?? "Not specified")</p>
+        <p><strong>Company:</strong> @(Model.Company?.Name ?? "Not specified")</p>
+        <p><strong>Role:</strong> @(Model.Role ?? "Not assigned")</p>
+        <p><strong>Phone:</strong> @(Model.PhoneNumber ?? "Not provided")</p>
+    </div>
+
+    <!-- Right Column: Detailed Information -->
+    <div class="col-md-8">
+        <h4>User Information</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-4">Username</dt>
+            <dd class="col-sm-8">@(Model.UserName ?? "Not specified")</dd>
+
+            <dt class="col-sm-4">Normalized Username</dt>
+            <dd class="col-sm-8">@(Model.NormalizedUserName ?? "Not specified")</dd>
+
+            <dt class="col-sm-4">Normalized Email</dt>
+            <dd class="col-sm-8">@(Model.NormalizedEmail ?? "Not specified")</dd>
+
+            <dt class="col-sm-4">Email Confirmed</dt>
+            <dd class="col-sm-8">@(Model.EmailConfirmed ? "Yes" : "No")</dd>
+
+            <dt class="col-sm-4">Phone Confirmed</dt>
+            <dd class="col-sm-8">@(Model.PhoneNumberConfirmed ? "Yes" : "No")</dd>
+
+            <dt class="col-sm-4">Two-Factor Enabled</dt>
+            <dd class="col-sm-8">@(Model.TwoFactorEnabled ? "Yes" : "No")</dd>
+
+            <dt class="col-sm-4">Lockout Enabled</dt>
+            <dd class="col-sm-8">@(Model.LockoutEnabled ? "Yes" : "No")</dd>
+
+            <dt class="col-sm-4">Lockout End</dt>
+            <dd class="col-sm-8">@(Model.LockoutEnd.HasValue ? Model.LockoutEnd.Value.ToString("dd/MM/yyyy HH:mm:ss") : "Not set")</dd>
+
+            <dt class="col-sm-4">Access Failed Count</dt>
+            <dd class="col-sm-8">@Model.AccessFailedCount</dd>
+
+            <dt class="col-sm-4">Resume URL</dt>
+            <dd class="col-sm-8">@(Model.ResumeUrl ?? "Not provided")</dd>
+
+            <dt class="col-sm-4">Created Date</dt>
+            <dd class="col-sm-8">@(Model.CreatedDate.ToString("dd/MM/yyyy HH:mm:ss"))</dd>
+        </dl>
+    </div>
+</div>
