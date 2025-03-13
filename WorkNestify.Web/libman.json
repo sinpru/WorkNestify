@@ -7,6 +7,18 @@
       "destination": "wwwroot/lib/bootstrap/dist"
     },
     {
+      "library": "bootswatch@5.3.3",
+      "destination": "wwwroot/lib/bootswatch",
+      "files": [
+        "lux/bootstrap.css",
+        "lux/bootstrap.min.css",
+        "lux/bootstrap.min.css.map",
+        "lux/bootstrap.rtl.css",
+        "lux/bootstrap.rtl.min.css",
+        "lux/bootstrap.rtl.min.css.map"
+      ]
+    },
+    {
       "library": "animate.css@4.1.1",
       "destination": "wwwroot/lib/animate.css",
       "files": [
@@ -34,7 +46,7 @@
       ]
     },
     {
-      "library": "jquery-validation-unobtrusive",
+      "library": "jquery-validation-unobtrusive@4.0.0",
       "destination": "wwwroot/lib/jquery-validation-unobtrusive"
     },
     {
