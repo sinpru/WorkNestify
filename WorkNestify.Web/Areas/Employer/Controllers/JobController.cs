@@ -1,11 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using WorkNestify.DataAccess.Data;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Models.Models.Jobs;
 using WorkNestify.Utilities.Constants;

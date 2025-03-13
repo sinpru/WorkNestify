@@ -3,7 +3,6 @@ using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
-using WorkNestify.DataAccess.Repositories.Interfaces.Users;
 
 // using WorkNestify.DataAccess.Repositories.Interfaces.Users;
 
@@ -28,9 +27,6 @@ public interface IUnitOfWork : IDisposable
     IDistrictRepository Districts { get; }
     IProvinceRepository Provinces { get; }
     IWardRepository Wards { get; }
-    
-    // Users
-    IApplicationUserRepository ApplicationUser { get; }
 
     Task SaveAsync();
 }

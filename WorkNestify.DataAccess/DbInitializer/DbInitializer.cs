@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using WorkNestify.DataAccess.Data;
 using WorkNestify.Models.Models.Users;
 using WorkNestify.Utilities.Constants;

@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Models.Models.Jobs;
 using WorkNestify.Services;
-using WorkNestify.Utilities;
 using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
