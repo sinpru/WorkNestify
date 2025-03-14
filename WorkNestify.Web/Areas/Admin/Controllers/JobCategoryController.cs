@@ -74,8 +74,11 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             {
                 await _unitOfWork.JobCategories.AddAsync(jobCategory);
                 await _unitOfWork.SaveAsync();
+                
+                TempData["Success"] = "Job category added.";
                 return RedirectToAction(nameof(Index));
             }
+            
             return View(jobCategory);
         }
 
@@ -116,19 +119,16 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                     await _unitOfWork.JobCategories.UpdateAsync(jobCategory);
                     await _unitOfWork.SaveAsync();
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (Exception ex)
                 {
-                    if (!await JobCategoryExists(jobCategory.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    TempData["Warning"] = $"Failed to update job application: {ex.Message}";
+                    return View(jobCategory);
                 }
+                
+                TempData["Success"] = "Job category edited.";
                 return RedirectToAction(nameof(Index));
             }
+            
             return View(jobCategory);
         }
 
@@ -163,12 +163,8 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 await _unitOfWork.SaveAsync();
             }
             
+            TempData["Success"] = "Job category deleted.";
             return RedirectToAction(nameof(Index));
-        }
-
-        private async Task<bool> JobCategoryExists(int id)
-        {
-            return await _unitOfWork.JobCategories.GetAsync(jc => jc.Id == id) != null;
         }
     }
 }

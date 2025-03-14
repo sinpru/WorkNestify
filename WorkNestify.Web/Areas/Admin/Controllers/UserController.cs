@@ -148,6 +148,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
                     await _emailSender.SendEmailAsync(applicationUser.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    
+                    TempData["Success"] = "User created successfully.";
+                    return RedirectToAction(nameof(Index));
                 }
 
                 // If creation failed, add errors to ModelState
@@ -157,11 +160,11 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 }
 
                 PopulateDropdowns();
-                return RedirectToAction(nameof(Index));
+                return View(applicationUser);
             }
             catch (Exception ex)
             {
-                TempData["Warning"] = ex.Message;
+                TempData["Warning"] = $"Error creating user: {ex.Message}";
                 PopulateDropdowns();
                 return View(applicationUser);
             }
@@ -256,6 +259,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
                 if (result.Succeeded)
                 {
+                    TempData["Success"] = "User updated successfully.";
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -268,22 +272,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 PopulateDropdowns();
                 return View(applicationUser);
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await ApplicationUserExists(applicationUser.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    TempData["Warning"] = "Concurrency error: The user was modified by another process.";
-                    PopulateDropdowns();
-                    return View(applicationUser);
-                }
-            }
             catch (Exception ex)
             {
-                TempData["Warning"] = ex.Message;
+                TempData["Warning"] = $"Error updating user: {ex.Message}";
                 PopulateDropdowns();
                 return View(applicationUser);
             }
@@ -394,6 +385,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
                 if (result.Succeeded)
                 {
+                    TempData["Success"] = "User deleted successfully.";
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -413,12 +405,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
         }
 
-        private async Task<bool> ApplicationUserExists(string id)
-        {
-            return await _userManager.FindByIdAsync(id) != null;
-        }
-
-        private void PopulateDropdowns(ApplicationUser? applicationUser = null)
+        private void PopulateDropdowns()
         {
             ViewData["Role"] = new SelectList(Roles.AllRoles);
             ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Name");

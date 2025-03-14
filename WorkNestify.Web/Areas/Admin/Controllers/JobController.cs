@@ -41,7 +41,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 {
                     j.Id,
                     j.Title,
-                    Company = j.Company?.Name ?? j.Company?.StreetAddress, // Prefer Name if available
+                    Company = j.Company?.Name ?? j.Company?.StreetAddress,
                     j.StreetAddress,
                     j.Salary,
                     j.Type,
@@ -75,6 +75,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         public async Task<IActionResult> Create()
         {
             await PopulateDropdownsAsync();
+            PopulateDateFields();
             return View();
         }
 
@@ -84,33 +85,41 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind(
-                "Title,CompanyId,Salary,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,ProvinceId,DistrictId,WardCode,StreetAddress,StartDate,EndDate,Description")]
+            [Bind("Title,CompanyId,Salary,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,ProvinceId,DistrictId,WardCode,StreetAddress,StartDate,EndDate,Description")]
             Job job)
         {
             if (!ModelState.IsValid)
             {
                 await PopulateDropdownsAsync();
+                PopulateDateFields();
                 return View(job);
             }
 
-            // Ensure the input location exists
-            bool locationExists =
-                await _locationManager.EnsureLocationExists(job.ProvinceId, job.DistrictId, job.WardCode);
-
-            if (!locationExists)
+            try
             {
-                TempData["Warning"] = "Invalid location data.";
+                // Ensure the input location exists
+                bool locationExists =
+                    await _locationManager.EnsureLocationExists(job.ProvinceId, job.DistrictId, job.WardCode);
+
+                if (!locationExists)
+                {
+                    TempData["Warning"] = "Invalid location data.";
+                    await PopulateDropdownsAsync();
+                    PopulateDateFields();
+                    return View(job);
+                }
+
+                await _unitOfWork.Jobs.AddAsync(job);
+                await _unitOfWork.SaveAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["Warning"] = $"Error creating job: {ex.Message}";
                 await PopulateDropdownsAsync();
+                PopulateDateFields();
                 return View(job);
             }
-            
-            job.CreatedDate = DateTime.UtcNow;
-            job.ModifiedDate = DateTime.UtcNow;
-
-            await _unitOfWork.Jobs.AddAsync(job);
-            await _unitOfWork.SaveAsync();
-            return RedirectToAction(nameof(Index));
         }
 
         // GET: Admin/Job/Edit/5
@@ -130,6 +139,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
 
             await PopulateDropdownsAsync(job);
+            PopulateDateFields();
             return View(job);
         }
 
@@ -139,8 +149,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,
-            [Bind(
-                "Id,Title,CompanyId,Salary,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,ProvinceId,DistrictId,WardCode,StreetAddress,StartDate,EndDate,Description")]
+            [Bind("Id,Title,CompanyId,Salary,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,ProvinceId,DistrictId,WardCode,StreetAddress,StartDate,EndDate,Description")]
             Job job)
         {
             if (id != job.Id)
@@ -151,36 +160,35 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             if (!ModelState.IsValid)
             {
                 await PopulateDropdownsAsync();
-                return View(job);
-            }
-            
-            bool locationExists =
-                await _locationManager.EnsureLocationExists(job.ProvinceId, job.DistrictId, job.WardCode);
-
-            if (!locationExists)
-            {
-                TempData["Warning"] = "Invalid location data.";
-                await PopulateDropdownsAsync();
+                PopulateDateFields();
                 return View(job);
             }
             
             try
             {
+                bool locationExists =
+                    await _locationManager.EnsureLocationExists(job.ProvinceId, job.DistrictId, job.WardCode);
+
+                if (!locationExists)
+                {
+                    TempData["Warning"] = "Invalid location data.";
+                    await PopulateDropdownsAsync();
+                    PopulateDateFields();
+                    return View(job);
+                }
+                
                 await _unitOfWork.Jobs.UpdateAsync(job);
                 await _unitOfWork.SaveAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (Exception ex)
             {
-                if (!await JobExists(job.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                TempData["Warning"] = $"Error updating job: {ex.Message}";
+                await PopulateDropdownsAsync();
+                PopulateDateFields();
+                return View(job);
             }
 
+            TempData["Success"] = "Job updated successfully.";
             return RedirectToAction(nameof(Index));
         }
 
@@ -211,13 +219,25 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             var job = await _unitOfWork.Jobs
                 .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
 
-            if (job != null)
+            if (job == null)
+            {
+                return NotFound();
+            }
+
+            try
             {
                 _unitOfWork.Jobs.Remove(job);
                 await _unitOfWork.SaveAsync();
+                
+                TempData["Success"] = "Job deleted successfully.";
+                return RedirectToAction(nameof(Index));
             }
-
-            return RedirectToAction(nameof(Index));
+            catch (Exception ex)
+            {
+                TempData["Warning"] = $"Error deleting job: {ex.Message}";
+                await PopulateDropdownsAsync();
+                return View(job);
+            }
         }
 
         private async Task<bool> JobExists(int id)
@@ -252,6 +272,15 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             {
                 ViewData["WardCode"] = new SelectList(Enumerable.Empty<object>(), "Code", "Name");
             }
+        }
+        
+        private void PopulateDateFields(Job job = null)
+        {
+            var currentDate = DateTime.Now;
+            var futureDate = currentDate.AddDays(14);
+            
+            ViewData["EndDate"] = job?.EndDate?.ToString("yyyy-MM-ddTHH:mm") ?? futureDate.ToString("yyyy-MM-ddTHH:mm");
+            ViewData["StartDate"] = job?.StartDate?.ToString("yyyy-MM-ddTHH:mm") ?? currentDate.ToString("yyyy-MM-ddTHH:mm");
         }
     }
 }
