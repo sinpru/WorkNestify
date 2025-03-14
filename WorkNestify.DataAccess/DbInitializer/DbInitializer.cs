@@ -46,7 +46,6 @@ public class DbInitializer : IDbInitializer
         {
             _roleManager.CreateAsync(new IdentityRole(Roles.JobSeeker)).GetAwaiter().GetResult();
             _roleManager.CreateAsync(new IdentityRole(Roles.Employer)).GetAwaiter().GetResult();
-            _roleManager.CreateAsync(new IdentityRole(Roles.Staff)).GetAwaiter().GetResult();
             _roleManager.CreateAsync(new IdentityRole(Roles.Admin)).GetAwaiter().GetResult();
             
             // Create admin user
@@ -65,7 +64,7 @@ public class DbInitializer : IDbInitializer
                 var user = _context.ApplicationUsers.FirstOrDefault(u => u.Email == _configuration["AdminAccount:AccountEmail"]);
                 if (user != null)
                 {
-                    _userManager.AddToRoleAsync(user, Roles.JobSeeker).GetAwaiter().GetResult();
+                    _userManager.AddToRoleAsync(user, Roles.Admin).GetAwaiter().GetResult();
                 }
                 else
                 {
