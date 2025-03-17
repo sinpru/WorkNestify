@@ -1,78 +1,116 @@
-﻿@{
-    Layout = null;
+﻿@model List<WorkNestify.Models.Models.Jobs.Job>
+
+@{
+    ViewData["Title"] = "Homepage";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Home Page - WorkNestify</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-</head>
-<body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow">
-        <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                <image src=""/>
-                WorkNestify
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                    aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="JobSeeker" asp-controller="Home"
-                           asp-action="Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="JobSeeker" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="Employer" asp-controller="Job" asp-action="Index">
-                            Job Listing
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                            Admin Dashboard
-                        </a>
-                    </li>
-                </ul>
-                <partial name="_LoginPartial"/>
-            </div>
+<div class="row justify-content-center">
+    <div class="col-12 col-md-10">
+        <!-- Search Bar -->
+        <div class="bg-light p-4 rounded-3 shadow-sm mb-4">
+            <form asp-action="Index" asp-controller="Job" asp-area="JobSeeker" method="get">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0">
+                                <i class="bi bi-search"></i>
+                            </span>
+                            <input type="text" name="search" class="form-control border-start-0" placeholder="Job title, keyword..." value="@Context.Request.Query["search"]" />
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="category" class="form-select" asp-items="ViewBag.JobCategoryId">
+                            <option value="">All Categories</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <select name="location" class="form-select" asp-items="ViewBag.ProvinceId">
+                            <option value="">All Locations</option>
+                        </select>
+                    </div>
+                    <div class="col-md-12 text-center">
+                        <button type="submit" class="btn btn-primary btn-lg px-5">
+                            <i class="bi bi-search"></i> Search Jobs
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
-    </nav>
-</header>
 
-<main role="main" class="home-banner text-center">
-    <h1 class="display-4 text-light">Welcome</h1>
-    <form class="container d-flex justify-content-center align-items-center mt-3"
-          asp-area="JobSeeker" asp-controller="Job" asp-action="Search">
-        <input type="text" name="query" class="form-control"
-               placeholder="Search for jobs, companies..."/>
-        <button type="submit" class="btn btn-primary d-flex align-items-center px-4">
-            <i class="fs-4 bi-search me-1"></i> Search
-        </button>
-    </form>
-</main>
+        <!-- Banner Section -->
+        <div class="bg-primary text-white p-4 rounded-3 text-center mb-5 animate__animated animate__fadeIn">
+            <h2 class="h3 mb-3">Find Your Dream Job in 24 Hours!</h2>
+            <p class="lead mb-4">
+                Connect with thousands of job postings daily from top companies across Vietnam.
+            </p>
+            <a href="@Url.Action("Index", "Job", new { area = "JobSeeker" })" class="btn btn-light btn-lg">
+                Explore Opportunities Now
+            </a>
+        </div>
 
+        <!-- Job Listings Section -->
+        <div class="mb-5">
+            <h2 class="h4 mb-4 text-primary">Top Job Opportunities</h2>
+            <!-- Filters -->
+            <form asp-action="Index" asp-controller="Home" asp-area="JobSeeker" method="get">
+                <div class="d-flex flex-wrap gap-3 mb-3">
+                    <select name="location" class="form-select w-auto" asp-items="ViewBag.ProvinceId" onchange="this.form.submit()">
+                        <option value="" selected disabled hidden>Locations</option>
+                    </select>
+                    <select name="category" class="form-select w-auto" asp-items="ViewBag.JobCategoryId" onchange="this.form.submit()">
+                        <option value="" selected disabled hidden>Categories</option>
+                    </select>
+                </div>
+            </form>
+            <!-- Job Cards -->
+            @if (Model.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                    @foreach (var job in Model)
+                    {
+                        <div class="col">
+                            <div class="card h-100 border-light shadow-sm animate__animated animate__fadeInUp">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center mb-2">
+                                        <img src="https://via.placeholder.com/40" alt="Company Logo" class="me-2 rounded" style="width: 40px; height: 40px;" />
+                                        <div>
+                                            <h5 class="card-title mb-0 text-primary fs-6">@job.Title</h5>
+                                            <p class="card-subtitle mb-0 text-muted small">
+                                                @(job.Company?.Name ?? job.Company?.StreetAddress ?? "N/A")
+                                            </p>
+                                        </div>
+                                    </div>
+                                    <p class="card-text small text-muted mb-1">
+                                        <strong>Salary:</strong> $@(job.Salary.ToString("N0"))
+                                    </p>
+                                    <p class="card-text small text-muted mb-1">
+                                        <strong>Location:</strong> @(job.StreetAddress ?? "N/A")
+                                    </p>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="badge bg-success">@(job.Status ?? "N/A")</span>
+                                        <a asp-action="Details" asp-controller="Job" asp-area="JobSeeker" asp-route-id="@job.Id" class="btn btn-outline-primary btn-sm">
+                                            Details
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center">
+                    <p class="text-muted">No top jobs available at the moment.</p>
+                </div>
+            }
+        </div>
 
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2025 - WorkNestify - <a asp-area="JobSeeker" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        <!-- Pagination (Optional) -->
+        <div class="text-center">
+            <a asp-action="Index" asp-controller="Job" asp-area="JobSeeker" class="btn btn-outline-primary">
+                View All Jobs
+            </a>
+        </div>
     </div>
-</footer>
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
-<script src="https://accounts.google.com/gsi/client" async></script>
-</body>
-</html>
+</div>

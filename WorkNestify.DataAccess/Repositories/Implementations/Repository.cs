@@ -28,23 +28,112 @@ public class Repository<T> : IRepository<T> where T : class
                 query = query.Include(property);
             }
         }
+
         return await query.FirstOrDefaultAsync();
     }
 
-    public async Task<IEnumerable<T>> GetAllAsync(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
+    public async Task<IEnumerable<T>> GetAllAsync(
+        Expression<Func<T, bool>>? filter = null,
+        string? includeProperties = null,
+        Expression<Func<T, object>>[]? orderBy = null,
+        Expression<Func<T, object>>[]? orderByDescending = null,
+        int? skip = null,
+        int? take = null)
     {
         IQueryable<T> query = _dbSet;
+
         if (filter != null)
             query = query.Where(filter);
+
         if (!string.IsNullOrEmpty(includeProperties))
         {
-            foreach (var property in includeProperties
-                         .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var property in includeProperties.Split(',', StringSplitOptions.RemoveEmptyEntries))
             {
                 query = query.Include(property);
             }
         }
+
+        if (orderBy != null && orderBy.Length > 0)
+        {
+            IOrderedQueryable<T> orderedQuery = query.OrderBy(orderBy[0]);
+            for (int i = 1; i < orderBy.Length; i++)
+            {
+                orderedQuery = orderedQuery.ThenBy(orderBy[i]);
+            }
+
+            query = orderedQuery;
+        }
+
+        if (orderByDescending != null && orderByDescending.Length > 0)
+        {
+            IOrderedQueryable<T> orderedQuery = query.OrderByDescending(orderByDescending[0]);
+            for (int i = 1; i < orderByDescending.Length; i++)
+            {
+                orderedQuery = orderedQuery.ThenByDescending(orderByDescending[i]);
+            }
+
+            query = orderedQuery;
+        }
+
+        if (skip.HasValue)
+            query = query.Skip(skip.Value);
+
+        if (take.HasValue)
+            query = query.Take(take.Value);
+
         return await query.ToListAsync();
+    }
+
+    public IQueryable<T> GetAllQueryable(
+        Expression<Func<T, bool>>? filter = null,
+        string? includeProperties = null,
+        Expression<Func<T, object>>[]? orderBy = null,
+        Expression<Func<T, object>>[]? orderByDescending = null,
+        int? skip = null,
+        int? take = null)
+    {
+        IQueryable<T> query = _dbSet;
+
+        if (filter != null)
+            query = query.Where(filter);
+
+        if (!string.IsNullOrEmpty(includeProperties))
+        {
+            foreach (var property in includeProperties.Split(',', StringSplitOptions.RemoveEmptyEntries))
+            {
+                query = query.Include(property);
+            }
+        }
+
+        if (orderBy != null && orderBy.Length > 0)
+        {
+            IOrderedQueryable<T> orderedQuery = query.OrderBy(orderBy[0]);
+            for (int i = 1; i < orderBy.Length; i++)
+            {
+                orderedQuery = orderedQuery.ThenBy(orderBy[i]);
+            }
+
+            query = orderedQuery;
+        }
+
+        if (orderByDescending != null && orderByDescending.Length > 0)
+        {
+            IOrderedQueryable<T> orderedQuery = query.OrderByDescending(orderByDescending[0]);
+            for (int i = 1; i < orderByDescending.Length; i++)
+            {
+                orderedQuery = orderedQuery.ThenByDescending(orderByDescending[i]);
+            }
+
+            query = orderedQuery;
+        }
+
+        if (skip.HasValue)
+            query = query.Skip(skip.Value);
+
+        if (take.HasValue)
+            query = query.Take(take.Value);
+
+        return query;
     }
 
     public async Task AddAsync(T entity)

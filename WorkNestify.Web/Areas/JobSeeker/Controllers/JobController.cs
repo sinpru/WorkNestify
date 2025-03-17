@@ -1,8 +1,10 @@
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Models.Models.Jobs;
+using WorkNestify.Services;
 using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.Web.Areas.JobSeeker.Controllers
@@ -11,18 +13,39 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
     public class JobController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly GhnService _ghnService;
 
-        public JobController(IUnitOfWork unitOfWork)
+        public JobController(
+            IUnitOfWork unitOfWork, 
+            GhnService ghnService)
         {
             _unitOfWork = unitOfWork;
+            _ghnService = ghnService;
         }
 
         // GET: JobSeeker/Job
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string search, string category, string location, int page = 1)
         {
-            var jobs = await _unitOfWork.Jobs
-                .GetAllAsync(includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType");
-            return View();
+            const int pageSize = 9;
+            var jobsQuery = _unitOfWork.Jobs.GetAllQueryable(
+                filter: j => j.Status == "Open"
+                             && (string.IsNullOrEmpty(search) || j.Title.Contains(search))
+                             && (string.IsNullOrEmpty(category) || j.JobCategoryId.ToString() == category)
+                             && (string.IsNullOrEmpty(location) || j.StreetAddress.Contains(location)),
+                includeProperties: "Company,JobCategory",
+                orderByDescending: new[] { (Expression<Func<Job, object>>)(j => j.CreatedDate) },
+                skip: (page - 1) * pageSize,
+                take: pageSize
+            );
+            var totalJobs = await jobsQuery.CountAsync();
+            var jobs = await jobsQuery.ToListAsync();
+
+            await PopulateDropdownsAsync();
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalJobs / pageSize);
+            ViewBag.Search = search;
+            ViewBag.Page = page;
+
+            return View(jobs);
         }
 
         // GET: JobSeeker/Job/Details/5
@@ -35,7 +58,7 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
 
             var job = await _unitOfWork.Jobs
                 .GetAsync(j => j.Id == id,
-                    includeProperties: "Company,JobCategory,JobLevel,JobStatus,JobType");
+                    includeProperties: "Company,JobCategory");
             
             if (job == null)
             {
@@ -48,7 +71,7 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
         // GET: JobSeeker/Job/Create
         public IActionResult Create()
         {
-            PopulateDropdowns();
+            PopulateDropdownsAsync();
             return View();
         }
 
@@ -66,7 +89,7 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
                 return RedirectToAction(nameof(Index));
             }
             
-            PopulateDropdowns();
+            PopulateDropdownsAsync();
             return View(job);
         }
 
@@ -87,7 +110,7 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
                 return NotFound();
             }
             
-            PopulateDropdowns();
+            PopulateDropdownsAsync();
             return View(job);
         }
 
@@ -125,7 +148,7 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
                 return RedirectToAction(nameof(Index));
             }
             
-            PopulateDropdowns();
+            PopulateDropdownsAsync();
             return View(job);
         }
 
@@ -183,13 +206,16 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             return await _unitOfWork.Jobs.GetAsync(j => j.Id == id) != null;
         }
         
-        private void PopulateDropdowns(Job job = null)
+        private async Task PopulateDropdownsAsync(Job? job = null, string? search = null, int? page = null)
         {
             ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Address", job?.CompanyId);
             ViewData["JobCategoryId"] = new SelectList(_unitOfWork.JobCategories.GetAllAsync().Result, "Id", "Name", job?.JobCategoryId);
+            ViewData["ProvinceId"] = new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name");
             ViewData["Level"] = new SelectList(JobLevels.AllLevels);
             ViewData["Status"] = new SelectList(JobStatuses.AllStatuses);
             ViewData["Type"] = new SelectList(JobTypes.AllTypes);
+            ViewBag.Search = search;
+            ViewBag.Page = page;
         }
     }
 }
