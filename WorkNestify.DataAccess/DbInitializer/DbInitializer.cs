@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using WorkNestify.DataAccess.Data;
+using WorkNestify.DataAccess.DbInitializer.Seeds;
 using WorkNestify.Models.Models.Users;
 using WorkNestify.Utilities.Constants;
 
@@ -25,7 +26,7 @@ public class DbInitializer : IDbInitializer
         _context = context;
         _configuration = configuration;
     }
-    
+
     public void Initialize()
     {
         // Apply migrations if pending
@@ -40,14 +41,14 @@ public class DbInitializer : IDbInitializer
         {
             throw;
         }
-        
+
         // Create roles if they do not exist
         if (!_roleManager.RoleExistsAsync(Roles.JobSeeker).GetAwaiter().GetResult())
         {
             _roleManager.CreateAsync(new IdentityRole(Roles.JobSeeker)).GetAwaiter().GetResult();
             _roleManager.CreateAsync(new IdentityRole(Roles.Employer)).GetAwaiter().GetResult();
             _roleManager.CreateAsync(new IdentityRole(Roles.Admin)).GetAwaiter().GetResult();
-            
+
             // Create admin user
             var adminUser = new ApplicationUser
             {
@@ -75,6 +76,47 @@ public class DbInitializer : IDbInitializer
             {
                 throw new Exception("Failed to create admin user: " + string.Join(", ", adminAdded.Errors.Select(e => e.Description)));
             }
+        }
+
+        // Seed data for entities
+        SeedEntities();
+    }
+
+    public void SeedEntities()
+    {
+        // Seed Job Categories
+        if (!_context.JobCategories.Any())
+        {
+            _context.JobCategories.AddRange(JobCategorySeed.GetJobCategories());
+            _context.SaveChanges();
+        }
+
+        // Seed Provinces
+        if (!_context.Provinces.Any())
+        {
+            _context.Provinces.AddRange(ProvinceSeed.GetProvinces());
+            _context.SaveChanges();
+        }
+
+        // Seed Districts
+        if (!_context.Districts.Any())
+        {
+            _context.Districts.AddRange(DistrictSeed.GetDistricts());
+            _context.SaveChanges();
+        }
+
+        // Seed Wards
+        if (!_context.Wards.Any())
+        {
+            _context.Wards.AddRange(WardSeed.GetWards());
+            _context.SaveChanges();
+        }
+
+        // Seed Companies
+        if (!_context.Companies.Any())
+        {
+            _context.Companies.AddRange(CompanySeed.GetCompanies());
+            _context.SaveChanges();
         }
     }
 }
