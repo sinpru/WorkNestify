@@ -11,7 +11,6 @@ public static class CompanySeed
         {
             new Company
             {
-                Id = 1,
                 Name = "FPT Corporation",
                 Website = "https://fpt.com/en",
                 Email = "ir@fpt.com",
@@ -29,7 +28,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 2,
                 Name = "Base.vn",
                 Website = "https://base.vn",
                 Email = "contact@base.vn",
@@ -47,7 +45,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 3,
                 Name = "KiotViet",
                 Website = "https://www.kiotviet.vn",
                 Email = "hotro@kiotviet.vn",
@@ -65,7 +62,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 4,
                 Name = "The Coffee House",
                 Website = "https://www.thecoffeehouse.com",
                 Email = "hi@thecoffeehouse.com",
@@ -83,7 +79,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 5,
                 Name = "Foody.vn",
                 Website = "https://www.foody.vn",
                 Email = "support@shopeefood.vn",
@@ -101,7 +96,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 6,
                 Name = "Digiworld",
                 Website = "https://digiworld.com.vn",
                 Email = "contact@digiworld.com.vn",
@@ -119,7 +113,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 7,
                 Name = "Techcombank",
                 Website = "https://www.techcombank.com.vn",
                 Email = "contact@techcombank.com.vn",
@@ -137,7 +130,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 8,
                 Name = "VinFast",
                 Website = "https://vinfastauto.com",
                 Email = "info@vinfastauto.com",
@@ -155,7 +147,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 9,
                 Name = "Shopee Vietnam",
                 Website = "https://shopee.vn",
                 Email = "support@shopee.vn",
@@ -173,7 +164,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 10,
                 Name = "VNG Corporation",
                 Website = "https://www.vng.com.vn",
                 Email = "info@vng.com.vn",
@@ -191,7 +181,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 11,
                 Name = "Sun Asterisk Vietnam",
                 Website = "https://sun-asterisk.vn",
                 Email = "contact@sun-asterisk.vn",
@@ -209,7 +198,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 12,
                 Name = "Highlands Coffee",
                 Website = "https://www.highlandscoffee.com.vn",
                 Email = "support@highlandscoffee.com.vn",
@@ -227,7 +215,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 13,
                 Name = "Viettel Group",
                 Website = "https://viettel.com.vn",
                 Email = "contact@viettel.com.vn",
@@ -245,7 +232,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 14,
                 Name = "FLC Group",
                 Website = "https://flc.vn",
                 Email = "info@flc.vn",
@@ -263,7 +249,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 15,
                 Name = "Lazada Vietnam",
                 Website = "https://www.lazada.vn",
                 Email = "support@lazada.vn",
@@ -281,7 +266,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 16,
                 Name = "Tiki Corporation",
                 Website = "https://tiki.vn",
                 Email = "support@tiki.vn",
@@ -299,7 +283,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 17,
                 Name = "Axon Active Vietnam",
                 Website = "https://www.axonactive.com",
                 Email = "contact@axonactive.com",
@@ -317,7 +300,6 @@ public static class CompanySeed
             },
             new Company
             {
-                Id = 18,
                 Name = "Phuc Long Tea & Coffee",
                 Website = "https://phuclong.com.vn",
                 Email = "support@phuclong.com",

@@ -141,6 +141,11 @@ public class Repository<T> : IRepository<T> where T : class
         await _dbSet.AddAsync(entity);
     }
 
+    public async Task AddRangeAsync(IEnumerable<T> entities)
+    {
+        await _dbSet.AddRangeAsync(entities);
+    }
+
     public void Remove(T entity)
     {
         _dbSet.Remove(entity);

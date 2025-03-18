@@ -69,6 +69,7 @@ builder.Services.AddScoped<IProvinceRepository, ProvinceRepository>();
 builder.Services.AddScoped<IWardRepository, WardRepository>();
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 
 // External Authentication
 builder.Services.AddAuthentication(options =>
@@ -97,7 +98,7 @@ builder.Services.AddHttpClient<GhnService>();
 
 var app = builder.Build();
 
-// Roles & admin account
+// Seed the database
 SeedDatabase();
 
 // Configure the HTTP request pipeline.
@@ -126,11 +127,11 @@ app.MapControllerRoute(
 
 app.Run();
 
-void SeedDatabase()
+async Task SeedDatabase()
 {
     using (var scope = app.Services.CreateScope())
     {
         var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-        dbInitializer.Initialize();
+        await dbInitializer.Initialize();
     }
 }
