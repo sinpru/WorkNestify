@@ -20,7 +20,7 @@
                 <p class="card-text"><strong>Location:</strong> @(Model.StreetAddress ?? "N/A")</p>
                 <p class="card-text"><strong>Category:</strong> @(Model.JobCategory?.Name ?? "N/A")</p>
                 <p class="card-text"><strong>Status:</strong> @(Model.Status ?? "N/A")</p>
-                <p class="card-text"><strong>Description:</strong> @(Model.Description ?? "No description available.")</p>
+                <p class="card-text"><strong>Description:</strong> @Html.Raw(Model.Description)</p>
                 <div class="text-end">
                     <a asp-action="Index" asp-controller="Job" asp-area="JobSeeker" class="btn btn-outline-primary">Back to List</a>
                 </div>

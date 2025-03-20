@@ -15,10 +15,10 @@
       ]
     },
     {
-      "library": "animate.css@4.1.1",
-      "destination": "wwwroot/lib/animate.css",
+      "library": "paginationjs@2.6.0",
+      "destination": "wwwroot/lib/paginationjs",
       "files": [
-        "animate.min.css"
+        "pagination.min.js"
       ]
     },
     {

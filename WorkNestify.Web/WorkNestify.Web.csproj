@@ -40,6 +40,7 @@
       <Folder Include="Areas\Employer\Controllers\" />
       <Folder Include="Controllers\" />
       <Folder Include="wwwroot\assets\images\" />
+      <Folder Include="wwwroot\css\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -187,6 +188,7 @@
       <_ContentIncludedByDefault Remove="wwwroot\lib\pdfmake\pdfmake.min.js" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\pdfmake\vfs_fonts.js" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\pdfmake\vfs_fonts.min.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\animate.css\animate.min.css" />
     </ItemGroup>
 
     <ItemGroup>

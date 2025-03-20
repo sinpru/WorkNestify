@@ -24,7 +24,12 @@ public class HomeController : Controller
         _ghnService = ghnService;
     }
     
-    public async Task<IActionResult> Index(string search, string category, string location)
+    public async Task<IActionResult> Index(
+        string search,
+        string category,
+        string location,
+        int page = 1,
+        int pageSize = 6)
     {
         // Populate dropdowns for categories and locations
         await PopulateDropdownsAsync();
@@ -35,13 +40,25 @@ public class HomeController : Controller
                          && (string.IsNullOrEmpty(search) || j.Title.Contains(search))
                          && (string.IsNullOrEmpty(category) || j.JobCategoryId.ToString() == category)
                          && (string.IsNullOrEmpty(location) || j.StreetAddress.Contains(location)),
-            includeProperties: "Company,JobCategory",
-            orderByDescending: new[] { (Expression<Func<Job, object>>)(j => j.CreatedDate) }, // Explicit cast
-            take: 6
+            includeProperties: "Company,JobCategory"
         );
-        var featuredJobs = await featuredJobsQuery.ToListAsync();
+        
+        // Get total count for pagination
+        var totalJobs = await featuredJobsQuery.CountAsync();
 
-        return View(featuredJobs); // Pass the featured jobs to the view
+        // Apply pagination
+        var paginatedJobs = await featuredJobsQuery
+            .OrderByDescending(j => j.CreatedDate)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        // Pass data to ViewBag for pagination.js
+        ViewBag.TotalJobs = totalJobs;
+        ViewBag.CurrentPage = page;
+        ViewBag.PageSize = pageSize;
+
+        return View(paginatedJobs);
     }
 
     public IActionResult Privacy()
