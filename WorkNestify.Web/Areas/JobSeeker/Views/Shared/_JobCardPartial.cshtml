@@ -1,0 +1,29 @@
+@model WorkNestify.Models.Models.Jobs.Job
+
+<div class="col">
+    <div class="card h-100 border-light shadow-sm animate__animated animate__fadeInUp">
+        <div class="card-body">
+            <div class="d-flex align-items-center mb-2">
+                <img src="@Model.Company?.Logo" alt="Company Logo" class="me-2 rounded" style="width: 40px; height: 40px;" />
+                <div>
+                    <h5 class="card-title mb-0 text-primary fs-6">@Model.Title</h5>
+                    <p class="card-subtitle mb-0 text-muted small">
+                        @(Model.Company?.Name ?? Model.Company?.StreetAddress ?? "N/A")
+                    </p>
+                </div>
+            </div>
+            <p class="card-text small text-muted mb-1">
+                <strong>Salary:</strong> @(Model.Salary.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " ₫")
+            </p>
+            <p class="card-text small text-muted mb-1">
+                <strong>Location:</strong> @(Model.StreetAddress ?? "N/A")
+            </p>
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="badge bg-success">@(Model.Status ?? "N/A")</span>
+                <a asp-action="Details" asp-controller="Job" asp-area="JobSeeker" asp-route-id="@Model.Id" class="btn btn-outline-primary btn-sm">
+                    Details
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
