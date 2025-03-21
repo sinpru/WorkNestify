@@ -15,24 +15,10 @@
       ]
     },
     {
-      "library": "paginationjs@2.6.0",
-      "destination": "wwwroot/lib/paginationjs",
-      "files": [
-        "pagination.min.js"
-      ]
-    },
-    {
       "library": "jquery@3.7.1",
       "destination": "wwwroot/lib/jquery/dist",
       "files": [
         "jquery.min.js"
-      ]
-    },
-    {
-      "library": "axios@1.7.8",
-      "destination": "wwwroot/lib/axios/",
-      "files": [
-        "axios.min.js"
       ]
     },
     {
@@ -46,6 +32,27 @@
     {
       "library": "jquery-validation-unobtrusive@4.0.0",
       "destination": "wwwroot/lib/jquery-validation-unobtrusive"
+    },
+    {
+      "library": "microsoft-signalr@8.0.7",
+      "destination": "wwwroot/lib/signalr",
+      "files": [
+        "signalr.min.js"
+      ]
+    },
+    {
+      "library": "axios@1.7.8",
+      "destination": "wwwroot/lib/axios/",
+      "files": [
+        "axios.min.js"
+      ]
+    },
+    {
+      "library": "paginationjs@2.6.0",
+      "destination": "wwwroot/lib/paginationjs",
+      "files": [
+        "pagination.min.js"
+      ]
     },
     {
       "library": "datatables.net@2.2.1",
