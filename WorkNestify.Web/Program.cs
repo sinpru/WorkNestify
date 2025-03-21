@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using WorkNestify.DataAccess.DbInitializer;
 using WorkNestify.DataAccess.Repositories.Implementations;
 using WorkNestify.DataAccess.Repositories.Implementations.Companies;
@@ -17,14 +19,27 @@ using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
 using WorkNestify.Models.Models.Users;
 using WorkNestify.Services;
 using WorkNestify.Utilities;
+using WorkNestify.Web.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Add SignalR
+builder.Services.AddSignalR();
+
 // Add Razor Pages
 builder.Services.AddRazorPages();
+
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.MaxDepth = 128;
+        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+        options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+    });
 
 // Database connection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -124,6 +139,8 @@ app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",
     pattern: "{area=JobSeeker}/{controller=Home}/{action=Index}/{id?}");
+
+app.MapHub<JobHub>("/jobHub");
 
 app.Run();
 

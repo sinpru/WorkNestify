@@ -23,35 +23,31 @@
         <!-- Job Listings Section -->
         <div class="mb-5">
             <h2 class="h4 mb-4 text-primary">Top Job Opportunities</h2>
-            <!-- Filters -->
-            <form asp-action="Index" asp-controller="Home" asp-area="JobSeeker" method="get">
-                <div class="d-flex flex-wrap gap-3 mb-3">
-                    <select name="location" class="form-select w-auto" asp-items="ViewBag.ProvinceId" onchange="this.form.submit()">
-                        <option value="" selected disabled hidden>Locations</option>
-                    </select>
-                    <select name="category" class="form-select w-auto" asp-items="ViewBag.JobCategoryId" onchange="this.form.submit()">
-                        <option value="" selected disabled hidden>Categories</option>
-                    </select>
+            <!-- Loading spinner -->
+            <div id="loading-spinner" class="text-center d-none">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
                 </div>
-            </form>
+            </div>
+
             <!-- Job Cards -->
-            @if (Model.Any())
-            {
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="job-listings">
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 @(Model.Count() < 3 ? "justify-content-center" : "")" id="job-listings">
+                @if (Model.Any())
+                {
                     @foreach (var job in Model)
                     {
                         @await Html.PartialAsync("_JobCardPartial", job, new ViewDataDictionary(ViewData) { { "Layout", "compact" } })
                     }
-                </div>
-            }
-            else
-            {
-                <div class="text-center">
-                    <p class="text-muted">No top jobs available at the moment.</p>
-                </div>
-            }
+                }
+                else
+                {
+                    <div class="text-center">
+                        <p class="text-muted">No top jobs available at the moment.</p>
+                    </div>
+                }
+            </div>
 
-            <!-- Pagination with pagination.js and Bootstrap -->
+            <!-- Pagination -->
             @if (ViewBag.TotalJobs > ViewBag.PageSize)
             {
                 <nav aria-label="Job pagination" class="mt-4">
@@ -64,13 +60,14 @@
 
 @section Scripts {
     <script asp-append-version="true">
-        var totalJobs = @ViewBag.TotalJobs;
-        var pageSize = @ViewBag.PageSize;
-        var currentPage = @ViewBag.CurrentPage;
-        var baseUrlFromRazor = '@Url.Action("Index", "Home", new { area = "JobSeeker" })';
-        var searchFromRazor = '@Context.Request.Query["search"]';
-        var categoryFromRazor = '@Context.Request.Query["category"]';
-        var locationFromRazor = '@Context.Request.Query["location"]';
+        window.jobFilterConfig = {
+            totalJobs: @(ViewBag.TotalJobs ?? 0),
+            pageSize: @(ViewBag.PageSize ?? 6),
+            currentPage: @(ViewBag.CurrentPage ?? 1),
+            search: '@Html.Raw(Context.Request.Query["search"])',
+            category: '@Html.Raw(Context.Request.Query["category"])',
+            location: '@Html.Raw(Context.Request.Query["location"])'
+        };
     </script>
     <script src="~/js/PaginationRenderer.js" asp-append-version="true"></script>
 }
