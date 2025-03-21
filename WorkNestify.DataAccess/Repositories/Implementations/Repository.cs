@@ -16,9 +16,16 @@ public class Repository<T> : IRepository<T> where T : class
         _dbSet = _context.Set<T>();
     }
 
-    public async Task<T?> GetAsync(Expression<Func<T, bool>> filter, string? includeProperties = null)
+    public async Task<T?> GetAsync(
+        Expression<Func<T, bool>> filter, 
+        string? includeProperties = null, 
+        bool? tracked = true)
     {
         IQueryable<T> query = _dbSet;
+        if (tracked == true)
+        {
+            query = query.AsNoTracking();
+        }
         query = query.Where(filter);
         if (!string.IsNullOrEmpty(includeProperties))
         {

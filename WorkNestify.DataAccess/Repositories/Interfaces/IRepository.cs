@@ -6,7 +6,8 @@ public interface IRepository<T> where T : class
 {
     Task<T?> GetAsync(
         Expression<Func<T, bool>> filter, 
-        string? includeProperties = null);
+        string? includeProperties = null,
+        bool? tracked = true);
     
     Task<IEnumerable<T>> GetAllAsync(
         Expression<Func<T, bool>>? filter = null,
