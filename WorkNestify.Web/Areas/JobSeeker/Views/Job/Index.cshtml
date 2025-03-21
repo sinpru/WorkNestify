@@ -5,38 +5,34 @@
 }
 
 <div class="row justify-content-center">
-    <div class="col-12 col-md-10">
+    <div class="col-12">
         <!-- Search Bar -->
         <partial name="_SearchBarPartial"/>
-
+    </div>
+    
+    <div class="col-4">
+        
+    </div>
+    
+    <div class="col-8">
         <!-- Job Listings -->
         <div class="mb-5">
             <h2 class="h4 mb-4 text-primary">Job Listings</h2>
             @if (Model.Any())
             {
-                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                <div class="row row-cols-1 g-4" id="job-listings">
                     @foreach (var job in Model)
                     {
-                        <partial name="_JobCardPartial" model="job"/>
+                        @await Html.PartialAsync("_JobCardPartial", job, new ViewDataDictionary(ViewData) { { "Layout", "wide" } })
                     }
                 </div>
-                <!-- Pagination -->
-                <nav aria-label="Page navigation" class="mt-4">
-                    <ul class="pagination justify-content-center">
-                        <li class="page-item @(ViewBag.Page == 1 ? "disabled" : "")">
-                            <a class="page-link" asp-action="Index" asp-controller="Job" asp-area="JobSeeker" asp-route-page="@(ViewBag.Page - 1)" asp-route-search="@ViewBag.Search" asp-route-category="@Context.Request.Query["category"]" asp-route-location="@Context.Request.Query["location"]">Previous</a>
-                        </li>
-                        @for (int i = 1; i <= ViewBag.TotalPages; i++)
-                        {
-                            <li class="page-item @(ViewBag.Page == i ? "active" : "")">
-                                <a class="page-link" asp-action="Index" asp-controller="Job" asp-area="JobSeeker" asp-route-page="@i" asp-route-search="@ViewBag.Search" asp-route-category="@Context.Request.Query["category"]" asp-route-location="@Context.Request.Query["location"]">@i</a>
-                            </li>
-                        }
-                        <li class="page-item @(ViewBag.Page == ViewBag.TotalPages ? "disabled" : "")">
-                            <a class="page-link" asp-action="Index" asp-controller="Job" asp-area="JobSeeker" asp-route-page="@(ViewBag.Page + 1)" asp-route-search="@ViewBag.Search" asp-route-category="@Context.Request.Query["category"]" asp-route-location="@Context.Request.Query["location"]">Next</a>
-                        </li>
-                    </ul>
-                </nav>
+                <!-- Pagination with pagination.js and Bootstrap -->
+                @if (ViewBag.TotalJobs > ViewBag.PageSize)
+                {
+                    <nav aria-label="Job pagination" class="mt-4">
+                        <div id="pagination-container" class="d-flex justify-content-center"></div>
+                    </nav>
+                }
             }
             else
             {
@@ -47,3 +43,16 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script asp-append-version="true">
+        var totalJobs = @ViewBag.TotalJobs;
+        var pageSize = @ViewBag.PageSize;
+        var currentPage = @ViewBag.CurrentPage;
+        var baseUrlFromRazor = '@Url.Action("Index", "Job", new { area = "JobSeeker" })'; // Updated to Job controller
+        var searchFromRazor = '@Context.Request.Query["search"]';
+        var categoryFromRazor = '@Context.Request.Query["category"]';
+        var locationFromRazor = '@Context.Request.Query["location"]';
+    </script>
+    <script src="~/js/PaginationRenderer.js" asp-append-version="true"></script>
+}

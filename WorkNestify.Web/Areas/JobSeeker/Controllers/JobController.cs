@@ -16,7 +16,7 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
         private readonly GhnService _ghnService;
 
         public JobController(
-            IUnitOfWork unitOfWork, 
+            IUnitOfWork unitOfWork,
             GhnService ghnService)
         {
             _unitOfWork = unitOfWork;
@@ -24,28 +24,43 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
         }
 
         // GET: JobSeeker/Job
-        public async Task<IActionResult> Index(string search, string category, string location, int page = 1)
+        public async Task<IActionResult> Index(
+            string search,
+            string category,
+            string location,
+            int page = 1,
+            int pageSize = 10)
         {
-            const int pageSize = 9;
+            // Populate dropdowns for categories and locations
+            await PopulateDropdownsAsync();
+
+            // Fetch featured jobs (e.g., status "Open", ordered by CreatedDate, limit to 6)
             var jobsQuery = _unitOfWork.Jobs.GetAllQueryable(
                 filter: j => j.Status == "Open"
                              && (string.IsNullOrEmpty(search) || j.Title.Contains(search))
                              && (string.IsNullOrEmpty(category) || j.JobCategoryId.ToString() == category)
                              && (string.IsNullOrEmpty(location) || j.StreetAddress.Contains(location)),
-                includeProperties: "Company,JobCategory",
-                orderByDescending: new[] { (Expression<Func<Job, object>>)(j => j.CreatedDate) },
-                skip: (page - 1) * pageSize,
-                take: pageSize
+                includeProperties: "Company,JobCategory,Province,District,Ward"
             );
+
+            // Get total count for pagination
             var totalJobs = await jobsQuery.CountAsync();
-            var jobs = await jobsQuery.ToListAsync();
 
-            await PopulateDropdownsAsync();
-            ViewBag.TotalPages = (int)Math.Ceiling((double)totalJobs / pageSize);
+            // Apply pagination
+            var paginatedJobs = await jobsQuery
+                .OrderByDescending(j => j.CreatedDate)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Pass data to ViewBag for pagination.js
+            ViewBag.TotalJobs = totalJobs;
+            ViewBag.CurrentPage = page;
+            ViewBag.PageSize = pageSize;
+
             ViewBag.Search = search;
-            ViewBag.Page = page;
 
-            return View(jobs);
+            return View(paginatedJobs);
         }
 
         // GET: JobSeeker/Job/Details/5
@@ -59,7 +74,7 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             var job = await _unitOfWork.Jobs
                 .GetAsync(j => j.Id == id,
                     includeProperties: "Company,JobCategory");
-            
+
             if (job == null)
             {
                 return NotFound();
@@ -67,11 +82,13 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
 
             return View(job);
         }
-        
+
         private async Task PopulateDropdownsAsync(Job? job = null, string? search = null, int? page = null)
         {
-            ViewData["JobCategoryId"] = new SelectList(_unitOfWork.JobCategories.GetAllAsync().Result, "Id", "Name");
-            ViewData["ProvinceId"] = new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name");
+            ViewData["JobCategoryId"] = new SelectList(await _unitOfWork.JobCategories.GetAllAsync(), "Id", "Name",
+                job?.JobCategoryId);
+            ViewData["ProvinceId"] =
+                new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name", job?.ProvinceId);
             ViewData["Level"] = new SelectList(JobLevels.AllLevels);
             ViewData["Status"] = new SelectList(JobStatuses.AllStatuses);
             ViewData["Type"] = new SelectList(JobTypes.AllTypes);

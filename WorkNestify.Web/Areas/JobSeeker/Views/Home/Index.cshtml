@@ -5,7 +5,7 @@
 }
 
 <div class="row justify-content-center">
-    <div class="col-12 col-md-10">
+    <div class="col-12">
         <!-- Search Bar -->
         <partial name="_SearchBarPartial" />
 
@@ -40,7 +40,7 @@
                 <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="job-listings">
                     @foreach (var job in Model)
                     {
-                        <partial name="_JobCardPartial" model="job" />
+                        @await Html.PartialAsync("_JobCardPartial", job, new ViewDataDictionary(ViewData) { { "Layout", "compact" } })
                     }
                 </div>
             }
