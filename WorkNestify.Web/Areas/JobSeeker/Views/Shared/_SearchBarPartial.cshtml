@@ -1,9 +1,8 @@
-@* _SearchBarPartial.cshtml *@
-<div class="bg-light p-4 shadow-sm mb-4 border">
+<div class="bg-light p-4 mb-4">
     <form asp-action="Index" asp-controller="Job" asp-area="JobSeeker" method="get">
         <div class="row g-3 align-items-center">
             <!-- Search Input -->
-            <div class="col-md-6">
+            <div class="col-md-4">
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0 border-2 fw-bold text-muted">
                         <i class="bi bi-search"></i>
@@ -25,8 +24,8 @@
                 </select>
             </div>
             <!-- Submit Button -->
-            <div class="col-md-12 text-center mt-3">
-                <button type="submit" class="btn btn-primary btn-lg px-5 shadow-sm text-uppercase fw-bold">
+            <div class="col-md-2 text-center">
+                <button type="submit" class="btn btn-primary text-uppercase fw-bold">
                     <i class="bi bi-search me-2"></i>Search Jobs
                 </button>
             </div>
