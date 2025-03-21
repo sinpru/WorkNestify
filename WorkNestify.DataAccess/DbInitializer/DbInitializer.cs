@@ -92,18 +92,54 @@ public class DbInitializer : IDbInitializer
             await _unitOfWork.SaveAsync();
         }
 
-        // Seed Provinces
+        // Seed Provinces with explicit transaction
         if (await _unitOfWork.Provinces.CountAsync(null) == 0)
         {
-            await _unitOfWork.Provinces.AddRangeAsync(ProvinceSeed.GetProvinces());
-            await _unitOfWork.SaveAsync();
+            var provinces = ProvinceSeed.GetProvinces();
+            await _unitOfWork.Provinces.AddRangeAsync(provinces);
+
+            // Use a transaction to isolate Province save
+            using (var transaction = await _unitOfWork.Context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    await _unitOfWork.Context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Provinces ON");
+                    await _unitOfWork.Context.SaveChangesAsync(); // Save only Provinces
+                    await _unitOfWork.Context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Provinces OFF");
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine($"Error seeding Provinces: {ex.Message}");
+                    throw;
+                }
+            }
         }
 
         // Seed Districts (after Provinces)
         if (await _unitOfWork.Districts.CountAsync(null) == 0)
         {
-            await _unitOfWork.Districts.AddRangeAsync(DistrictSeed.GetDistricts());
-            await _unitOfWork.SaveAsync();
+            var districts = DistrictSeed.GetDistricts();
+            await _unitOfWork.Districts.AddRangeAsync(districts);
+
+            // Use a transaction for Districts
+            using (var transaction = await _unitOfWork.Context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    await _unitOfWork.Context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Districts ON");
+                    await _unitOfWork.Context.SaveChangesAsync(); // Save only Districts
+                    await _unitOfWork.Context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Districts OFF");
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine($"Error seeding Districts: {ex.Message}");
+                    throw;
+                }
+            }
         }
 
         // Seed Wards (after Districts)

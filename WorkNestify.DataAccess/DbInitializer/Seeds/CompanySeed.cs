@@ -120,7 +120,7 @@ public static class CompanySeed
                 StreetAddress = "6 Quang Trung",
                 Description =
                     "<h1>About Techcombank</h1>  \n\n<h2>Overview</h2>  \n<p>Techcombank is one of Vietnam’s leading commercial banks, providing a wide range of financial services to individuals, businesses, and institutions.</p>  \n\n<h2>Core Services</h2>  \n<p>Techcombank offers retail banking, corporate banking, wealth management, digital banking, and investment services, catering to diverse financial needs.</p>  \n\n<h2>Industry Presence</h2>  \n<p>With a strong presence across Vietnam, Techcombank serves millions of customers and is recognized for its innovative banking solutions and customer-centric approach.</p>  \n\n<h2>Technology & Innovation</h2>  \n<p>Techcombank invests heavily in digital banking technologies, offering a seamless online and mobile banking experience with features like instant payments, digital loans, and AI-driven financial advice.</p>  \n\n<h2>Growth & Expansion</h2>  \n<p>Techcombank continues to expand its network of branches and ATMs nationwide while enhancing its digital offerings to reach a broader customer base.</p>  \n\n<h2>Commitment to Excellence</h2>  \n<p>Committed to delivering exceptional financial services, Techcombank focuses on innovation, sustainability, and empowering customers to achieve their financial goals.</p>  \n",
-                Logo = "https://www.techcombank.com.vn/images/logo-techcombank.png",
+                Logo = "https://dongphucvina.vn/wp-content/uploads/2023/05/logo-techcombank-dongphucvina.vn_.png",
                 Industry = "Banking, Financial Services",
                 FoundedDate = new DateTime(1993, 9, 27),
                 Size = CompanySizes.Large,
@@ -137,7 +137,7 @@ public static class CompanySeed
                 StreetAddress = "Vinhomes Riverside, Long Bien",
                 Description =
                     "<h1>About VinFast</h1>  \n\n<h2>Overview</h2>  \n<p>VinFast is Vietnam’s first global automotive manufacturer, producing electric vehicles (EVs), scooters, and cars with a focus on sustainability and innovation.</p>  \n\n<h2>Core Products</h2>  \n<p>VinFast designs and manufactures a range of electric vehicles, including SUVs, sedans, and e-scooters, as well as offering smart mobility solutions.</p>  \n\n<h2>Industry Presence</h2>  \n<p>As a pioneer in Vietnam’s automotive industry, VinFast has made significant inroads into international markets, including North America and Europe.</p>  \n\n<h2>Technology & Innovation</h2>  \n<p>VinFast leverages cutting-edge technologies such as AI, battery management systems, and autonomous driving to create smart, eco-friendly vehicles.</p>  \n\n<h2>Growth & Expansion</h2>  \n<p>With ambitious plans for global expansion, VinFast is rapidly scaling its production capabilities and establishing a strong presence in the EV market.</p>  \n\n<h2>Commitment to Sustainability</h2>  \n<p>VinFast is dedicated to promoting sustainable transportation by accelerating the adoption of electric vehicles and reducing carbon emissions worldwide.</p>  \n",
-                Logo = "https://vinfastauto.com/themes/porto/images/logo-vinfast.png",
+                Logo = "https://upload.wikimedia.org/wikipedia/commons/a/ac/Logo_of_VinFast_%283D_Banner%29.svg",
                 Industry = "Automotive, Electric Vehicles",
                 FoundedDate = new DateTime(2017, 9, 2),
                 Size = CompanySizes.Large,
@@ -154,7 +154,7 @@ public static class CompanySeed
                 StreetAddress = "Floor 4 - 5 - 6, Capital Palace Building, 29 Lieu Giai Street",
                 Description =
                     "<h1>About Shopee Vietnam</h1>  \n\n<h2>Overview</h2>  \n<p>Shopee Vietnam is a leading e-commerce platform, offering a wide range of products and services to millions of users across the country.</p>  \n\n<h2>Core Services</h2>  \n<p>Shopee provides an online marketplace for buying and selling goods, logistics support, and digital payment solutions through ShopeePay.</p>  \n\n<h2>Industry Presence</h2>  \n<p>Shopee is a dominant player in Vietnam’s e-commerce sector, connecting sellers and buyers while offering promotions, flash sales, and a seamless shopping experience.</p>  \n\n<h2>Technology & Innovation</h2>  \n<p>Shopee leverages AI, machine learning, and data analytics to personalize recommendations, optimize logistics, and enhance user engagement.</p>  \n\n<h2>Growth & Expansion</h2>  \n<p>Since entering the Vietnamese market, Shopee has seen exponential growth, expanding its user base and product categories to meet diverse consumer needs.</p>  \n\n<h2>Commitment to Community</h2>  \n<p>Shopee is committed to empowering small businesses and entrepreneurs by providing them with a platform to reach a wider audience and grow their brands.</p>  \n",
-                Logo = "https://shopee.vn/images/shopee-logo.png",
+                Logo = "https://upload.wikimedia.org/wikipedia/commons/f/fe/Shopee.svg",
                 Industry = "E-commerce, Online Retail",
                 FoundedDate = new DateTime(2016, 1, 1),
                 Size = CompanySizes.Large,
@@ -205,7 +205,7 @@ public static class CompanySeed
                 StreetAddress = "216 Tran Quang Khai",
                 Description =
                     "<h1>About Highlands Coffee</h1>  \n\n<h2>Overview</h2>  \n<p>Highlands Coffee is Vietnam’s largest coffee chain, known for its authentic Vietnamese coffee and modern café experience.</p>  \n\n<h2>Signature Offerings</h2>  \n<p>Highlands Coffee serves traditional Vietnamese phin coffee, espresso-based drinks, tea, and snacks, emphasizing quality and authenticity.</p>  \n\n<h2>Store Experience</h2>  \n<p>With hundreds of locations nationwide, Highlands Coffee offers a cozy and contemporary space for customers to relax, work, or socialize.</p>  \n\n<h2>Commitment to Quality</h2>  \n<p>Highlands sources premium coffee beans from Vietnam’s Central Highlands, ensuring rich, authentic flavors in every cup.</p>  \n\n<h2>Growth & Expansion</h2>  \n<p>Highlands Coffee has expanded rapidly across Vietnam and into international markets, becoming a cultural icon for Vietnamese coffee lovers.</p>  \n\n<h2>Community Engagement</h2>  \n<p>Highlands Coffee fosters community connections through its stores, promoting Vietnamese coffee culture and supporting local farmers.</p>  \n",
-                Logo = "https://www.highlandscoffee.com.vn/vnt_upload/weblink/White_logo800.png",
+                Logo = "https://upload.wikimedia.org/wikipedia/commons/3/3d/Highlands_Coffee_5G.svg",
                 Industry = "Food & Beverage, Coffee Retail",
                 FoundedDate = new DateTime(1999, 1, 1),
                 Size = CompanySizes.Large,
@@ -273,7 +273,7 @@ public static class CompanySeed
                 StreetAddress = "52 Ut Tich Street",
                 Description =
                     "<h1>About Tiki Corporation</h1>  \n\n<h2>Overview</h2>  \n<p>Tiki Corporation is a leading e-commerce platform in Vietnam, known for its fast delivery and wide range of products, including books, electronics, and more.</p>  \n\n<h2>Core Services</h2>  \n<p>Tiki offers an online marketplace, TikiNOW fast delivery, and a subscription service (TikiPRO) for premium benefits.</p>  \n\n<h2>Industry Presence</h2>  \n<p>Tiki is a trusted name in Vietnam’s e-commerce sector, competing with platforms like Shopee and Lazada while focusing on quality and customer satisfaction.</p>  \n\n<h2>Technology & Innovation</h2>  \n<p>Tiki leverages advanced logistics technology, AI-driven recommendations, and a robust supply chain to ensure fast and reliable deliveries.</p>  \n\n<h2>Growth & Expansion</h2>  \n<p>Tiki has expanded its services across Vietnam, introducing new categories and enhancing its delivery infrastructure to meet growing demand.</p>  \n\n<h2>Commitment to Quality</h2>  \n<p>Tiki is committed to providing authentic products, fast delivery, and excellent customer service, making online shopping a delightful experience.</p>  \n",
-                Logo = "https://tiki.vn/images/logo-tiki.png",
+                Logo = "https://salt.tikicdn.com/ts/upload/0e/07/78/ee828743c9afa9792cf20d75995e134e.png",
                 Industry = "E-commerce, Online Retail",
                 FoundedDate = new DateTime(2010, 3, 1),
                 Size = CompanySizes.Medium,
