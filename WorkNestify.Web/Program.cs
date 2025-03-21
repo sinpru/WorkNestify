@@ -67,22 +67,6 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 
 // Repository Structure Implementation
-// Companies
-builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
-builder.Services.AddScoped<ICompanyReviewRepository, CompanyReviewRepository>();
-
-// Jobs
-builder.Services.AddScoped<IJobRepository, JobRepository>();
-builder.Services.AddScoped<IJobCategoryRepository, JobCategoryRepository>();
-
-// JobApplications
-builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
-
-// Locations
-builder.Services.AddScoped<IDistrictRepository, DistrictRepository>();
-builder.Services.AddScoped<IProvinceRepository, ProvinceRepository>();
-builder.Services.AddScoped<IWardRepository, WardRepository>();
-
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 

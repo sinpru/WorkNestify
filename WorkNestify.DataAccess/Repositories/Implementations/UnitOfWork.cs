@@ -1,5 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
+using WorkNestify.DataAccess.Repositories.Implementations.Companies;
+using WorkNestify.DataAccess.Repositories.Implementations.JobApplications;
+using WorkNestify.DataAccess.Repositories.Implementations.Jobs;
+using WorkNestify.DataAccess.Repositories.Implementations.Locations;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
@@ -31,25 +35,17 @@ public class UnitOfWork : IUnitOfWork
     public IProvinceRepository Provinces { get; private set; }
     public IWardRepository Wards { get; private set; }
 
-    public UnitOfWork(ApplicationDbContext context,
-        ICompanyRepository companyRepository,
-        ICompanyReviewRepository companyReviewRepository,
-        IJobRepository jobRepository,
-        IJobCategoryRepository jobCategoryRepository,
-        IJobApplicationRepository jobApplicationRepository,
-        IDistrictRepository districtRepository,
-        IProvinceRepository provinceRepository,
-        IWardRepository wardRepository)
+    public UnitOfWork(ApplicationDbContext context)
     {
         _context = context;
-        Companies = companyRepository;
-        CompanyReviews = companyReviewRepository;
-        Jobs = jobRepository;
-        JobCategories = jobCategoryRepository;
-        JobApplications = jobApplicationRepository;
-        Districts = districtRepository;
-        Provinces = provinceRepository;
-        Wards = wardRepository;
+        Companies = new CompanyRepository(_context);
+        CompanyReviews = new CompanyReviewRepository(_context);
+        Jobs = new JobRepository(_context);
+        JobCategories = new JobCategoryRepository(_context);
+        JobApplications = new JobApplicationRepository(_context);
+        Provinces = new ProvinceRepository(_context);
+        Districts = new DistrictRepository(_context);
+        Wards = new WardRepository(_context);
     }
 
     public async Task SaveAsync()
