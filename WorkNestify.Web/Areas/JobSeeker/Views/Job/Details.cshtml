@@ -4,26 +4,109 @@
     ViewData["Title"] = Model.Title;
 }
 
-<div class="row justify-content-center">
-    <div class="col-12 col-md-10">
-        <h2 class="h3 mb-4 text-primary">@Model.Title</h2>
-        <div class="card border-light shadow-sm">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-3">
-                    <img src="https://via.placeholder.com/50" alt="Company Logo" class="me-3 rounded" style="width: 50px; height: 50px;" />
-                    <div>
-                        <h5 class="card-title mb-0">@(Model.Company?.Name ?? Model.Company?.StreetAddress ?? "N/A")</h5>
-                        <p class="card-subtitle text-muted small">Posted on @Model.CreatedDate.ToString("dd/MM/yyyy")</p>
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10">
+            <partial name="_NotificationsPartial"/>
+            
+            <!-- Job Header Section -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="text-primary">@Model.Title <span class="badge bg-success">✔</span></h2>
+                <div class="d-flex align-items-center">
+                    <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-share"></i> Share</a>
+                    <a href="#" class="btn btn-outline-secondary me-2"><i class="bi bi-heart"></i> Save</a>
+                    <a asp-controller="JobApplication" asp-action="Index" asp-route-jobId="@Model.Id"
+                       class="btn btn-outline-success">
+                        <i class="bi bi-send me-2"></i>Apply Now
+                    </a>
+                </div>
+            </div>
+
+            <!-- Company and Job Info Card -->
+            <div class="card border-light shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <h3 class="card-title mb-0">@(Model.Company?.Name ?? "N/A")</h3>
+                            <p class="card-subtitle text-muted">Posted
+                                on @Model.CreatedDate.ToString("dd/MM/yyyy")</p>
+                        </div>
+                        <img src="@Model.Company?.Logo" alt="Company Logo" class="me-3" style="height: 80px;"/>
+                    </div>
+
+                    <!-- Job Details -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <i
+                                    class="bi bi-currency-dollar text-success me-2"></i><strong>Salary:</strong>
+                                $@(Model.Salary.ToString("N0"))</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <i
+                                    class="bi bi-geo-alt text-primary me-2"></i><strong>Location:</strong> @(Model.StreetAddress ?? "N/A"), @(Model.Ward?.Name ?? "N/A"), @(Model.District?.Name ?? "N/A"), @(Model.Province?.Name ?? "N/A")
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <i
+                                    class="bi bi-briefcase text-info me-2"></i><strong>Experience:</strong> @(Model.Level ?? "N/A")
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <i
+                                    class="bi bi-clock text-warning me-2"></i><strong>Type:</strong> @(Model.Type ?? "N/A")
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <i
+                                    class="bi bi-tag text-secondary me-2"></i><strong>Category:</strong> @(Model.JobCategory?.Name ?? "N/A")
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <i
+                                    class="bi bi-hourglass-split text-danger me-2"></i><strong>Status:</strong> @(Model.Status ?? "N/A")
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Job Description -->
+                    <h3 class="mb-3">Job Description</h3>
+                    <div class="card-text">
+                        @Html.Raw(Model.Description)
                     </div>
                 </div>
-                <p class="card-text"><strong>Salary:</strong> $@(Model.Salary.ToString("N0"))</p>
-                <p class="card-text"><strong>Location:</strong> @(Model.StreetAddress ?? "N/A")</p>
-                <p class="card-text"><strong>Category:</strong> @(Model.JobCategory?.Name ?? "N/A")</p>
-                <p class="card-text"><strong>Status:</strong> @(Model.Status ?? "N/A")</p>
-                <p class="card-text"><strong>Description:</strong> @Html.Raw(Model.Description)</p>
-                <div class="text-end">
-                    <a asp-action="Index" asp-controller="Job" asp-area="JobSeeker" class="btn btn-outline-primary">Back to List</a>
+            </div>
+
+            <!-- Additional Job Details -->
+            <div class="card border-light shadow-sm">
+                <div class="card-body">
+                    <h5 class="mb-3">Additional Information</h5>
+                    <ul class="list-unstyled">
+                        <li class="mb-2"><i class="bi bi-calendar-check text-primary me-2"></i>
+                            <strong>Start
+                                Date:</strong> @(Model.StartDate?.ToString("dd/MM/yyyy") ?? "N/A")</li>
+                        <li class="mb-2"><i class="bi bi-calendar-x text-danger me-2"></i>
+                            <strong>End
+                                Date:</strong> @(Model.EndDate?.ToString("dd/MM/yyyy") ?? "N/A")</li>
+                        <li class="mb-2"><i class="bi bi-clock-history text-muted me-2"></i>
+                            <strong>Last
+                                Modified:</strong> @Model.ModifiedDate.ToString("dd/MM/yyyy")</li>
+                    </ul>
                 </div>
+            </div>
+
+            <!-- Back to List Button -->
+            <div class="text-end mt-4">
+                <a asp-action="Index" asp-controller="Job" asp-area="JobSeeker" class="btn btn-outline-primary">Back to
+                    List</a>
             </div>
         </div>
     </div>
