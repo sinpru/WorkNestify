@@ -4,8 +4,6 @@ using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
 
-// using WorkNestify.DataAccess.Repositories.Interfaces.Users;
-
 namespace WorkNestify.DataAccess.Repositories.Interfaces;
 
 public interface IUnitOfWork : IDisposable

@@ -2,12 +2,12 @@
 
 @{
     ViewData["Title"] = "User Management";
-    ViewData["IndexAction"] = "Index";
     ViewData["CreateAction"] = "Create";
     ViewData["CreateText"] = "Add New User";
 }
 
 <partial name="_ManagementNavigationPartial"/>
+<partial name="_NotificationsPartial"/>
 
 @if (TempData["Warning"] != null)
 {

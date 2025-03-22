@@ -78,19 +78,4 @@ public class GhnService
             DistrictId = districtId
         }).ToList() ?? new List<Ward>();
     }
-
-    public async Task<string> CalculateShippingFeeAsync(int fromDistrict, int toDistrict, int serviceId, int weight, int height, int width, int length)
-    {
-        var requestData = new
-        {
-            from_district_id = fromDistrict,
-            to_district_id = toDistrict,
-            service_id = serviceId,
-            weight,
-            height,
-            width,
-            length
-        };
-        return await PostAsync("v2/shipping-order/fee", requestData);
-    }
 }

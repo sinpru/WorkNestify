@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using WorkNestify.Services;
 
-
 namespace WorkNestify.Web.Controllers
 {
     [Route("api/[controller]")]

@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using WorkNestify.DataAccess.Data;
+using WorkNestify.DataAccess.DbInitializer.Seeds;
+using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Models.Models.Users;
 using WorkNestify.Utilities.Constants;
 
@@ -11,44 +13,43 @@ public class DbInitializer : IDbInitializer
 {
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    private readonly ApplicationDbContext _context;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IConfiguration _configuration;
 
     public DbInitializer(
         UserManager<ApplicationUser> userManager,
         RoleManager<IdentityRole> roleManager,
-        ApplicationDbContext context,
+        IUnitOfWork unitOfWork,
         IConfiguration configuration)
     {
         _userManager = userManager;
         _roleManager = roleManager;
-        _context = context;
+        _unitOfWork = unitOfWork;
         _configuration = configuration;
     }
-    
-    public void Initialize()
+
+    public async Task Initialize()
     {
         // Apply migrations if pending
         try
         {
-            if (_context.Database.GetPendingMigrations().Count() > 0)
+            if (_unitOfWork.Context.Database.GetPendingMigrations().Any())
             {
-                _context.Database.Migrate();
+                await _unitOfWork.Context.Database.MigrateAsync();
             }
         }
         catch (Exception)
         {
             throw;
         }
-        
+
         // Create roles if they do not exist
-        if (!_roleManager.RoleExistsAsync(Roles.JobSeeker).GetAwaiter().GetResult())
+        if (!await _roleManager.RoleExistsAsync(Roles.JobSeeker))
         {
-            _roleManager.CreateAsync(new IdentityRole(Roles.JobSeeker)).GetAwaiter().GetResult();
-            _roleManager.CreateAsync(new IdentityRole(Roles.Employer)).GetAwaiter().GetResult();
-            _roleManager.CreateAsync(new IdentityRole(Roles.Staff)).GetAwaiter().GetResult();
-            _roleManager.CreateAsync(new IdentityRole(Roles.Admin)).GetAwaiter().GetResult();
-            
+            await _roleManager.CreateAsync(new IdentityRole(Roles.JobSeeker));
+            await _roleManager.CreateAsync(new IdentityRole(Roles.Employer));
+            await _roleManager.CreateAsync(new IdentityRole(Roles.Admin));
+
             // Create admin user
             var adminUser = new ApplicationUser
             {
@@ -58,14 +59,14 @@ public class DbInitializer : IDbInitializer
                 PhoneNumber = _configuration["AdminAccount:AccountPhoneNumber"]
             };
 
-            var adminAdded = _userManager.CreateAsync(adminUser, _configuration["AdminAccount:AccountPassword"]).GetAwaiter().GetResult();
+            var adminAdded = await _userManager.CreateAsync(adminUser, _configuration["AdminAccount:AccountPassword"]);
             if (adminAdded.Succeeded)
             {
-                _context.SaveChanges(); // Ensure the user is committed to the database
-                var user = _context.ApplicationUsers.FirstOrDefault(u => u.Email == _configuration["AdminAccount:AccountEmail"]);
+                await _unitOfWork.SaveAsync(); // Save user changes
+                var user = _unitOfWork.Context.ApplicationUsers.FirstOrDefault(u => u.Email == _configuration["AdminAccount:AccountEmail"]);
                 if (user != null)
                 {
-                    _userManager.AddToRoleAsync(user, Roles.JobSeeker).GetAwaiter().GetResult();
+                    await _userManager.AddToRoleAsync(user, Roles.Admin);
                 }
                 else
                 {
@@ -76,6 +77,90 @@ public class DbInitializer : IDbInitializer
             {
                 throw new Exception("Failed to create admin user: " + string.Join(", ", adminAdded.Errors.Select(e => e.Description)));
             }
+        }
+
+        // Seed data for entities
+        await SeedEntities();
+    }
+
+    public async Task SeedEntities()
+    {
+        // Seed Job Categories
+        if (await _unitOfWork.JobCategories.CountAsync(null) == 0)
+        {
+            await _unitOfWork.JobCategories.AddRangeAsync(JobCategorySeed.GetJobCategories());
+            await _unitOfWork.SaveAsync();
+        }
+
+        // Seed Provinces with explicit transaction
+        if (await _unitOfWork.Provinces.CountAsync(null) == 0)
+        {
+            var provinces = ProvinceSeed.GetProvinces();
+            await _unitOfWork.Provinces.AddRangeAsync(provinces);
+
+            // Use a transaction to isolate Province save
+            using (var transaction = await _unitOfWork.Context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    await _unitOfWork.Context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Provinces ON");
+                    await _unitOfWork.Context.SaveChangesAsync(); // Save only Provinces
+                    await _unitOfWork.Context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Provinces OFF");
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine($"Error seeding Provinces: {ex.Message}");
+                    throw;
+                }
+            }
+        }
+
+        // Seed Districts (after Provinces)
+        if (await _unitOfWork.Districts.CountAsync(null) == 0)
+        {
+            var districts = DistrictSeed.GetDistricts();
+            await _unitOfWork.Districts.AddRangeAsync(districts);
+
+            // Use a transaction for Districts
+            using (var transaction = await _unitOfWork.Context.Database.BeginTransactionAsync())
+            {
+                try
+                {
+                    await _unitOfWork.Context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Districts ON");
+                    await _unitOfWork.Context.SaveChangesAsync(); // Save only Districts
+                    await _unitOfWork.Context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Districts OFF");
+                    await transaction.CommitAsync();
+                }
+                catch (Exception ex)
+                {
+                    await transaction.RollbackAsync();
+                    Console.WriteLine($"Error seeding Districts: {ex.Message}");
+                    throw;
+                }
+            }
+        }
+
+        // Seed Wards (after Districts)
+        if (await _unitOfWork.Wards.CountAsync(null) == 0)
+        {
+            await _unitOfWork.Wards.AddRangeAsync(WardSeed.GetWards());
+            await _unitOfWork.SaveAsync();
+        }
+
+        // Seed Companies
+        if (await _unitOfWork.Companies.CountAsync(null) == 0)
+        {
+            await _unitOfWork.Companies.AddRangeAsync(CompanySeed.GetCompanies());
+            await _unitOfWork.SaveAsync();
+        }
+
+        // Seed Jobs
+        if (await _unitOfWork.Jobs.CountAsync(null) == 0)
+        {
+            await _unitOfWork.Jobs.AddRangeAsync(JobSeed.GetJobs());
+            await _unitOfWork.SaveAsync();
         }
     }
 }

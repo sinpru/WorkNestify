@@ -1,0 +1,74 @@
+@model WorkNestify.Models.Models.Jobs.Job
+
+@{
+    // Determine the layout based on ViewData (default to "compact" for homepage)
+    var layout = ViewData["Layout"]?.ToString() ?? "compact";
+    var isCompact = layout == "compact";
+
+    // Calculate "Posted X days ago"
+    var daysAgo = (DateTime.UtcNow - Model.CreatedDate).Days;
+    var postedText = daysAgo == 0 ? "Posted today" : $"Posted {daysAgo} day{(daysAgo == 1 ? "" : "s")} ago";
+}
+
+<div class="col">
+    <div
+        class="card @(isCompact ? "h-100 border-light shadow-sm" : "border-light shadow-sm") animate__animated animate__fadeInUp">
+        <div class="card-body">
+            @if (isCompact)
+            {
+                <!-- Compact layout -->
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <div>
+                        <h5 class="card-title mb-0 text-primary fs-5">@Model.Title</h5>
+                        <p class="card-subtitle mb-0 text-muted">@(Model.Company?.Name ?? "N/A")</p>
+                    </div>
+                    <img src="@Model.Company?.Logo" alt="Company Logo" class="me-2" style="height: 40px;"/>
+                </div>
+                <p class="card-text text-muted mb-1">@(Model.Province?.Name ?? "N/A")</p>
+                <p class="card-text text-muted mb-1">@(Model.Salary.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " ₫")</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <span class="badge bg-success">@(Model.Status ?? "N/A")</span>
+                    <a asp-action="Details" asp-controller="Job" asp-area="JobSeeker" asp-route-id="@Model.Id"
+                       class="btn btn-outline-primary btn-sm">Details</a>
+                </div>
+            }
+            else
+            {
+                <!-- Wide layout -->
+                <div class="d-flex align-items-start">
+                    <div class="me-4 align-self-center">
+                        <img src="@Model.Company?.Logo" alt="Company Logo" style="width: 140px;"/>
+                    </div>
+                    <div class="flex-grow-1 border-start ps-4">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <div>
+                                <h5 class="card-title mb-1 text-primary">@Model.Title</h5>
+                                <p class="card-subtitle text-muted mb-0">@(Model.Company?.Name ?? "N/A")</p>
+                            </div>
+                            <p class="card-text mb-0">
+                                <strong>Salary:</strong> @(Model.Salary.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " ₫")
+                            </p>
+                        </div>
+                        <p class="card-text text-muted mb-2">
+                            <strong>Location:</strong> @(Model.StreetAddress != null ? $"{Model.StreetAddress}, {Model.Ward?.Name}, {Model.District?.Name}, {Model.Province?.Name}" : "N/A")
+                        </p>
+                        <p class="card-text text-muted mb-2">
+                            <strong>Experience Level:</strong> @(Model.Level ?? "N/A")
+                        </p>
+                        <p class="card-text text-muted mb-2">
+                            <strong>Type:</strong> @(Model.Type ?? "N/A")
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center mt-4">
+                            <span class="badge bg-success">@(Model.Status ?? "N/A")</span>
+                            <div class="d-flex align-items-center gap-3">
+                                <span class="text-muted">@postedText</span>
+                                <a asp-action="Details" asp-controller="Job" asp-area="JobSeeker"
+                                   asp-route-id="@Model.Id" class="btn btn-outline-primary">Details</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

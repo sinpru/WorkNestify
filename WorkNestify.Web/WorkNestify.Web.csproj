@@ -12,6 +12,7 @@
       <PackageReference Include="Microsoft.AspNetCore.Authentication.Google" Version="8.0.13" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.13" />
       <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.13" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.14" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.ViewFeatures" Version="2.3.0" />
       <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.13" />
       <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.13" />
@@ -38,8 +39,8 @@
 
     <ItemGroup>
       <Folder Include="Areas\Employer\Controllers\" />
-      <Folder Include="Controllers\" />
       <Folder Include="wwwroot\assets\images\" />
+      <Folder Include="wwwroot\css\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -187,6 +188,7 @@
       <_ContentIncludedByDefault Remove="wwwroot\lib\pdfmake\pdfmake.min.js" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\pdfmake\vfs_fonts.js" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\pdfmake\vfs_fonts.min.js" />
+      <_ContentIncludedByDefault Remove="wwwroot\lib\animate.css\animate.min.css" />
     </ItemGroup>
 
     <ItemGroup>

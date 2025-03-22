@@ -3,28 +3,35 @@ using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using WorkNestify.DataAccess.DbInitializer;
 using WorkNestify.DataAccess.Repositories.Implementations;
-using WorkNestify.DataAccess.Repositories.Implementations.Companies;
-using WorkNestify.DataAccess.Repositories.Implementations.JobApplications;
-using WorkNestify.DataAccess.Repositories.Implementations.Jobs;
-using WorkNestify.DataAccess.Repositories.Implementations.Locations;
 using WorkNestify.DataAccess.Repositories.Interfaces;
-using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
-using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
-using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
-using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
 using WorkNestify.Models.Models.Users;
 using WorkNestify.Services;
 using WorkNestify.Utilities;
+using WorkNestify.Web.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+// Add SignalR
+builder.Services.AddSignalR();
+
 // Add Razor Pages
 builder.Services.AddRazorPages();
+
+builder.Services.AddControllers()
+    .AddNewtonsoftJson(options =>
+    {
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.MaxDepth = 128;
+        options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+        options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore;
+    });
 
 // Database connection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -52,23 +59,8 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 
 // Repository Structure Implementation
-// Companies
-builder.Services.AddScoped<ICompanyRepository, CompanyRepository>();
-builder.Services.AddScoped<ICompanyReviewRepository, CompanyReviewRepository>();
-
-// Jobs
-builder.Services.AddScoped<IJobRepository, JobRepository>();
-builder.Services.AddScoped<IJobCategoryRepository, JobCategoryRepository>();
-
-// JobApplications
-builder.Services.AddScoped<IJobApplicationRepository, JobApplicationRepository>();
-
-// Locations
-builder.Services.AddScoped<IDistrictRepository, DistrictRepository>();
-builder.Services.AddScoped<IProvinceRepository, ProvinceRepository>();
-builder.Services.AddScoped<IWardRepository, WardRepository>();
-
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 
 // External Authentication
 builder.Services.AddAuthentication(options =>
@@ -97,7 +89,7 @@ builder.Services.AddHttpClient<GhnService>();
 
 var app = builder.Build();
 
-// Roles & admin account
+// Seed the database
 SeedDatabase();
 
 // Configure the HTTP request pipeline.
@@ -124,13 +116,15 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{area=JobSeeker}/{controller=Home}/{action=Index}/{id?}");
 
+app.MapHub<JobHub>("/jobHub");
+
 app.Run();
 
-void SeedDatabase()
+async Task SeedDatabase()
 {
     using (var scope = app.Services.CreateScope())
     {
         var dbInitializer = scope.ServiceProvider.GetRequiredService<IDbInitializer>();
-        dbInitializer.Initialize();
+        await dbInitializer.Initialize();
     }
 }

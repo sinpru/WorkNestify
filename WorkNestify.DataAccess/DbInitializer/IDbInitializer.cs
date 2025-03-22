@@ -2,5 +2,6 @@ namespace WorkNestify.DataAccess.DbInitializer;
 
 public interface IDbInitializer
 {
-    void Initialize();
+    Task Initialize();
+    Task SeedEntities();
 }

@@ -1,78 +1,73 @@
-﻿@{
-    Layout = null;
+﻿@model List<WorkNestify.Models.Models.Jobs.Job>
+
+@{
+    ViewData["Title"] = "Homepage";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Home Page - WorkNestify</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-</head>
-<body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow">
-        <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                <image src=""/>
-                WorkNestify
+<div class="row justify-content-center">
+    <div class="col-12">
+        <!-- Search Bar -->
+        <partial name="_SearchBarPartial" />
+
+        <!-- Banner Section -->
+        <div class="bg-primary text-white p-4 text-center mb-5 animate__animated animate__fadeIn">
+            <h2 class="h3 mb-3">Find Your Dream Job in 24 Hours!</h2>
+            <p class="lead mb-4">
+                Connect with thousands of job postings daily from top companies across Vietnam.
+            </p>
+            <a href="@Url.Action("Index", "Job", new { area = "JobSeeker" })" class="btn btn-light btn-lg">
+                Explore Opportunities Now
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                    aria-controls="navbarSupportedContent"
-                    aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="JobSeeker" asp-controller="Home"
-                           asp-action="Index">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="JobSeeker" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="Employer" asp-controller="Job" asp-action="Index">
-                            Job Listing
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                            Admin Dashboard
-                        </a>
-                    </li>
-                </ul>
-                <partial name="_LoginPartial"/>
-            </div>
         </div>
-    </nav>
-</header>
 
-<main role="main" class="home-banner text-center">
-    <h1 class="display-4 text-light">Welcome</h1>
-    <form class="container d-flex justify-content-center align-items-center mt-3"
-          asp-area="JobSeeker" asp-controller="Job" asp-action="Search">
-        <input type="text" name="query" class="form-control"
-               placeholder="Search for jobs, companies..."/>
-        <button type="submit" class="btn btn-primary d-flex align-items-center px-4">
-            <i class="fs-4 bi-search me-1"></i> Search
-        </button>
-    </form>
-</main>
+        <!-- Job Listings Section -->
+        <div class="mb-5">
+            <h2 class="h4 mb-4 text-primary">Top Job Opportunities</h2>
+            <!-- Loading spinner -->
+            <div id="loading-spinner" class="text-center d-none">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
 
+            <!-- Job Cards -->
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 @(Model.Count() < 3 ? "justify-content-center" : "")" id="job-listings">
+                @if (Model.Any())
+                {
+                    @foreach (var job in Model)
+                    {
+                        @await Html.PartialAsync("_JobCardPartial", job, new ViewDataDictionary(ViewData) { { "Layout", "compact" } })
+                    }
+                }
+                else
+                {
+                    <div class="text-center">
+                        <p class="text-muted">No top jobs available at the moment.</p>
+                    </div>
+                }
+            </div>
 
-<footer class="border-top footer text-muted">
-    <div class="container">
-        &copy; 2025 - WorkNestify - <a asp-area="JobSeeker" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <!-- Pagination -->
+            @if (ViewBag.TotalJobs > ViewBag.PageSize)
+            {
+                <nav aria-label="Job pagination" class="mt-4">
+                    <div id="pagination-container" class="d-flex justify-content-center"></div>
+                </nav>
+            }
+        </div>
     </div>
-</footer>
-<script src="~/lib/jquery/dist/jquery.min.js"></script>
-<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-<script src="~/js/site.js" asp-append-version="true"></script>
-<script src="https://accounts.google.com/gsi/client" async></script>
-</body>
-</html>
+</div>
+
+@section Scripts {
+    <script asp-append-version="true">
+        window.jobFilterConfig = {
+            totalJobs: @(ViewBag.TotalJobs ?? 0),
+            pageSize: @(ViewBag.PageSize ?? 6),
+            currentPage: @(ViewBag.CurrentPage ?? 1),
+            search: '@Html.Raw(Context.Request.Query["search"])',
+            category: '@Html.Raw(Context.Request.Query["category"])',
+            location: '@Html.Raw(Context.Request.Query["location"])'
+        };
+    </script>
+    <script src="~/js/PaginationRenderer.js" asp-append-version="true"></script>
+}

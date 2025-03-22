@@ -1,5 +1,6 @@
 using System.Text;
 using System.Text.Encodings.Web;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -14,6 +15,7 @@ using WorkNestify.Utilities.Constants;
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = Roles.Admin)]
     public class UserController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -44,19 +46,24 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 .Include(u => u.JobApplications)
                 .ToListAsync();
             
-            return Json(new
+            // Fetch roles for each user
+            var userData = new List<object>();
+            foreach (var user in usersList)
             {
-                data = usersList.Select(u => new
+                var roles = await _userManager.GetRolesAsync(user);
+                userData.Add(new
                 {
-                    u.Id,
-                    u.FullName,
-                    u.Email,
-                    u.PhoneNumber,
-                    u.Role,
-                    Company = u.Company?.Name ?? "WorkNestify",
-                    JobApplication = u.JobApplications?.Count ?? 0,
-                })
-            });
+                    user.Id,
+                    user.FullName,
+                    user.Email,
+                    user.PhoneNumber,
+                    Role = roles.FirstOrDefault() ?? "None",
+                    Company = user.Company?.Name ?? "WorkNestify",
+                    JobApplication = user.JobApplications?.Count ?? 0
+                });
+            }
+            
+            return Json(new { data = userData });
         }
 
         // GET: Admin/User/Details/5
@@ -102,17 +109,34 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 var user = new ApplicationUser
                 {
                     UserName = applicationUser.Email,
-                    Role = applicationUser.Role,
                     Email = applicationUser.Email,
                     PhoneNumber = applicationUser.PhoneNumber,
                     FullName = applicationUser.FullName,
-                    CompanyId = applicationUser.CompanyId
+                    CompanyId = applicationUser.CompanyId,
+                    CreatedDate = DateTime.UtcNow,
+                    ModifiedDate = DateTime.UtcNow
                 };
 
                 var result = await _userManager.CreateAsync(user, applicationUser.PasswordHash!);
 
                 if (result.Succeeded)
                 {
+                    // Assign role using AddToRoleAsync
+                    if (!string.IsNullOrEmpty(applicationUser.Role))
+                    {
+                        var roleResult = await _userManager.AddToRoleAsync(user, applicationUser.Role);
+                        if (!roleResult.Succeeded)
+                        {
+                            foreach (var error in roleResult.Errors)
+                            {
+                                ModelState.AddModelError(string.Empty, error.Description);
+                            }
+                            PopulateDropdowns();
+                            return View(applicationUser);
+                        }
+                    }
+                    
+                    // Send email confirmation
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
@@ -124,6 +148,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
                     await _emailSender.SendEmailAsync(applicationUser.Email, "Confirm your email",
                         $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    
+                    TempData["Success"] = "User created successfully.";
+                    return RedirectToAction(nameof(Index));
                 }
 
                 // If creation failed, add errors to ModelState
@@ -133,11 +160,11 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 }
 
                 PopulateDropdowns();
-                return RedirectToAction(nameof(Index));
+                return View(applicationUser);
             }
             catch (Exception ex)
             {
-                TempData["Warning"] = ex.Message;
+                TempData["Warning"] = $"Error creating user: {ex.Message}";
                 PopulateDropdowns();
                 return View(applicationUser);
             }
@@ -157,6 +184,10 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
+            // Get the user's current role(s)
+            var roles = await _userManager.GetRolesAsync(applicationUser);
+            applicationUser.Role = roles.FirstOrDefault()!;
+            
             PopulateDropdowns();
             return View(applicationUser);
         }
@@ -191,18 +222,44 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
                 // Update basic properties
                 existingUser.FullName = applicationUser.FullName;
-                existingUser.Role = applicationUser.Role;
                 existingUser.CompanyId = applicationUser.CompanyId;
                 existingUser.PhoneNumber = applicationUser.PhoneNumber;
                 existingUser.Email = applicationUser.Email;
                 existingUser.UserName = applicationUser.Email;
                 existingUser.ModifiedDate = DateTime.UtcNow;
 
+                // Update the user's role
+                var currentRoles = await _userManager.GetRolesAsync(existingUser);
+                var currentRole = currentRoles.FirstOrDefault();
+                if (currentRole != applicationUser.Role)
+                {
+                    // Remove the old role if it exists
+                    if (!string.IsNullOrEmpty(currentRole))
+                    {
+                        await _userManager.RemoveFromRoleAsync(existingUser, currentRole);
+                    }
+                    // Add the new role if specified
+                    if (!string.IsNullOrEmpty(applicationUser.Role))
+                    {
+                        var roleResult = await _userManager.AddToRoleAsync(existingUser, applicationUser.Role);
+                        if (!roleResult.Succeeded)
+                        {
+                            foreach (var error in roleResult.Errors)
+                            {
+                                ModelState.AddModelError(string.Empty, error.Description);
+                            }
+                            PopulateDropdowns();
+                            return View(applicationUser);
+                        }
+                    }
+                }
+                
                 // Update the user using UserManager
                 var result = await _userManager.UpdateAsync(existingUser);
 
                 if (result.Succeeded)
                 {
+                    TempData["Success"] = "User updated successfully.";
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -215,22 +272,9 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 PopulateDropdowns();
                 return View(applicationUser);
             }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!await ApplicationUserExists(applicationUser.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    TempData["Warning"] = "Concurrency error: The user was modified by another process.";
-                    PopulateDropdowns();
-                    return View(applicationUser);
-                }
-            }
             catch (Exception ex)
             {
-                TempData["Warning"] = ex.Message;
+                TempData["Warning"] = $"Error updating user: {ex.Message}";
                 PopulateDropdowns();
                 return View(applicationUser);
             }
@@ -272,6 +316,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
             try
             {
+                // Remove old password
                 var removeResult = await _userManager.RemovePasswordAsync(user);
                 if (!removeResult.Succeeded)
                 {
@@ -282,6 +327,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                     return View(model);
                 }
 
+                // Add new password
                 var addResult = await _userManager.AddPasswordAsync(user, model.NewPassword);
                 if (!addResult.Succeeded)
                 {
@@ -293,6 +339,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 }
                 
                 user.ModifiedDate = DateTime.UtcNow;
+                await _userManager.UpdateAsync(user);
 
                 TempData["Success"] = "Password changed successfully.";
                 return RedirectToAction(nameof(Index));
@@ -338,6 +385,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
                 if (result.Succeeded)
                 {
+                    TempData["Success"] = "User deleted successfully.";
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -357,29 +405,10 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
         }
 
-        private async Task<bool> ApplicationUserExists(string id)
-        {
-            return await _userManager.FindByIdAsync(id) != null;
-        }
-
-        private void PopulateDropdowns(ApplicationUser? applicationUser = null)
+        private void PopulateDropdowns()
         {
             ViewData["Role"] = new SelectList(Roles.AllRoles);
             ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Name");
-        }
-
-        private ApplicationUser CreateUser()
-        {
-            try
-            {
-                return Activator.CreateInstance<ApplicationUser>();
-            }
-            catch
-            {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
-                                                    $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
-                                                    $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
-            }
         }
     }
 }

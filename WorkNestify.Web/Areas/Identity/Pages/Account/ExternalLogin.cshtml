@@ -1,33 +1,51 @@
 ﻿@page
 @model ExternalLoginModel
+
 @{
     ViewData["Title"] = "Register";
+    Layout = "_AuthLayout";
 }
 
-<h1>@ViewData["Title"]</h1>
-<h2 id="external-login-title">Associate your @Model.ProviderDisplayName account.</h2>
-<hr />
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h1 class="card-title text-center mb-4">
+            <i class="bi bi-person-plus-fill me-2"></i>Associate Account
+        </h1>
 
-<p id="external-login-description" class="text-info">
-    You've successfully authenticated with <strong>@Model.ProviderDisplayName</strong>.
-    Please enter an email address for this site below and click the Register button to finish
-    logging in.
-</p>
+        <p class="text-center text-info mb-4">
+            You've successfully authenticated with <strong>@Model.ProviderDisplayName</strong>.<br />
+            Please enter an email address to complete registration.
+        </p>
 
-<div class="row">
-    <div class="col-md-4">
         <form asp-page-handler="Confirmation" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="email" placeholder="Please enter your email."/>
-                <label asp-for="Input.Email" class="form-label"></label>
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Email" class="form-label fw-bold">
+                    <i class="bi bi-envelope-fill me-2"></i>Email
+                </label>
+                <input asp-for="Input.Email" class="form-control"
+                       autocomplete="email"
+                       placeholder="name@example.com"/>
                 <span asp-validation-for="Input.Email" class="text-danger"></span>
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+
+            <button type="submit" class="btn btn-primary w-100 mb-3">
+                <i class="bi bi-person-check me-2"></i>Register
+            </button>
+
+            <div class="text-center">
+                <p class="mb-0">
+                    Back to
+                    <a asp-page="./Login" class="text-primary">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Sign in
+                    </a>
+                </p>
+            </div>
         </form>
     </div>
 </div>
 
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+    <partial name="_ValidationScriptsPartial"/>
 }
