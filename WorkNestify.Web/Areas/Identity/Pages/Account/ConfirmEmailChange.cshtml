@@ -1,8 +1,25 @@
 ﻿@page
 @model ConfirmEmailChangeModel
+
 @{
-    ViewData["Title"] = "Confirm email change";
+    ViewData["Title"] = "Confirm Email Change";
+    Layout = "_AuthLayout";
 }
 
-<h1>@ViewData["Title"]</h1>
-<partial name="_StatusMessage" model="Model.StatusMessage" />
+<div class="card shadow-sm">
+    <div class="card-body">
+        <h1 class="card-title text-center mb-4">
+            <i class="bi bi-envelope-check-fill me-2"></i>Confirm Email Change
+        </h1>
+
+        <div class="text-center">
+            <partial name="_StatusMessage" model="Model.StatusMessage" />
+            <p class="mb-4">
+                Your email change has been confirmed. You can now sign in with your new email.
+            </p>
+            <a asp-page="./Login" class="btn btn-primary">
+                <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+            </a>
+        </div>
+    </div>
+</div>
