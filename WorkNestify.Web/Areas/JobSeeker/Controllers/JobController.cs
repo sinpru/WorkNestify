@@ -32,33 +32,38 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             int pageSize = 10)
         {
             // Populate dropdowns for categories and locations
-            await PopulateDropdownsAsync();
+            await PopulateDropdownsAsync(null, search);
 
-            // Fetch featured jobs (e.g., status "Open", ordered by CreatedDate, limit to 6)
-            var jobsQuery = _unitOfWork.Jobs.GetAllQueryable(
-                filter: j => j.Status == "Open"
-                             && (string.IsNullOrEmpty(search) || j.Title.Contains(search))
-                             && (string.IsNullOrEmpty(category) || j.JobCategoryId.ToString() == category)
-                             && (string.IsNullOrEmpty(location) || j.StreetAddress.Contains(location)),
-                includeProperties: "Company,JobCategory,Province,District,Ward"
-            );
+            // Define the filter
+            Expression<Func<Job, bool>> filter = j =>
+                j.Status == "Open"
+                && (string.IsNullOrEmpty(search) || j.Title.Contains(search))
+                && (string.IsNullOrEmpty(category) ||
+                    j.JobCategoryId.ToString() == category)
+                && (string.IsNullOrEmpty(location) ||
+                    j.StreetAddress.Contains(location));
 
-            // Get total count for pagination
-            var totalJobs = await jobsQuery.CountAsync();
+            // Define ordering
+            Expression<Func<Job, object>>[] orderByDescending = new[]
+                { (Expression<Func<Job, object>>)(j => j.CreatedDate) };
 
-            // Apply pagination
-            var paginatedJobs = await jobsQuery
-                .OrderByDescending(j => j.CreatedDate)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
+            // Get total count
+            var totalJobsQuery = _unitOfWork.Jobs.GetAllQueryable(filter: filter);
+            var totalJobs = await totalJobsQuery.CountAsync();
+
+            // Get paginated results
+            var paginatedJobs = await _unitOfWork.Jobs.GetAllQueryable(
+                filter: filter,
+                includeProperties: "Company,JobCategory,Province,District,Ward",
+                orderByDescending: orderByDescending,
+                skip: (page - 1) * pageSize,
+                take: pageSize
+            ).ToListAsync();
 
             // Pass data to ViewBag for pagination.js
             ViewBag.TotalJobs = totalJobs;
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
-
-            ViewBag.Search = search;
 
             return View(paginatedJobs);
         }
@@ -73,7 +78,7 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
 
             var job = await _unitOfWork.Jobs
                 .GetAsync(j => j.Id == id,
-                    includeProperties: "Company,JobCategory");
+                    includeProperties: "Company,JobCategory,Province,District,Ward");
 
             if (job == null)
             {
@@ -83,7 +88,7 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             return View(job);
         }
 
-        private async Task PopulateDropdownsAsync(Job? job = null, string? search = null, int? page = null)
+        private async Task PopulateDropdownsAsync(Job? job = null, string? search = null)
         {
             ViewData["JobCategoryId"] = new SelectList(await _unitOfWork.JobCategories.GetAllAsync(), "Id", "Name",
                 job?.JobCategoryId);
@@ -92,8 +97,10 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             ViewData["Level"] = new SelectList(JobLevels.AllLevels);
             ViewData["Status"] = new SelectList(JobStatuses.AllStatuses);
             ViewData["Type"] = new SelectList(JobTypes.AllTypes);
-            ViewBag.Search = search;
-            ViewBag.Page = page;
+            if (search != null)
+            {
+                ViewBag.Search = search;
+            }
         }
     }
 }

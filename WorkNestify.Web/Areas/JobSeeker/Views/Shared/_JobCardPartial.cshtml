@@ -16,57 +16,41 @@
         <div class="card-body">
             @if (isCompact)
             {
-                <!-- Compact layout for Homepage -->
+                <!-- Compact layout -->
                 <div class="d-flex align-items-center justify-content-between mb-2">
                     <div>
                         <h5 class="card-title mb-0 text-primary fs-5">@Model.Title</h5>
-                        <p class="card-subtitle mb-0 text-muted">
-                            @(Model.Company?.Name ?? "N/A")
-                        </p>
+                        <p class="card-subtitle mb-0 text-muted">@(Model.Company?.Name ?? "N/A")</p>
                     </div>
-                    <img src="@Model.Company?.Logo" alt="Company Logo" class="me-2"
-                         style="height: 40px;"/>
+                    <img src="@Model.Company?.Logo" alt="Company Logo" class="me-2" style="height: 40px;"/>
                 </div>
-                <p class="card-text text-muted mb-1">
-                    @(Model.Province.Name ?? "N/A")
-                </p>
-                <p class="card-text text-muted mb-1">
-                    @(Model.Salary.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " ₫")
-                </p>
+                <p class="card-text text-muted mb-1">@(Model.Province?.Name ?? "N/A")</p>
+                <p class="card-text text-muted mb-1">@(Model.Salary.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " ₫")</p>
                 <div class="d-flex justify-content-between align-items-center">
                     <span class="badge bg-success">@(Model.Status ?? "N/A")</span>
                     <a asp-action="Details" asp-controller="Job" asp-area="JobSeeker" asp-route-id="@Model.Id"
-                       class="btn btn-outline-primary btn-sm">
-                        Details
-                    </a>
+                       class="btn btn-outline-primary btn-sm">Details</a>
                 </div>
             }
             else
             {
-                <!-- Wider, top-to-bottom layout for Jobs List page (with larger logo on left and info on right) -->
+                <!-- Wide layout -->
                 <div class="d-flex align-items-start">
-                    <!-- Left Section: Logo -->
                     <div class="me-4 align-self-center">
                         <img src="@Model.Company?.Logo" alt="Company Logo" style="width: 140px;"/>
                     </div>
-                    <!-- Right Section: Job Information -->
                     <div class="flex-grow-1 border-start ps-4">
-                        <!-- Top Section: Title and Salary -->
                         <div class="d-flex justify-content-between align-items-start mb-2">
                             <div>
                                 <h5 class="card-title mb-1 text-primary">@Model.Title</h5>
-                                <p class="card-subtitle text-muted mb-0">
-                                    @(Model.Company?.Name ?? "N/A")
-                                </p>
+                                <p class="card-subtitle text-muted mb-0">@(Model.Company?.Name ?? "N/A")</p>
                             </div>
                             <p class="card-text mb-0">
                                 <strong>Salary:</strong> @(Model.Salary.ToString("N0", new System.Globalization.CultureInfo("vi-VN")) + " ₫")
                             </p>
                         </div>
-                        <!-- Remaining Information -->
                         <p class="card-text text-muted mb-2">
-                            <strong>Location:</strong>
-                            @(Model.StreetAddress != null ? $"{Model.StreetAddress}, {Model.Ward?.Name}, {Model.District?.Name}, {Model.Province?.Name}" : "N/A")
+                            <strong>Location:</strong> @(Model.StreetAddress != null ? $"{Model.StreetAddress}, {Model.Ward?.Name}, {Model.District?.Name}, {Model.Province?.Name}" : "N/A")
                         </p>
                         <p class="card-text text-muted mb-2">
                             <strong>Experience Level:</strong> @(Model.Level ?? "N/A")
@@ -74,15 +58,12 @@
                         <p class="card-text text-muted mb-2">
                             <strong>Type:</strong> @(Model.Type ?? "N/A")
                         </p>
-                        <!-- Bottom Section: Status, Posted Text, and Details Button -->
                         <div class="d-flex justify-content-between align-items-center mt-4">
                             <span class="badge bg-success">@(Model.Status ?? "N/A")</span>
                             <div class="d-flex align-items-center gap-3">
                                 <span class="text-muted">@postedText</span>
                                 <a asp-action="Details" asp-controller="Job" asp-area="JobSeeker"
-                                   asp-route-id="@Model.Id" class="btn btn-outline-primary">
-                                    Details
-                                </a>
+                                   asp-route-id="@Model.Id" class="btn btn-outline-primary">Details</a>
                             </div>
                         </div>
                     </div>

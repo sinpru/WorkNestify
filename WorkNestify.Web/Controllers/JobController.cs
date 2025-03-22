@@ -54,7 +54,23 @@ namespace WorkNestify.Web.Controllers
                     orderByDescending: orderByDescending,
                     skip: (page - 1) * pageSize,
                     take: pageSize
-                ).ToListAsync();
+                ).Select(j => new
+                {
+                    id = j.Id,
+                    title = j.Title,
+                    companyName = j.Company != null ? j.Company.Name : null,
+                    companyLogo = j.Company != null ? j.Company.Logo : null,
+                    streetAddress = j.StreetAddress,
+                    category = j.JobCategory != null ? j.JobCategory.Name : null,
+                    province = j.Province != null ? j.Province.Name : null,
+                    district = j.District != null ? j.District.Name : null,
+                    ward = j.Ward != null ? j.Ward.Name : null,
+                    createdDate = j.CreatedDate,
+                    salary = j.Salary,
+                    status = j.Status,
+                    level = j.Level,
+                    type = j.Type
+                }).ToListAsync();
 
                 var response = new
                 {
@@ -69,44 +85,6 @@ namespace WorkNestify.Web.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { error = "An error occurred while fetching jobs: " + ex.Message });
-            }
-        }
-
-        [HttpGet("card/{jobId}")]
-        public async Task<IActionResult> GetJobCard(int jobId)
-        {
-            try
-            {
-                var job = await _unitOfWork.Jobs.GetAsync(
-                    j => j.Id == jobId,
-                    includeProperties: "Company,JobCategory,Province,District,Ward"
-                );
-
-                if (job == null)
-                {
-                    return NotFound(new { error = "Job not found" });
-                }
-
-                return Ok(new
-                {
-                    id = job.Id,
-                    title = job.Title,
-                    companyName = job.Company?.Name,
-                    companyLogo = job.Company?.Logo,
-                    streetAddress = job.StreetAddress,
-                    category = job.JobCategory?.Name,
-                    province = job.Province?.Name,
-                    district = job.District?.Name,
-                    ward = job.Ward?.Name,
-                    createdDate = job.CreatedDate,
-                    salary = job.Salary,
-                    status = job.Status
-                });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500,
-                    new { error = "An error occurred while fetching job card", detail = ex.Message });
             }
         }
     }

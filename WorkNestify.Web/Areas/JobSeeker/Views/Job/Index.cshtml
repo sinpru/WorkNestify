@@ -30,13 +30,6 @@
                     {
                         @await Html.PartialAsync("_JobCardPartial", job, new ViewDataDictionary(ViewData) { { "Layout", "wide" } })
                     }
-                    <!-- Pagination with pagination.js and Bootstrap -->
-                    @if (ViewBag.TotalJobs > ViewBag.PageSize)
-                    {
-                        <nav aria-label="Job pagination" class="mt-4">
-                            <div id="pagination-container" class="d-flex justify-content-center"></div>
-                        </nav>
-                    }
                 }
                 else
                 {
@@ -45,6 +38,14 @@
                     </div>
                 }
             </div>
+            
+            <!-- Pagination with pagination.js and Bootstrap -->
+            @if (ViewBag.TotalJobs > ViewBag.PageSize)
+            {
+                <nav aria-label="Job pagination" class="mt-4">
+                    <div id="pagination-container" class="d-flex justify-content-center"></div>
+                </nav>
+            }
         </div>
     </div>
 </div>
@@ -53,7 +54,7 @@
     <script asp-append-version="true">
         window.jobFilterConfig = {
             totalJobs: @(ViewBag.TotalJobs ?? 0),
-            pageSize: @(ViewBag.PageSize ?? 6),
+            pageSize: @(ViewBag.PageSize ?? 10),
             currentPage: @(ViewBag.CurrentPage ?? 1),
             search: '@Html.Raw(Context.Request.Query["search"])',
             category: '@Html.Raw(Context.Request.Query["category"])',
