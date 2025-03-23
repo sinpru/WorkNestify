@@ -56,7 +56,7 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
                     j.Type,
                     j.Status,
                     j.Level,
-                    JobCategory = j.JobCategory?.Name,
+                    JobCategory = j.JobCategory?.Name ?? "Not specified",
                     CreatedDate = j.CreatedDate.ToString("o") // ISO 8601 for JavaScript
                 })
             });
@@ -100,6 +100,13 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
             [Bind("Title,Description,StreetAddress,Salary,StartDate,EndDate,Type,Status,Level,JobCategoryId,CompanyId,ProvinceId,DistrictId,WardCode")] 
             Job job)
         {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (job.CompanyId != currentUser.CompanyId)
+            {
+                TempData["Warning"] = "You are not authorized to access this page.";
+                return RedirectToAction(nameof(Index));
+            }
+            
             if (!ModelState.IsValid)
             {
                 await PopulateDropdownsAsync();
@@ -151,6 +158,13 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
                 return NotFound();
             }
             
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (job.CompanyId != currentUser.CompanyId)
+            {
+                TempData["Warning"] = "You cannot edit this job.";
+                return RedirectToAction(nameof(Index));
+            }
+            
             await PopulateDropdownsAsync(job);
             PopulateDateFields(job);
             return View(job);
@@ -168,6 +182,13 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
             if (id != job.Id)
             {
                 return NotFound();
+            }
+            
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (job.CompanyId != currentUser.CompanyId)
+            {
+                TempData["Warning"] = "You cannot edit this job.";
+                return RedirectToAction(nameof(Index));
             }
 
             if (!ModelState.IsValid)
@@ -221,6 +242,13 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
             {
                 return NotFound();
             }
+            
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (job.CompanyId != currentUser.CompanyId)
+            {
+                TempData["Warning"] = "You cannot edit this job.";
+                return RedirectToAction(nameof(Index));
+            }
 
             return View(job);
         }
@@ -237,6 +265,13 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
             if (job == null)
             {
                 return NotFound();
+            }
+            
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (job.CompanyId != currentUser.CompanyId)
+            {
+                TempData["Warning"] = "You cannot edit this job.";
+                return RedirectToAction(nameof(Index));
             }
 
             try

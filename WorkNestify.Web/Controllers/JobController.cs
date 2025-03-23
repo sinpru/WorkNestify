@@ -1,8 +1,11 @@
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Models.Models.Jobs;
+using WorkNestify.Models.Models.Users;
 using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.Web.Controllers
@@ -12,10 +15,14 @@ namespace WorkNestify.Web.Controllers
     public class JobController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public JobController(IUnitOfWork unitOfWork)
+        public JobController(
+            IUnitOfWork unitOfWork,
+            UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
+            _userManager = userManager;
         }
 
         [HttpGet("filter")]
@@ -89,7 +96,8 @@ namespace WorkNestify.Web.Controllers
             }
         }
 
-        [HttpPost("toggle-job")]
+        [HttpPost("toggle-job/{id}")]
+        [Authorize(Roles = Roles.Admin + "," + Roles.Employer)]
         public async Task<IActionResult> ToggleStatus(int id)
         {
             try
@@ -102,6 +110,12 @@ namespace WorkNestify.Web.Controllers
                 if (job == null)
                 {
                     return NotFound(new { success = false, message = "Job not found" });
+                }
+                
+                var currentUser = await _userManager.GetUserAsync(User);
+                if (job.CompanyId != currentUser.CompanyId)
+                {
+                    return Unauthorized(new { success = false, message = "You are not authorized to change the job" });
                 }
 
                 if (job.Status == JobStatuses.Pending)

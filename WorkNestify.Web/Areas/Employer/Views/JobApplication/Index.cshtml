@@ -1,7 +1,7 @@
-@model IEnumerable<WorkNestify.Models.Models.Jobs.Job>
+@model IEnumerable<WorkNestify.Models.Models.JobApplications.JobApplication>
 
 @{
-    ViewData["Title"] = "Job Management";
+    ViewData["Title"] = "Job Applications Management";
 }
 
 <div class="container mt-4">
@@ -10,30 +10,28 @@
     <div class="row mb-3 align-items-center">
         <div class="col-md-6">
             <h1 class="display-6 text-primary">
-                <i class="bi bi-briefcase-fill me-2"></i>Job Management
+                <i class="bi bi-file-earmark-person-fill me-2"></i>Job Applications Management
             </h1>
-            <p class="text-muted">Manage your job postings efficiently.</p>
+            <p class="text-muted">Manage job applications efficiently.</p>
         </div>
         <div class="col-md-6 text-md-end">
-            <a asp-action="Create" class="btn btn-success shadow-sm" title="Create a new job posting">
-                <i class="bi bi-plus-circle me-2"></i>Create New Job
+            <a asp-action="Create" class="btn btn-success shadow-sm" title="Create a new job application">
+                <i class="bi bi-plus-circle me-2"></i>Create New Application
             </a>
         </div>
     </div>
 
     <div class="card shadow-sm">
         <div class="card-body">
-            <table class="table table-striped table-hover nowrap w-100" id="jobsTable">
+            <table class="table table-striped table-hover nowrap w-100" id="jobApplicationsTable">
                 <thead class="table-dark">
                 <tr>
-                    <th>@Html.DisplayNameFor(model => model.Title)</th>
-                    <th>@Html.DisplayNameFor(model => model.StreetAddress)</th>
-                    <th>@Html.DisplayNameFor(model => model.Salary)</th>
+                    <th>@Html.DisplayNameFor(model => model.ApplicationUser)</th>
+                    <th>@Html.DisplayNameFor(model => model.Job)</th>
                     <th>@Html.DisplayNameFor(model => model.Status)</th>
-                    <th>@Html.DisplayNameFor(model => model.JobCategory)</th>
-                    <th>@Html.DisplayNameFor(model => model.Type)</th>
-                    <th>@Html.DisplayNameFor(model => model.Level)</th>
-                    <th>@Html.DisplayNameFor(model => model.CreatedDate)</th>
+                    <th>@Html.DisplayNameFor(model => model.Resume)</th>
+                    <th>@Html.DisplayNameFor(model => model.CoverLetter)</th>
+                    <th>@Html.DisplayNameFor(model => model.ApplicationDate)</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -47,11 +45,11 @@
 {
     @{ await Html.RenderPartialAsync("_DataTablesScriptsPartial"); }
     <style>
-        #jobsTable td {
+        #jobApplicationsTable td {
             vertical-align: middle;
         }
 
-        #jobsTable .btn-group {
+        #jobApplicationsTable .btn-group {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -59,34 +57,25 @@
     </style>
     <script asp-append-version="true">
         $(document).ready(function () {
-            const table = $('#jobsTable').DataTable({
+            const table = $('#jobApplicationsTable').DataTable({
                 ajax: {
-                    url: '/Employer/Job/GetAll',
+                    url: '/Employer/JobApplication/GetAll',
                     dataSrc: 'data'
                 },
                 columns: [
-                    {data: 'title'},
-                    {data: 'streetAddress'},
-                    {
-                        data: 'salary',
-                        render: function (data) {
-                            return data.toLocaleString('vi-VN') + ' ₫';
-                        }
-                    },
+                    {data: 'applicationUser'},
+                    {data: 'job'},
                     {
                         data: 'status',
                         render: function (data, type, row) {
                             if (type === 'display') {
                                 let badgeClass;
                                 switch (data?.toLowerCase()) {
-                                    case 'open':
-                                        badgeClass = 'bg-success';
-                                        break;
-                                    case 'closed':
-                                        badgeClass = 'bg-warning';
-                                        break;
                                     case 'pending':
                                         badgeClass = 'bg-secondary';
+                                        break;
+                                    case 'reviewed':
+                                        badgeClass = 'bg-success';
                                         break;
                                     default:
                                         badgeClass = 'bg-info';
@@ -96,11 +85,32 @@
                             return data;
                         }
                     },
-                    {data: 'jobCategory'},
-                    {data: 'type'},
-                    {data: 'level'},
                     {
-                        data: 'createdDate',
+                        data: 'resume',
+                        render: function (data) {
+                            return data ?
+                                `<a href="${data}" class="btn btn-sm btn-outline-primary" target="_blank" title="Download Resume">
+                                    <i class="bi bi-download"></i>
+                                </a>` :
+                                'N/A';
+                        },
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'coverLetter',
+                        render: function (data) {
+                            return data ?
+                                `<a href="${data}" class="btn btn-sm btn-outline-primary" target="_blank" title="Download Cover Letter">
+                                    <i class="bi bi-download"></i>
+                                </a>` :
+                                'N/A';
+                        },
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'applicationDate',
                         render: function (data) {
                             return new Date(data).toLocaleDateString('vi-VN');
                         }
@@ -109,19 +119,18 @@
                         data: 'id',
                         render: function (data, type, row) {
                             return `<div class="btn-group" role="group">
-                                <a href="/Employer/Job/Edit/${data}" class="btn btn-primary" title="Edit this job">
-                                    <i class="bi bi-pencil-square"></i>
-                                </a>
-                                <a href="/Employer/Job/Details/${data}" class="btn btn-info" title="View job details">
-                                    <i class="bi bi-info-circle"></i>
-                                </a>
-                                <button class="btn btn-warning toggle-status" data-id="${data}" title="Toggle job status" ${row.status?.toLowerCase() === 'pending' ? 'disabled' : ''}>
-                                    <i class="bi bi-arrow-repeat"></i>
-                                </button>
-                                <a href="/Employer/Job/Delete/${data}" class="btn btn-danger" title="Delete this job">
-                                    <i class="bi bi-trash-fill"></i>
-                                </a>
-                            </div>`;
+                                        <button class="btn btn-success accept-application" 
+                                            data-id="${data}" 
+                                            title="Accept application"
+                                            ${row.status?.toLowerCase() !== 'pending' ? 'disabled' : ''}>
+                                            <i class="bi bi-check-circle"></i>
+                                        </button>
+                                        <a href="/Employer/JobApplication/Details/${data}" 
+                                            class="btn btn-info" 
+                                            title="View application details">
+                                            <i class="bi bi-info-circle"></i>
+                                        </a>
+                                    </div>`;
                         },
                         orderable: false,
                         searchable: false
@@ -157,11 +166,11 @@
                     }
                 ],
                 language: {
-                    emptyTable: "No jobs found",
+                    emptyTable: "No job applications found",
                     search: '<i class="bi bi-search me-2"></i>',
-                    searchPlaceholder: 'Search jobs...'
+                    searchPlaceholder: 'Search applications...'
                 },
-                order: [[7, 'desc']],
+                order: [[5, 'desc']],
                 pageLength: 10,
                 lengthMenu: [5, 10, 25, 50],
                 drawCallback: function () {
@@ -172,26 +181,26 @@
                 }
             });
 
-            // Handle status toggle
-            $('#jobsTable').on('click', '.toggle-status', function () {
+            // Handle accept application
+            $('#jobApplicationsTable').on('click', '.accept-application', function () {
                 const $button = $(this);
-                const jobId = $button.data('id');
+                const applicationId = $button.data('id');
 
-                $button.prop('disabled', true); // Disable button during request
+                $button.prop('disabled', true);
 
                 $.ajax({
-                    url: `/api/Job/toggle-job?id=${jobId}`,
-                    method: 'POST',
+                    url: `/api/JobApplication/reviewed/${applicationId}`,
+                    method: 'GET',
                     contentType: 'application/json',
                     success: function (response) {
                         if (response.success) {
                             table.ajax.reload(null, false);
                         } else {
-                            alert('Failed to toggle status: ' + (response.message || 'Unknown error'));
+                            alert('Failed to accept application: ' + (response.message || 'Unknown error'));
                         }
                     },
                     error: function (xhr) {
-                        let errorMsg = 'Error occurred while toggling status';
+                        let errorMsg = 'Error occurred while accepting application';
                         try {
                             const errorData = JSON.parse(xhr.responseText);
                             errorMsg += ': ' + (errorData.message || xhr.statusText);
@@ -201,7 +210,7 @@
                         alert(errorMsg);
                     },
                     complete: function () {
-                        $button.prop('disabled', false); // Re-enable button
+                        $button.prop('disabled', false);
                     }
                 });
             });
