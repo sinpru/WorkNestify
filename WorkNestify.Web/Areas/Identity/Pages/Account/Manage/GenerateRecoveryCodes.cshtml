@@ -5,23 +5,39 @@
     ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
 }
 
-<partial name="_StatusMessage" for="StatusMessage" />
-<h3>@ViewData["Title"]</h3>
-<div class="alert alert-warning" role="alert">
-    <p>
-        <span class="glyphicon glyphicon-warning-sign"></span>
-        <strong>Put these codes in a safe place.</strong>
-    </p>
-    <p>
-        If you lose your device and don't have the recovery codes you will lose access to your account.
-    </p>
-    <p>
-        Generating new recovery codes does not change the keys used in authenticator apps. If you wish to change the key
-        used in an authenticator app you should <a asp-page="./ResetAuthenticator">reset your authenticator keys.</a>
-    </p>
-</div>
-<div>
-    <form method="post">
-        <button class="btn btn-danger" type="submit">Generate Recovery Codes</button>
-    </form>
+<div class="row">
+    <div class="col-md-12">
+        <h3><i class="bi bi-key me-2"></i>@ViewData["Title"]</h3>
+        <partial name="_StatusMessage" for="StatusMessage" />
+
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <p>
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong>Put these codes in a safe place.</strong>
+            </p>
+            <p>
+                <i class="bi bi-lock me-2"></i>
+                If you lose your device and don’t have the recovery codes, you will lose access to your account.
+            </p>
+            <p>
+                <i class="bi bi-info-circle me-2"></i>
+                Generating new recovery codes does not change the keys used in authenticator apps. If you wish to change the key
+                used in an authenticator app, you should
+                <a asp-page="./ResetAuthenticator" class="alert-link">
+                    <i class="bi bi-arrow-repeat me-1"></i>reset your authenticator keys
+                </a>.
+            </p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form method="post">
+                    <button class="w-100 btn btn-lg btn-danger" type="submit">
+                        <i class="bi bi-shield-lock-fill me-2"></i>Generate Recovery Codes
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>

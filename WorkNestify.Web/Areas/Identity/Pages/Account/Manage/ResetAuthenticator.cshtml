@@ -5,20 +5,31 @@
     ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
 }
 
-<partial name="_StatusMessage" for="StatusMessage" />
-<h3>@ViewData["Title"]</h3>
-<div class="alert alert-warning" role="alert">
-    <p>
-        <span class="glyphicon glyphicon-warning-sign"></span>
-        <strong>If you reset your authenticator key your authenticator app will not work until you reconfigure it.</strong>
-    </p>
-    <p>
-        This process disables 2FA until you verify your authenticator app.
-        If you do not complete your authenticator app configuration you may lose access to your account.
-    </p>
-</div>
-<div>
-    <form id="reset-authenticator-form" method="post">
-        <button id="reset-authenticator-button" class="btn btn-danger" type="submit">Reset authenticator key</button>
-    </form>
+<div class="row">
+    <div class="col-md-12">
+        <h3><i class="bi bi-arrow-repeat me-2"></i>@ViewData["Title"]</h3>
+        <partial name="_StatusMessage" for="StatusMessage" />
+
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <p>
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong>If you reset your authenticator key, your authenticator app will not work until you reconfigure it.</strong>
+            </p>
+            <p>
+                <i class="bi bi-lock me-2"></i>
+                This process disables 2FA until you verify your authenticator app. If you do not complete the configuration, you may lose access to your account.
+            </p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <form id="reset-authenticator-form" method="post">
+                    <button id="reset-authenticator-button" class="w-100 btn btn-lg btn-danger" type="submit">
+                        <i class="bi bi-shield-x me-2"></i>Reset authenticator key
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
