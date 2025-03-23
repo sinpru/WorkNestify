@@ -55,30 +55,24 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.AccessDeniedPath = "/Account/AccessDenied";
 });
 
-// DbInitializer
-builder.Services.AddScoped<IDbInitializer, DbInitializer>();
-
-// Repository Structure Implementation
-builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-builder.Services.AddScoped<IDbInitializer, DbInitializer>();
-
 // External Authentication
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
-    })
-    .AddCookie()
+builder.Services.AddAuthentication()
     .AddGoogle(googleOptions =>
     {
         googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"]!;
         googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]!;
+        googleOptions.SaveTokens = true;
     })
     .AddFacebook(facebookOptions =>
     {
         facebookOptions.AppId = builder.Configuration["Authentication:Facebook:AppId"]!;
         facebookOptions.AppSecret = builder.Configuration["Authentication:Facebook:AppSecret"]!;
+        facebookOptions.SaveTokens = true;
     });
+
+// Repository Structure Implementation
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 
 // External Services
 // Cloudinary
@@ -90,7 +84,7 @@ builder.Services.AddHttpClient<GhnService>();
 var app = builder.Build();
 
 // Seed the database
-SeedDatabase();
+await SeedDatabase();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

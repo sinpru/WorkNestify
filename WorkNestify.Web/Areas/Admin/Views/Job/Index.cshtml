@@ -61,7 +61,7 @@
                     {
                         data: 'salary',
                         render: function (data) {
-                            return '$' + data.toLocaleString(); // Format as currency
+                            return data.toLocaleString('vi-VN') + ' ₫';
                         }
                     },
                     { data: 'type' },

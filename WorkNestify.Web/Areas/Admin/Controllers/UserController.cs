@@ -45,7 +45,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 .Include(u => u.Company)
                 .Include(u => u.JobApplications)
                 .ToListAsync();
-            
+    
             // Fetch roles for each user
             var userData = new List<object>();
             foreach (var user in usersList)
@@ -54,15 +54,15 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 userData.Add(new
                 {
                     user.Id,
-                    user.FullName,
+                    FullName = user.FullName ?? "Not specified",
                     user.Email,
-                    user.PhoneNumber,
+                    PhoneNumber = user.PhoneNumber ?? "Not provided",
                     Role = roles.FirstOrDefault() ?? "None",
                     Company = user.Company?.Name ?? "WorkNestify",
                     JobApplication = user.JobApplications?.Count ?? 0
                 });
             }
-            
+    
             return Json(new { data = userData });
         }
 

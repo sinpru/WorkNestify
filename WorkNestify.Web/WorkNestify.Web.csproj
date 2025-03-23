@@ -189,6 +189,11 @@
       <_ContentIncludedByDefault Remove="wwwroot\lib\pdfmake\vfs_fonts.js" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\pdfmake\vfs_fonts.min.js" />
       <_ContentIncludedByDefault Remove="wwwroot\lib\animate.css\animate.min.css" />
+      <_ContentIncludedByDefault Remove="Areas\Employer\Views\Job\Create.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Employer\Views\Job\Delete.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Employer\Views\Job\Details.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Employer\Views\Job\Edit.cshtml" />
+      <_ContentIncludedByDefault Remove="Areas\Employer\Views\Job\Index.cshtml" />
     </ItemGroup>
 
     <ItemGroup>

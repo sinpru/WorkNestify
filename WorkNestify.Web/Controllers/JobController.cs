@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Models.Models.Jobs;
+using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.Web.Controllers
 {
@@ -85,6 +86,48 @@ namespace WorkNestify.Web.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, new { error = "An error occurred while fetching jobs: " + ex.Message });
+            }
+        }
+
+        [HttpPost("toggle-job")]
+        public async Task<IActionResult> ToggleStatus(int id)
+        {
+            try
+            {
+                var job = await _unitOfWork.Jobs.GetAsync(
+                    j => j.Id == id,
+                    includeProperties: "Company"
+                );
+
+                if (job == null)
+                {
+                    return NotFound(new { success = false, message = "Job not found" });
+                }
+
+                if (job.Status == JobStatuses.Pending)
+                {
+                    return Ok(new { success = false, message = "Cannot toggle pending job" });
+                }
+
+                // Toggle status
+                job.Status = job.Status == JobStatuses.Open ? JobStatuses.Closed : JobStatuses.Open;
+                await _unitOfWork.Jobs.UpdateAsync(job);
+                await _unitOfWork.SaveAsync();
+
+                return Ok(new
+                {
+                    success = true,
+                    newStatus = job.Status
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"An error occurred: {ex.Message}",
+                    details = ex.StackTrace
+                });
             }
         }
     }
