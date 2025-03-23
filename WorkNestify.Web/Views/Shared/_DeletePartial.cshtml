@@ -1,18 +1,22 @@
+@using WorkNestify.Utilities.Constants
 @{
     string name = ViewData["Name"] as string ?? "Entity Name";
     string? id = ViewData["Id"]?.ToString();
 }
 
-<div class="d-flex justify-content-between mt-4">
-    <a class="btn btn-outline-secondary d-flex align-items-center" asp-action="Index">
-        <i class="fs-4 bi-x-lg me-1"></i> Cancel
-    </a>
+@if (User.Identity.IsAuthenticated && User.IsInRole(Roles.Admin))
+{
+    <div class="d-flex justify-content-between mt-4">
+        <a class="btn btn-outline-secondary d-flex align-items-center" asp-action="Index">
+            <i class="fs-4 bi-x-lg me-1"></i> Cancel
+        </a>
 
-    <!-- Delete Button with Confirmation Modal -->
-    <button type="button" class="btn btn-danger d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
-        <i class="fs-4 bi-trash3 me-1"></i> Delete
-    </button>
-</div>
+        <!-- Delete Button with Confirmation Modal -->
+        <button type="button" class="btn btn-danger d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+            <i class="fs-4 bi-trash3 me-1"></i> Delete
+        </button>
+    </div>
+}
 
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
@@ -27,7 +31,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form asp-action="Delete">
+                <form asp-action="Delete"
+                      asp-controller="Job"
+                      asp-area="@(User.Identity.IsAuthenticated && User.IsInRole("Employer") ? "Employer" : "Admin")">
                     <input type="hidden" asp-for="@id" />
                     <button type="submit" class="btn btn-danger">Confirm Delete</button>
                 </form>

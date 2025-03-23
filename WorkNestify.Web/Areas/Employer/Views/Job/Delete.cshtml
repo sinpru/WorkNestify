@@ -1,29 +1,32 @@
-@using WorkNestify.Utilities.Constants
 @model WorkNestify.Models.Models.Jobs.Job
 
 @{
-    ViewData["Title"] = Model.Title;
+    ViewData["Title"] = "Delete Job";
+    ViewData["Name"] = Model.Title;
+    ViewData["Id"] = Model.Id;
 }
 
 <div class="container my-4">
+    <partial name="_NotificationsPartial"/>
+    
     <div class="row justify-content-center">
         <div class="col-12 col-md-10">
             <!-- Job Header Section -->
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="text-primary">@Model.Title <span class="badge bg-success">✔</span></h2>
-                <div class="d-flex align-items-center">
-                    <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-share"></i> Share</a>
-                    <a href="#" class="btn btn-outline-secondary me-2"><i class="bi bi-heart"></i> Save</a>
-                    <a asp-controller="JobApplication" asp-action="Index" asp-route-jobId="@Model.Id"
-                       class="btn btn-outline-success">
-                        <i class="bi bi-send me-2"></i>Apply Now
-                    </a>
-                </div>
-            </div>
+            <h1 class="mb-4">
+                <i class="bi bi-trash3 me-2 text-danger"></i>Delete Job Posting
+            </h1>
 
             <!-- Company and Job Info Card -->
             <div class="card border-light shadow-sm mb-4">
                 <div class="card-body">
+                    <div class="alert alert-danger" role="alert">
+                        <h3 class="text-danger"><i class="bi bi-exclamation-triangle"></i> Warning</h3>
+                        <p>
+                            Deleting this job will permanently remove all associated data.
+                            <strong>This action cannot be undone.</strong>
+                        </p>
+                    </div>
+                    
                     <div class="d-flex align-items-center justify-content-between mb-3">
                         <div>
                             <h3 class="card-title mb-0">@(Model.Company?.Name ?? "N/A")</h3>
@@ -104,16 +107,18 @@
 
             <!-- Back to List Button -->
             <div class="text-end mt-4">
-                @if (User.Identity.IsAuthenticated && User.IsInRole(Roles.Employer))
-                {
-                    <a asp-action="Index" asp-controller="Job" asp-area="Employer" class="btn btn-outline-primary">
-                        Back to Management
-                    </a>
-                }
+                <a asp-action="Index" asp-controller="Job" asp-area="Employer" class="btn btn-outline-primary">
+                    Back to Management
+                </a>
                 <a asp-action="Index" asp-controller="Job" asp-area="JobSeeker" class="btn btn-outline-primary">
                     Back to List
                 </a>
+                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                    <i class="fs-4 bi-trash3 me-1"></i> Delete
+                </button>
             </div>
         </div>
     </div>
 </div>
+
+<partial name="_DeletePartial"/>
