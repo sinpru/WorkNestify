@@ -5,7 +5,7 @@ $(document).ready(function () {
     var currentPage = config.currentPage || 1;
     var search = config.search || '';
     var category = config.category || '';
-    var location = config.location || '';
+    var location = config.location ? parseInt(config.location, 10) : null;
     var isInitialLoad = true;
 
     function updateJobListings(jobs) {
@@ -127,7 +127,7 @@ $(document).ready(function () {
             var params = new URLSearchParams();
             if (search) params.append('search', search);
             if (category) params.append('category', category);
-            if (location) params.append('location', location);
+            if (location !== null && !isNaN(location)) params.append('location', location);
             params.append('page', pagination.pageNumber);
             params.append('pageSize', pagination.pageSize);
 

@@ -29,7 +29,7 @@ namespace WorkNestify.Web.Controllers
         public async Task<IActionResult> GetFilteredJobs(
             string? search,
             string? category,
-            string? location,
+            int? location,
             int page = 1,
             int pageSize = 6)
         {
@@ -45,7 +45,7 @@ namespace WorkNestify.Web.Controllers
                     j.Status == "Open"
                     && (string.IsNullOrEmpty(search) || j.Title.Contains(search))
                     && (string.IsNullOrEmpty(category) || j.JobCategoryId.ToString() == category)
-                    && (string.IsNullOrEmpty(location) || j.StreetAddress.Contains(location));
+                    && (!location.HasValue || j.ProvinceId == location);
 
                 // Define ordering
                 Expression<Func<Job, object>>[] orderByDescending = new[]

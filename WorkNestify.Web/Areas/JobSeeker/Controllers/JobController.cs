@@ -25,9 +25,9 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
 
         // GET: JobSeeker/Job
         public async Task<IActionResult> Index(
-            string search,
-            string category,
-            string location,
+            string? search,
+            string? category,
+            int? location,
             int page = 1,
             int pageSize = 10)
         {
@@ -38,10 +38,8 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             Expression<Func<Job, bool>> filter = j =>
                 j.Status == "Open"
                 && (string.IsNullOrEmpty(search) || j.Title.Contains(search))
-                && (string.IsNullOrEmpty(category) ||
-                    j.JobCategoryId.ToString() == category)
-                && (string.IsNullOrEmpty(location) ||
-                    j.StreetAddress.Contains(location));
+                && (string.IsNullOrEmpty(category) || j.JobCategoryId.ToString() == category)
+                && (!location.HasValue || j.ProvinceId == location);
 
             // Define ordering
             Expression<Func<Job, object>>[] orderByDescending = new[]
