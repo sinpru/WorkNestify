@@ -8,6 +8,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
     <title>@ViewData["Title"] - WorkNestify Admin</title>
+    <link rel="icon" type="image/x-icon" href="~/assets/images/monogram.png"/>
     <link rel="stylesheet" href="~/lib/bootswatch/lux/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/lib/animate.css/animate.min.css"/>
@@ -106,6 +107,11 @@
                     <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdown-user">
                         <li>
                             <a class="dropdown-item" asp-area="Identity" asp-page="/Account/Manage/Index">Profile</a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" asp-area="JobSeeker" asp-controller="JobApplication" asp-action="Index">
+                                My Job Application
+                            </a>
                         </li>
                         <li>
                             <hr class="dropdown-divider">

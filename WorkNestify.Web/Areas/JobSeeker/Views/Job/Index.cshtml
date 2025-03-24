@@ -4,22 +4,21 @@
     ViewData["Title"] = "Jobs List";
 }
 
-<div class="row justify-content-center">
+<div class="row justify-content-center animate__animated animate__fadeIn">
     <div class="col-12">
         <!-- Search Bar -->
-        <partial name="_SearchBarPartial"/>
+        <partial name="_SearchBarPartial" class="animate__animated animate__fadeInUp animate__delay-1s" />
     </div>
 
     <div class="row">
         <!-- Filter side bar -->
-        <div class="col-4">
+        <div class="col-4 animate__animated animate__fadeInLeft animate__delay-1s">
             <div class="d-flex border-bottom mb-3 justify-content-between">
                 <div class="d-flex">
                     <i class="bi bi-funnel-fill me-2"></i>
                     <h2 class="h4 text-primary">Advanced Filters</h2>
                 </div>
-                <a class="text-muted small text-decoration-none" asp-action="Index" asp-controller="Job"
-                   asp-area="JobSeeker">
+                <a class="text-muted small text-decoration-none" asp-action="Index" asp-controller="Job" asp-area="JobSeeker">
                     Reset Filters
                 </a>
             </div>
@@ -27,7 +26,7 @@
             <!-- Filter Form -->
             <form id="filter-form" method="get" asp-action="Index" asp-controller="Job" asp-area="JobSeeker">
                 <!-- Job Category Filter -->
-                <div class="mb-3">
+                <div class="mb-3 animate__animated animate__fadeInUp animate__delay-2s">
                     <h5 class="text-primary">By Job Category</h5>
                     @if (ViewData["JobCategoryId"] is SelectList categories && categories.Any())
                     {
@@ -50,7 +49,7 @@
                 </div>
 
                 <!-- Job Type Filter -->
-                <div class="mb-3">
+                <div class="mb-3 animate__animated animate__fadeInUp animate__delay-2s">
                     <h5 class="text-primary">Job Type</h5>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="type" value="All" id="type-all"
@@ -80,7 +79,7 @@
                 </div>
 
                 <!-- Job Level Filter -->
-                <div class="mb-3">
+                <div class="mb-3 animate__animated animate__fadeInUp animate__delay-2s">
                     <h5 class="text-primary">Level</h5>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="level" value="All" id="level-all"
@@ -110,7 +109,7 @@
                 </div>
 
                 <!-- Salary Range Filter (in VND) -->
-                <div class="mb-3">
+                <div class="mb-3 animate__animated animate__fadeInUp animate__delay-2s">
                     <h5 class="text-primary">Salary Range (VND)</h5>
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="salary" value="All" id="salary-all"
@@ -175,10 +174,10 @@
             </form>
         </div>
 
-        <div class="col-8">
+        <div class="col-8 animate__animated animate__fadeInRight animate__delay-1s">
             <!-- Job Listings -->
             <div class="mb-5">
-                <h2 class="h4 mb-4 text-primary">Job Listings</h2>
+                <h2 class="h4 mb-4 text-primary animate__animated animate__fadeInUp animate__delay-2s">Job Listings</h2>
                 <!-- Loading spinner -->
                 <div id="loading-spinner" class="text-center d-none">
                     <div class="spinner-border text-primary" role="status">
@@ -191,12 +190,12 @@
                     {
                         @foreach (var job in Model)
                         {
-                            @await Html.PartialAsync("_JobCardPartial", job, new ViewDataDictionary(ViewData) { { "Layout", "wide" } })
+                            @await Html.PartialAsync("_JobCardPartial", job, new ViewDataDictionary(ViewData) { { "Layout", "wide" }, { "Animation", "animate__animated animate__fadeInUp animate__delay-2s" } })
                         }
                     }
                     else
                     {
-                        <div class="text-center">
+                        <div class="text-center animate__animated animate__fadeInUp animate__delay-2s">
                             <p class="text-muted">No jobs available at the moment.</p>
                         </div>
                     }
@@ -205,7 +204,7 @@
                 <!-- Pagination with pagination.js and Bootstrap -->
                 @if (ViewBag.TotalJobs > ViewBag.PageSize)
                 {
-                    <nav aria-label="Job pagination" class="mt-4">
+                    <nav aria-label="Job pagination" class="mt-4 animate__animated animate__fadeInUp animate__delay-3s">
                         <div id="pagination-container" class="d-flex justify-content-center"></div>
                     </nav>
                 }

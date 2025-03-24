@@ -14,7 +14,7 @@
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="text-primary">@Model.Title <span class="badge bg-success">✔</span></h2>
                 <div class="d-flex align-items-center">
-                    <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-share"></i> Share</a>
+                    <a href="#" class="btn btn-outline-primary me-2 btn-share"><i class="bi bi-share"></i> Share</a>
                     <a href="#" class="btn btn-outline-secondary me-2"><i class="bi bi-heart"></i> Save</a>
                     <a asp-controller="JobApplication" asp-action="Create" asp-route-jobId="@Model.Id"
                        class="btn btn-outline-success">
@@ -119,3 +119,53 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const shareButton = document.querySelector('.btn-share');
+            const jobTitle = '@Model.Title';
+            const jobUrl = window.location.href;
+
+            shareButton.addEventListener('click', async function(e) {
+                e.preventDefault();
+
+                // Check if Web Share API is supported
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: jobTitle,
+                            text: 'Check out this job opportunity: ' + jobTitle,
+                            url: jobUrl
+                        });
+                        console.log('Job shared successfully');
+                    } catch (error) {
+                        console.error('Error sharing:', error);
+                    }
+                } else {
+                    // Fallback for browsers that don't support Web Share API
+                    const shareData = {
+                        title: jobTitle,
+                        url: jobUrl
+                    };
+                    fallbackShare(shareData);
+                }
+            });
+        });
+
+        function fallbackShare(data) {
+            // You can implement a custom fallback here
+            // For example, copy to clipboard
+            navigator.clipboard.writeText(`${data.title}\n${data.url}`)
+                .then(() => {
+                    alert('Job link copied to clipboard!\n' + 
+                          'Title: ' + data.title + '\n' + 
+                          'URL: ' + data.url);
+                })
+                .catch(err => {
+                    alert('Failed to copy to clipboard. Here is the link:\n' + data.url);
+                    console.error('Clipboard error:', err);
+                });
+        }
+    </script>
+}
