@@ -10,7 +10,6 @@ namespace WorkNestify.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize(Roles = Roles.Admin + "," + Roles.Employer)]
     public class JobApplicationController : ControllerBase
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -100,6 +99,54 @@ namespace WorkNestify.Web.Controllers
                 }
                 
                 jobApplication.Status = JobApplicationStatuses.Rejected;
+                await _unitOfWork.JobApplications.UpdateAsync(jobApplication);
+                await _unitOfWork.SaveAsync();
+                
+                return Ok(new
+                {
+                    success = true,
+                    newStatus = jobApplication.Status,
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"An error occurred: {ex.Message}",
+                    details = ex.StackTrace
+                });
+            }
+        }
+
+        [HttpPost("withdrawn")]
+        [Authorize]
+        public async Task<IActionResult> JobApplicationWithdrawn(int id)
+        {
+            try
+            {
+                var jobApplication = await _unitOfWork.JobApplications.GetAsync(
+                    ja => ja.Id == id,
+                    includeProperties: "Job"
+                );
+
+                if (jobApplication == null)
+                {
+                    return NotFound(new { success = false, message = "Job application not found." });
+                }
+                
+                var currentUser = await _userManager.GetUserAsync(User);
+                if (jobApplication.ApplicationUserId != currentUser.Id)
+                {
+                    return Unauthorized(new { success = false, message = "You are not authorized to withdrawn this job application." });
+                }
+
+                if (jobApplication.Status == JobApplicationStatuses.Withdrawn)
+                {
+                    return Ok(new { success = false, message = "Job application is withdrawn." });
+                }
+                
+                jobApplication.Status = JobApplicationStatuses.Withdrawn;
                 await _unitOfWork.JobApplications.UpdateAsync(jobApplication);
                 await _unitOfWork.SaveAsync();
                 

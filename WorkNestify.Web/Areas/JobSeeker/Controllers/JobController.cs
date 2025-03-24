@@ -52,13 +52,14 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             var totalJobs = await totalJobsQuery.CountAsync();
 
             // Get paginated results
-            var paginatedJobs = await _unitOfWork.Jobs.GetAllQueryable(
-                filter: filter,
-                includeProperties: "Company,JobCategory,Province,District,Ward",
-                orderByDescending: orderByDescending,
-                skip: (page - 1) * pageSize,
-                take: pageSize
-            ).ToListAsync();
+            var paginatedJobs = await _unitOfWork.Jobs
+                .GetAllQueryable(
+                    filter: filter,
+                    includeProperties: "Company,JobCategory,Province,District,Ward",
+                    orderByDescending: orderByDescending,
+                    skip: (page - 1) * pageSize,
+                    take: pageSize
+                ).ToListAsync();
 
             // Pass data to ViewBag for pagination.js
             ViewBag.TotalJobs = totalJobs;

@@ -35,7 +35,7 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
 
             var jobApplicationsList = _unitOfWork.JobApplications
                 .GetAllAsync(ja => ja.Job.CompanyId == currentUser.CompanyId,
-                    includeProperties: "Job").Result;
+                    includeProperties: "Job,ApplicationUser").Result;
             return Json(new
             {
                 data = jobApplicationsList.Select(ja => new
