@@ -45,22 +45,8 @@
     <!-- Status Filter -->
     <div class="row mb-4">
         <div class="col-md-4">
-            <select class="form-select" id="statusFilter" onchange="filterByStatus(this.value)">
+            <select class="form-select" id="statusFilter" asp-items="ViewBag.Status">
                 <option value="">All Statuses</option>
-                @if (ViewData["Status"] != null)
-                {
-                    @foreach (var status in (SelectList)ViewData["Status"])
-                    {
-                        if (status.Value == ViewBag.CurrentStatus)
-                        {
-                            <option value="@status.Value" selected>@status.Text</option>
-                        }
-                        else
-                        {
-                            <option value="@status.Value">@status.Text</option>
-                        }
-                    }
-                }
             </select>
         </div>
     </div>
@@ -165,15 +151,16 @@
             let currentStatus = '@(ViewBag.CurrentStatus ?? "")';
             let isInitialLoad = true;
 
-            function filterByStatus(status) {
+            $('#statusFilter').on('change', function() {
+                const status = $(this).val();
                 currentStatus = status;
                 const params = new URLSearchParams({
+                    ...(status && { status: status }),
                     page: 1,
-                    pageSize: pageSize,
-                    ...(status && { status: status })
+                    pageSize: pageSize
                 });
                 window.location.href = `/JobSeeker/JobApplication?${params.toString()}`;
-            }
+            });
 
             if ($('#pagination-container').length > 0) {
                 if (typeof $.fn.pagination === 'function') {
