@@ -5,42 +5,60 @@
     ViewData["IndexAction"] = "Index";
 }
 
-<partial name="_ManagementNavigationPartial"/>
-<partial name="_NotificationsPartial"/>
+<partial name="_ManagementNavigationPartial" />
 
-<form class="row" asp-action="Edit">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="Id"/>
-
-    <div class="col-md-12 mb-2">
-        <div class="form-group mb-2">
-            <label asp-for="Name" class="form-label"></label>
-            <input asp-for="Name" class="form-control"/>
-            <span asp-validation-for="Name" class="text-danger"></span>
-        </div>
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Job Category Details</h2>
     </div>
 
-    <div class="col-md-12 mb-2">
-        <div class="form-group mb-2">
-            <label asp-for="Description" class="form-label"></label>
-            <textarea asp-for="Description" id="editor" class="form-control"></textarea>
-            <div id="editor-word-count" class="small text-muted mt-1"></div>
-            <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
+    <div class="card-body p-4">
+        <partial name="_NotificationsPartial" />
 
-        <div class="form-group d-flex justify-content-between mt-2">
-            <a class="btn btn-outline-secondary d-flex align-items-center" asp-action="Index">
-                <i class="fs-4 bi-x-lg me-1"></i> Cancel
-            </a>
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert" style="display: none;"></div>
+            <input type="hidden" asp-for="Id" />
 
-            <button type="submit" class="btn btn-primary d-flex align-items-center">
-                <i class="fs-4 bi-check-circle me-1"></i> Save
-            </button>
-        </div>
+            <div class="row g-4">
+                <div class="col-12">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-tag"></i></span>
+                            <input asp-for="Name" class="form-control" placeholder="Enter category name" />
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text align-items-start pt-2"><i class="bi bi-text-paragraph"></i></span>
+                            <textarea asp-for="Description" id="editor" class="form-control" rows="5"
+                                      placeholder="Enter category description"></textarea>
+                        </div>
+                        <div id="editor-word-count" class="small text-muted mt-1"></div>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-4 d-flex justify-content-end gap-2">
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-x-lg me-2"></i>Cancel
+                </a>
+                <button type="submit"
+                        class="btn btn-primary px-4">
+                    <i class="bi bi-check-circle me-2"></i>Save Changes
+                </button>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
 @section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
-    @{ await Html.RenderPartialAsync("_FormScriptsPartial"); }
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_FormScriptsPartial" />
 }

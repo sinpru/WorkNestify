@@ -9,10 +9,12 @@ public class ChangePasswordViewModel
     [Required(ErrorMessage = "New password is required")]
     [DataType(DataType.Password)]
     [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+    [Display(Name = "New Password")]
     public string NewPassword { get; set; }
 
     [Required(ErrorMessage = "Password confirmation is required")]
     [DataType(DataType.Password)]
     [Compare("NewPassword", ErrorMessage = "The password and confirmation password do not match.")]
+    [Display(Name = "Confirm Password")]
     public string ConfirmPassword { get; set; }
 }
