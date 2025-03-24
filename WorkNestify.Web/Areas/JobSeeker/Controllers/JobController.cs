@@ -93,9 +93,12 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
                 job?.JobCategoryId);
             ViewData["ProvinceId"] =
                 new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name", job?.ProvinceId);
-            ViewData["Level"] = new SelectList(JobLevels.AllLevels);
-            ViewData["Status"] = new SelectList(JobStatuses.AllStatuses);
-            ViewData["Type"] = new SelectList(JobTypes.AllTypes);
+            ViewData["Level"] = new SelectList(JobLevels.AllLevels.Select(l => new { Value = l, Text = l }), "Value",
+                "Text");
+            ViewData["Status"] = new SelectList(JobStatuses.AllStatuses.Select(s => new { Value = s, Text = s }),
+                "Value", "Text");
+            ViewData["Type"] =
+                new SelectList(JobTypes.AllTypes.Select(t => new { Value = t, Text = t }), "Value", "Text");
             if (search != null)
             {
                 ViewBag.Search = search;

@@ -25,11 +25,14 @@ namespace WorkNestify.Web.Controllers
             _userManager = userManager;
         }
 
-        [HttpGet("filter")]
+        [HttpGet("filter-jobs")]
         public async Task<IActionResult> GetFilteredJobs(
             string? search,
             string? category,
             int? location,
+            string? type,
+            string? level,
+            string? salary,
             int page = 1,
             int pageSize = 6)
         {
@@ -39,13 +42,32 @@ namespace WorkNestify.Web.Controllers
                 {
                     return BadRequest(new { error = "Page and pageSize must be positive numbers" });
                 }
+                
+                // Category filter
+                var categoryList = string.IsNullOrEmpty(category) 
+                    ? new int[0] 
+                    : category.Split(',')
+                        .Select(c => int.TryParse(c, out int id) ? id : (int?)null)
+                        .Where(id => id.HasValue)
+                        .Select(id => id.Value)
+                        .ToArray();
 
                 // Define the filter
                 Expression<Func<Job, bool>> filter = j =>
                     j.Status == "Open"
                     && (string.IsNullOrEmpty(search) || j.Title.Contains(search))
-                    && (string.IsNullOrEmpty(category) || j.JobCategoryId.ToString() == category)
-                    && (!location.HasValue || j.ProvinceId == location);
+                    && (categoryList.Length == 0 || categoryList.Contains(j.JobCategoryId))
+                    && (!location.HasValue || j.ProvinceId == location)
+                    && (string.IsNullOrEmpty(type) || j.Type == type)
+                    && (string.IsNullOrEmpty(level) || j.Level == level)
+                    && (string.IsNullOrEmpty(salary) || (
+                        salary == "Under10M" ? j.Salary < 10000000 :
+                        salary == "10M-15M" ? (j.Salary >= 10000000 && j.Salary <= 15000000) :
+                        salary == "15M-20M" ? (j.Salary >= 15000000 && j.Salary <= 20000000) :
+                        salary == "20M-25M" ? (j.Salary >= 20000000 && j.Salary <= 25000000) :
+                        salary == "25M-30M" ? (j.Salary >= 25000000 && j.Salary <= 30000000) :
+                        salary == "30M-50M" ? (j.Salary >= 30000000 && j.Salary <= 50000000) :
+                        salary == "Over50M" ? j.Salary > 50000000 : true));
 
                 // Define ordering
                 Expression<Func<Job, object>>[] orderByDescending = new[]

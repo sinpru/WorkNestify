@@ -10,42 +10,206 @@
         <partial name="_SearchBarPartial"/>
     </div>
 
-    <partial name="_JobFilterPartial"/>
-
-    <div class="col-8">
-        <!-- Job Listings -->
-        <div class="mb-5">
-            <h2 class="h4 mb-4 text-primary">Job Listings</h2>
-            <!-- Loading spinner -->
-            <div id="loading-spinner" class="text-center d-none">
-                <div class="spinner-border text-primary" role="status">
-                    <span class="visually-hidden">Loading...</span>
+    <div class="row">
+        <!-- Filter side bar -->
+        <div class="col-4">
+            <div class="d-flex border-bottom mb-3 justify-content-between">
+                <div class="d-flex">
+                    <i class="bi bi-funnel-fill me-2"></i>
+                    <h2 class="h4 text-primary">Advanced Filters</h2>
                 </div>
+                <a class="text-muted small text-decoration-none" asp-action="Index" asp-controller="Job"
+                   asp-area="JobSeeker">
+                    Reset Filters
+                </a>
             </div>
 
-            <div class="row row-cols-1 g-4" id="job-listings">
-                @if (Model.Any())
-                {
-                    @foreach (var job in Model)
+            <!-- Filter Form -->
+            <form id="filter-form" method="get" asp-action="Index" asp-controller="Job" asp-area="JobSeeker">
+                <!-- Job Category Filter -->
+                <div class="mb-3">
+                    <h5 class="text-primary">By Job Category</h5>
+                    @if (ViewData["JobCategoryId"] is SelectList categories && categories.Any())
                     {
-                        @await Html.PartialAsync("_JobCardPartial", job, new ViewDataDictionary(ViewData) { { "Layout", "wide" } })
+                        foreach (var category in categories)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="category" value="@category.Value"
+                                       id="category-@category.Value"
+                                       @(Context.Request.Query["category"].ToString().Contains(category.Value) ? "checked" : "")>
+                                <label class="form-check-label" for="category-@category.Value">
+                                    @category.Text
+                                </label>
+                            </div>
+                        }
                     }
-                }
-                else
-                {
-                    <div class="text-center">
-                        <p class="text-muted">No jobs available at the moment.</p>
+                    else
+                    {
+                        <p class="text-muted">No categories available.</p>
+                    }
+                </div>
+
+                <!-- Job Type Filter -->
+                <div class="mb-3">
+                    <h5 class="text-primary">Job Type</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="type" value="All" id="type-all"
+                               @(string.IsNullOrEmpty(Context.Request.Query["type"]) ? "checked" : "")>
+                        <label class="form-check-label" for="type-all">
+                            All
+                        </label>
                     </div>
+                    @if (ViewData["Type"] is SelectList types && types.Any())
+                    {
+                        foreach (var type in types)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="type" value="@type.Value"
+                                       id="type-@type.Value"
+                                       @(Context.Request.Query["type"] == type.Value ? "checked" : "")>
+                                <label class="form-check-label" for="type-@type.Value">
+                                    @type.Text
+                                </label>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">No job types available.</p>
+                    }
+                </div>
+
+                <!-- Job Level Filter -->
+                <div class="mb-3">
+                    <h5 class="text-primary">Level</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="level" value="All" id="level-all"
+                               @(string.IsNullOrEmpty(Context.Request.Query["level"]) ? "checked" : "")>
+                        <label class="form-check-label" for="level-all">
+                            All
+                        </label>
+                    </div>
+                    @if (ViewData["Level"] is SelectList levels && levels.Any())
+                    {
+                        foreach (var level in levels)
+                        {
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="level" value="@level.Value"
+                                       id="level-@level.Value"
+                                       @(Context.Request.Query["level"] == level.Value ? "checked" : "")>
+                                <label class="form-check-label" for="level-@level.Value">
+                                    @level.Text
+                                </label>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">No levels available.</p>
+                    }
+                </div>
+
+                <!-- Salary Range Filter (in VND) -->
+                <div class="mb-3">
+                    <h5 class="text-primary">Salary Range (VND)</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="salary" value="All" id="salary-all"
+                               @(string.IsNullOrEmpty(Context.Request.Query["salary"]) ? "checked" : "")>
+                        <label class="form-check-label" for="salary-all">
+                            All
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="salary" value="Under10M"
+                               id="salary-under-10m" @(Context.Request.Query["salary"] == "Under10M" ? "checked" : "")>
+                        <label class="form-check-label" for="salary-under-10m">
+                            Under 10 Million
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="salary" value="10M-15M" id="salary-10m-15m"
+                               @(Context.Request.Query["salary"] == "10M-15M" ? "checked" : "")>
+                        <label class="form-check-label" for="salary-10m-15m">
+                            10 - 15 Million
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="salary" value="15M-20M" id="salary-15m-20m"
+                               @(Context.Request.Query["salary"] == "15M-20M" ? "checked" : "")>
+                        <label class="form-check-label" for="salary-15m-20m">
+                            15 - 20 Million
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="salary" value="20M-25M" id="salary-20m-25m"
+                               @(Context.Request.Query["salary"] == "20M-25M" ? "checked" : "")>
+                        <label class="form-check-label" for="salary-20m-25m">
+                            20 - 25 Million
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="salary" value="25M-30M" id="salary-25m-30m"
+                               @(Context.Request.Query["salary"] == "25M-30M" ? "checked" : "")>
+                        <label class="form-check-label" for="salary-25m-30m">
+                            25 - 30 Million
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="salary" value="30M-50M" id="salary-30m-50m"
+                               @(Context.Request.Query["salary"] == "30M-50M" ? "checked" : "")>
+                        <label class="form-check-label" for="salary-30m-50m">
+                            30 - 50 Million
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="salary" value="Over50M" id="salary-over-50m"
+                               @(Context.Request.Query["salary"] == "Over50M" ? "checked" : "")>
+                        <label class="form-check-label" for="salary-over-50m">
+                            Over 50 Million
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Hidden input to preserve search query -->
+                <input type="hidden" name="search" value="@Html.Raw(Context.Request.Query["search"])"/>
+            </form>
+        </div>
+
+        <div class="col-8">
+            <!-- Job Listings -->
+            <div class="mb-5">
+                <h2 class="h4 mb-4 text-primary">Job Listings</h2>
+                <!-- Loading spinner -->
+                <div id="loading-spinner" class="text-center d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+                <div class="row row-cols-1 g-4" id="job-listings">
+                    @if (Model.Any())
+                    {
+                        @foreach (var job in Model)
+                        {
+                            @await Html.PartialAsync("_JobCardPartial", job, new ViewDataDictionary(ViewData) { { "Layout", "wide" } })
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center">
+                            <p class="text-muted">No jobs available at the moment.</p>
+                        </div>
+                    }
+                </div>
+
+                <!-- Pagination with pagination.js and Bootstrap -->
+                @if (ViewBag.TotalJobs > ViewBag.PageSize)
+                {
+                    <nav aria-label="Job pagination" class="mt-4">
+                        <div id="pagination-container" class="d-flex justify-content-center"></div>
+                    </nav>
                 }
             </div>
-            
-            <!-- Pagination with pagination.js and Bootstrap -->
-            @if (ViewBag.TotalJobs > ViewBag.PageSize)
-            {
-                <nav aria-label="Job pagination" class="mt-4">
-                    <div id="pagination-container" class="d-flex justify-content-center"></div>
-                </nav>
-            }
         </div>
     </div>
 </div>
