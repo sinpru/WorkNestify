@@ -1,0 +1,110 @@
+@model IEnumerable<WorkNestify.Models.Models.Companies.Company>
+
+@{
+    ViewData["Title"] = "Companies List";
+}
+
+<div class="row justify-content-center animate__animated animate__fadeIn">
+    <div class="col-12">
+        <!-- Page Title -->
+        <h1 class="text-center text-primary mb-4 animate__animated animate__fadeInDown animate__delay-1s">
+            @ViewData["Title"]
+        </h1>
+
+        <!-- Custom Search Bar -->
+        <div class="d-flex justify-content-center mb-4 animate__animated animate__fadeInUp animate__delay-1s">
+            <form id="search-form" method="get" asp-action="Index" asp-controller="Company" asp-area="JobSeeker" class="d-flex w-75">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" name="search" class="form-control border-start-0" placeholder="Search for companies..."
+                           value="@Html.Raw(Context.Request.Query["search"])" aria-label="Search companies">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 animate__animated animate__fadeInRight animate__delay-1s">
+            <!-- Company Listings -->
+            <div class="mb-5">
+                <!-- Loading spinner -->
+                <div id="loading-spinner" class="text-center d-none">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+                <div class="row row-cols-1 row-cols-md-3 g-4" id="company-listings">
+                    @if (Model.Any())
+                    {
+                        @foreach (var company in Model)
+                        {
+                            <div class="col">
+                                <a asp-action="Details" asp-route-id="@company.Id" class="text-decoration-none">
+                                    <div class="card h-100 shadow-sm animate__animated animate__fadeInUp animate__delay-2s">
+                                        <!-- Company Logo -->
+                                        @if (!string.IsNullOrEmpty(company.Logo))
+                                        {
+                                            <img src="@company.Logo" class="card-img-top" alt="@company.Name Logo" style="height: 150px; object-fit: contain; padding: 10px;">
+                                        }
+                                        else
+                                        {
+                                            <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 150px;">
+                                                <span class="text-muted">No Logo</span>
+                                            </div>
+                                        }
+
+                                        <div class="card-body">
+                                            <h5 class="card-title text-primary">@company.Name</h5>
+                                            <p class="card-text text-muted">
+                                                <i class="bi bi-geo-alt-fill me-2"></i>
+                                                @company.StreetAddress, @company.Ward.Name, @company.District.Name, @company.Province.Name
+                                            </p>
+                                            <p class="card-text text-muted">
+                                                <i class="bi bi-building me-2"></i>
+                                                Industry: @company.Industry
+                                            </p>
+                                            <p class="card-text text-muted">
+                                                <i class="bi bi-people-fill me-2"></i>
+                                                Size: @company.Size
+                                            </p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center animate__animated animate__fadeInUp animate__delay-2s">
+                            <p class="text-muted">No companies available at the moment.</p>
+                        </div>
+                    }
+                </div>
+
+                <!-- Pagination placeholder -->
+                @if (ViewBag.TotalCompanies > ViewBag.PageSize)
+                {
+                    <nav aria-label="Company pagination" class="mt-4 animate__animated animate__fadeInUp animate__delay-3s">
+                        <div id="pagination-container" class="d-flex justify-content-center"></div>
+                    </nav>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script asp-append-version="true">
+        window.companyFilterConfig = {
+            totalCompanies: @(ViewBag.TotalCompanies ?? 0),
+            pageSize: @(ViewBag.PageSize ?? 12),
+            currentPage: @(ViewBag.CurrentPage ?? 1),
+            search: '@Html.Raw(Context.Request.Query["search"])'
+        }
+    </script>
+    <script src="~/js/CompanyPaginationRenderer.js" asp-append-version="true"></script>
+}

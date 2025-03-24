@@ -1,0 +1,141 @@
+@model WorkNestify.Models.Models.Companies.Company
+
+@{
+    ViewData["Title"] = Model.Name;
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-10">
+            <partial name="_NotificationsPartial"/>
+
+            <!-- Company Header Section -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="text-primary">@Model.Name <span class="badge bg-success">✔</span></h2>
+                <div class="d-flex align-items-center">
+                    <a href="#" class="btn btn-outline-primary me-2 btn-share"><i class="bi bi-share"></i> Share</a>
+                    <a asp-controller="CompanyReview" asp-action="Create" asp-route-companyId="@Model.Id"
+                       class="btn btn-outline-success">
+                        <i class="bi bi-star me-2"></i>Review Company
+                    </a>
+                </div>
+            </div>
+
+            <!-- Company Info Card -->
+            <div class="card border-light shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div>
+                            <h3 class="card-title mb-0">@Model.Name</h3>
+                            <p class="card-subtitle text-muted">Founded on @(Model.FoundedDate?.ToString("dd/MM/yyyy") ?? "N/A")</p>
+                        </div>
+                        <img src="@Model.Logo" alt="Company Logo" class="me-3" style="height: 80px;"/>
+                    </div>
+
+                    <!-- Company Details -->
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <i class="bi bi-globe text-primary me-2"></i>
+                                <strong>Website:</strong>
+                                <a href="@Model.Website" target="_blank">@(Model.Website ?? "N/A")</a>
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <i class="bi bi-geo-alt text-primary me-2"></i>
+                                <strong>Location:</strong> @(Model.StreetAddress ?? "N/A"), @(Model.Ward?.Name ?? "N/A"), @(Model.District?.Name ?? "N/A"), @(Model.Province?.Name ?? "N/A")
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <i class="bi bi-building text-info me-2"></i>
+                                <strong>Industry:</strong> @(Model.Industry ?? "N/A")
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <i class="bi bi-envelope text-warning me-2"></i>
+                                <strong>Email:</strong> @(Model.Email ?? "N/A")
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <i class="bi bi-telephone text-secondary me-2"></i>
+                                <strong>Phone:</strong> @(Model.Phone ?? "N/A")
+                            </p>
+                        </div>
+                        <div class="col-md-4">
+                            <p class="card-text">
+                                <i class="bi bi-people text-danger me-2"></i>
+                                <strong>Size:</strong> @(Model.Size ?? "N/A")
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Company Description -->
+                    <h3 class="mb-3">Company Description</h3>
+                    <div class="card-text">
+                        @Html.Raw(Model.Description)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Navigation Buttons -->
+            <div class="text-end mt-4">
+                <a asp-action="Index" asp-controller="Company" class="btn btn-outline-primary">
+                    Back to List
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const shareButton = document.querySelector('.btn-share');
+            const companyName = '@Model.Name';
+            const companyUrl = window.location.href;
+
+            shareButton.addEventListener('click', async function(e) {
+                e.preventDefault();
+
+                if (navigator.share) {
+                    try {
+                        await navigator.share({
+                            title: companyName,
+                            text: 'Check out this company: ' + companyName,
+                            url: companyUrl
+                        });
+                        console.log('Company shared successfully');
+                    } catch (error) {
+                        console.error('Error sharing:', error);
+                    }
+                } else {
+                    const shareData = {
+                        title: companyName,
+                        url: companyUrl
+                    };
+                    fallbackShare(shareData);
+                }
+            });
+        });
+
+        function fallbackShare(data) {
+            navigator.clipboard.writeText(`${data.title}\n${data.url}`)
+                .then(() => {
+                    alert('Company link copied to clipboard!\n' +
+                        'Name: ' + data.title + '\n' +
+                        'URL: ' + data.url);
+                })
+                .catch(err => {
+                    alert('Failed to copy to clipboard. Here is the link:\n' + data.url);
+                    console.error('Clipboard error:', err);
+                });
+        }
+    </script>
+}
