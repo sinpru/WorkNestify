@@ -31,8 +31,8 @@
                     <th>@Html.DisplayNameFor(model => model.Status)</th>
                     <th>@Html.DisplayNameFor(model => model.Resume)</th>
                     <th>@Html.DisplayNameFor(model => model.CoverLetter)</th>
-                    <th>@Html.DisplayNameFor(model => model.ApplicationDate)</th>
                     <th>Actions</th>
+                    <th>@Html.DisplayNameFor(model => model.ApplicationDate)</th>
                 </tr>
                 </thead>
                 <tbody></tbody>
@@ -77,6 +77,9 @@
                                     case 'reviewed':
                                         badgeClass = 'bg-success';
                                         break;
+                                    case  'rejected':
+                                        badgeClass = 'bg-danger';
+                                        break;
                                     default:
                                         badgeClass = 'bg-info';
                                 }
@@ -110,12 +113,6 @@
                         searchable: false
                     },
                     {
-                        data: 'applicationDate',
-                        render: function (data) {
-                            return new Date(data).toLocaleDateString('vi-VN');
-                        }
-                    },
-                    {
                         data: 'id',
                         render: function (data, type, row) {
                             return `<div class="btn-group" role="group">
@@ -124,6 +121,12 @@
                                             title="Accept application"
                                             ${row.status?.toLowerCase() !== 'pending' ? 'disabled' : ''}>
                                             <i class="bi bi-check-circle"></i>
+                                        </button>
+                                        <button class="btn btn-danger decline-application" 
+                                            data-id="${data}" 
+                                            title="Decline application"
+                                            ${row.status?.toLowerCase() !== 'pending' ? 'disabled' : ''}>
+                                            <i class="bi bi-x-circle"></i>
                                         </button>
                                         <a href="/Employer/JobApplication/Details/${data}" 
                                             class="btn btn-info" 
@@ -134,7 +137,13 @@
                         },
                         orderable: false,
                         searchable: false
-                    }
+                    },
+                    {
+                        data: 'applicationDate',
+                        render: function (data) {
+                            return new Date(data).toLocaleDateString('vi-VN');
+                        }
+                    },
                 ],
                 responsive: true,
                 dom: '<"row"<"col-md-6"l><"col-md-6"f>>rt<"row"<"col-md-6"i><"col-md-6"p>>B',
@@ -183,37 +192,14 @@
 
             // Handle accept application
             $('#jobApplicationsTable').on('click', '.accept-application', function () {
-                const $button = $(this);
-                const applicationId = $button.data('id');
-
-                $button.prop('disabled', true);
-
-                $.ajax({
-                    url: `/api/JobApplication/reviewed/${applicationId}`,
-                    method: 'GET',
-                    contentType: 'application/json',
-                    success: function (response) {
-                        if (response.success) {
-                            table.ajax.reload(null, false);
-                        } else {
-                            alert('Failed to accept application: ' + (response.message || 'Unknown error'));
-                        }
-                    },
-                    error: function (xhr) {
-                        let errorMsg = 'Error occurred while accepting application';
-                        try {
-                            const errorData = JSON.parse(xhr.responseText);
-                            errorMsg += ': ' + (errorData.message || xhr.statusText);
-                        } catch {
-                            errorMsg += ': ' + xhr.statusText;
-                        }
-                        alert(errorMsg);
-                    },
-                    complete: function () {
-                        $button.prop('disabled', false);
-                    }
-                });
+                acceptJobApplication($(this), table);
+            });
+            
+            // Handle decline application
+            $('#jobApplicationsTable').on('click', '.decline-application', function () {
+                declineJobApplication($(this), table);
             });
         });
     </script>
+    <script src="~/js/JobApplicationButtonHandlers.js" asp-append-version="true"></script>
 }
