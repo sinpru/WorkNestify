@@ -49,7 +49,7 @@
     @{ await Html.RenderPartialAsync("_DataTablesScriptsPartial"); }
     <script asp-append-version="true">
         $(document).ready(function () {
-            $('#jobsTable').DataTable({
+            const table = $('#jobsTable').DataTable({
                 ajax: {
                     url: '/Admin/Job/GetAll',
                     dataSrc: 'data'
@@ -75,10 +75,16 @@
                     },
                     {
                         data: 'id',
-                        render: function (data) {
+                        render: function (data, type, row) {
                             return `<div class="btn-group" role="group">
                                 <a href="/Admin/Job/Edit/${data}" class="btn btn-primary"> <i class="bi bi-pencil-square me-2"></i>Edit</a>
                                 <a href="/Admin/Job/Details/${data}" class="btn btn-info"> <i class="bi bi-info-circle me-2"></i>Details</a>
+                                <button class="btn btn-success accept-job" data-id="${data}" title="Accept job posting" ${row.status?.toLowerCase() === 'open' ? 'disabled' : ''}>
+                                    <i class="bi bi-check-circle"></i> Accept
+                                </button>
+                                <button class="btn btn-warning decline-job" data-id="${data}" title="Decline job posting" ${row.status?.toLowerCase() === 'declined' ? 'disabled' : ''}>
+                                    <i class="bi bi-x-circle"></i> Decline
+                                </button>
                                 <a href="/Admin/Job/Delete/${data}" class="btn btn-danger"> <i class="bi bi-trash-fill me-2"></i>Delete</a>
                             </div>`;
                         },
@@ -95,6 +101,17 @@
                     emptyTable: "No jobs found"
                 }
             });
+
+            // Handle accept job
+            $('#jobsTable').on('click', '.accept-job', function () {
+                handleAcceptJob($(this), table);
+            });
+
+            // Handle decline job
+            $('#jobsTable').on('click', '.decline-job', function () {
+                handleDeclineJob($(this), table);
+            });
         });
     </script>
+    <script src="~/js/JobButtonHandlers.js" asp-append-version="true"></script>
 }

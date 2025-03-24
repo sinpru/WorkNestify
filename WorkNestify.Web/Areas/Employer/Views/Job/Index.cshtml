@@ -110,16 +110,16 @@
                         render: function (data, type, row) {
                             return `<div class="btn-group" role="group">
                                 <a href="/Employer/Job/Edit/${data}" class="btn btn-primary" title="Edit this job">
-                                    <i class="bi bi-pencil-square"></i>
+                                    <i class="bi bi-pencil-square"></i> Edit
                                 </a>
                                 <a href="/Employer/Job/Details/${data}" class="btn btn-info" title="View job details">
-                                    <i class="bi bi-info-circle"></i>
+                                    <i class="bi bi-info-circle"></i> Details
                                 </a>
                                 <button class="btn btn-warning toggle-status" data-id="${data}" title="Toggle job status" ${row.status?.toLowerCase() === 'pending' ? 'disabled' : ''}>
-                                    <i class="bi bi-arrow-repeat"></i>
+                                    <i class="bi bi-arrow-repeat"></i> Toggle Status
                                 </button>
                                 <a href="/Employer/Job/Delete/${data}" class="btn btn-danger" title="Delete this job">
-                                    <i class="bi bi-trash-fill"></i>
+                                    <i class="bi bi-trash-fill"></i> Delete
                                 </a>
                             </div>`;
                         },
@@ -174,37 +174,9 @@
 
             // Handle status toggle
             $('#jobsTable').on('click', '.toggle-status', function () {
-                const $button = $(this);
-                const jobId = $button.data('id');
-
-                $button.prop('disabled', true); // Disable button during request
-
-                $.ajax({
-                    url: `/api/Job/toggle-job?id=${jobId}`,
-                    method: 'POST',
-                    contentType: 'application/json',
-                    success: function (response) {
-                        if (response.success) {
-                            table.ajax.reload(null, false);
-                        } else {
-                            alert('Failed to toggle status: ' + (response.message || 'Unknown error'));
-                        }
-                    },
-                    error: function (xhr) {
-                        let errorMsg = 'Error occurred while toggling status';
-                        try {
-                            const errorData = JSON.parse(xhr.responseText);
-                            errorMsg += ': ' + (errorData.message || xhr.statusText);
-                        } catch {
-                            errorMsg += ': ' + xhr.statusText;
-                        }
-                        alert(errorMsg);
-                    },
-                    complete: function () {
-                        $button.prop('disabled', false); // Re-enable button
-                    }
-                });
+                toggleStatusJob($(this), table);
             });
         });
     </script>
+    <script src="~/js/JobButtonHandlers.js" asp-append-version="true"></script>
 }

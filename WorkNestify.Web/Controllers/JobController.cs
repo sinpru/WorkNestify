@@ -96,7 +96,7 @@ namespace WorkNestify.Web.Controllers
             }
         }
 
-        [HttpPost("toggle-job/{id}")]
+        [HttpPost("toggle-job")]
         [Authorize(Roles = Roles.Admin + "," + Roles.Employer)]
         public async Task<IActionResult> ToggleStatus(int id)
         {
@@ -109,22 +109,111 @@ namespace WorkNestify.Web.Controllers
 
                 if (job == null)
                 {
-                    return NotFound(new { success = false, message = "Job not found" });
+                    return NotFound(new { success = false, message = "Job not found." });
                 }
                 
                 var currentUser = await _userManager.GetUserAsync(User);
                 if (job.CompanyId != currentUser.CompanyId)
                 {
-                    return Unauthorized(new { success = false, message = "You are not authorized to change the job" });
+                    return Unauthorized(new { success = false, message = "You are not authorized to change the job." });
                 }
 
                 if (job.Status == JobStatuses.Pending)
                 {
-                    return Ok(new { success = false, message = "Cannot toggle pending job" });
+                    return Ok(new { success = false, message = "Cannot toggle pending job." });
                 }
 
                 // Toggle status
                 job.Status = job.Status == JobStatuses.Open ? JobStatuses.Closed : JobStatuses.Open;
+                await _unitOfWork.Jobs.UpdateAsync(job);
+                await _unitOfWork.SaveAsync();
+
+                return Ok(new
+                {
+                    success = true,
+                    newStatus = job.Status
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"An error occurred: {ex.Message}",
+                    details = ex.StackTrace
+                });
+            }
+        }
+        
+        [HttpPost("accept-job")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> AcceptJob(int id)
+        {
+            try
+            {
+                var job = await _unitOfWork.Jobs.GetAsync(
+                    j => j.Id == id,
+                    includeProperties: "Company"
+                );
+
+                if (job == null)
+                {
+                    return NotFound(new { success = false, message = "Job not found." });
+                }
+
+                if (job.Status == JobStatuses.Open || job.Status == JobStatuses.Closed)
+                {
+                    return Ok(new { success = false, message = "Job is already processed." });
+                }
+
+                if (job.Status == JobStatuses.Pending || job.Status == JobStatuses.Declined)
+                {
+                    job.Status = JobStatuses.Open;
+                    await _unitOfWork.Jobs.UpdateAsync(job);
+                    await _unitOfWork.SaveAsync();
+                    
+                    return Ok(new
+                    {
+                        success = true,
+                        newStatus = job.Status
+                    });
+                }
+                
+                return Ok(new { success = false, message = "Job is not processed." });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new
+                {
+                    success = false,
+                    message = $"An error occurred: {ex.Message}",
+                    details = ex.StackTrace
+                });
+            }
+        }
+        
+        [HttpPost("decline-job")]
+        [Authorize(Roles = Roles.Admin)]
+        public async Task<IActionResult> DeclineJob(int id)
+        {
+            try
+            {
+                var job = await _unitOfWork.Jobs.GetAsync(
+                    j => j.Id == id,
+                    includeProperties: "Company"
+                );
+
+                if (job == null)
+                {
+                    return NotFound(new { success = false, message = "Job not found." });
+                }
+
+                if (job.Status == JobStatuses.Declined)
+                {
+                    return Ok(new { success = false, message = "Job is already declined." });
+                }
+                
+                job.Status = JobStatuses.Declined;
                 await _unitOfWork.Jobs.UpdateAsync(job);
                 await _unitOfWork.SaveAsync();
 

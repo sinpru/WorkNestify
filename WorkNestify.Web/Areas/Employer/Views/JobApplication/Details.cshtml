@@ -15,9 +15,17 @@
             <p class="text-muted">Detailed view of job application</p>
         </div>
         <div class="col-md-4 text-md-end">
-            <a asp-action="Index" class="btn btn-outline-primary shadow-sm" title="Return to applications list">
-                <i class="bi bi-arrow-left me-2"></i>Back to List
-            </a>
+            <div class="btn-group" role="group">
+                <a asp-action="Index" class="btn btn-outline-primary shadow-sm me-2" title="Return to applications list">
+                    <i class="bi bi-arrow-left me-2"></i>Back to List
+                </a>
+                <button class="btn btn-success accept-application"
+                        data-id="@Model.Id"
+                        title="Accept application"
+                        @(Model.Status?.ToLower() != "pending" ? "disabled" : "")>
+                    <i class="bi bi-check-circle me-2"></i>Accept
+                </button>
+            </div>
         </div>
     </div>
 
@@ -25,8 +33,7 @@
         <div class="card-header bg-primary text-white">
             <h5 class="mb-0">
                 Application for: @Model.Job?.Title
-                <span
-                    class="badge float-end @(Model.Status?.ToLower() == "pending" ? "bg-secondary" : Model.Status?.ToLower() == "reviewed" ? "bg-success" : "bg-info")">
+                <span class="badge float-end @(Model.Status?.ToLower() == "pending" ? "bg-secondary" : Model.Status?.ToLower() == "reviewed" ? "bg-success" : "bg-info")">
                     @Model.Status
                 </span>
             </h5>
@@ -62,8 +69,7 @@
                         <dd class="col-sm-8">
                             @if (!string.IsNullOrEmpty(Model.Resume))
                             {
-                                <a href="@Model.Resume" class="btn btn-sm btn-outline-primary" target="_blank"
-                                   title="Download Resume">
+                                <a href="@Model.Resume" class="btn btn-sm btn-outline-primary" target="_blank" title="Download Resume">
                                     <i class="bi bi-download me-2"></i>Download Resume
                                 </a>
                             }
@@ -77,8 +83,7 @@
                         <dd class="col-sm-8">
                             @if (!string.IsNullOrEmpty(Model.CoverLetter))
                             {
-                                <a href="@Model.CoverLetter" class="btn btn-sm btn-outline-primary" target="_blank"
-                                   title="Download Cover Letter">
+                                <a href="@Model.CoverLetter" class="btn btn-sm btn-outline-primary" target="_blank" title="Download Cover Letter">
                                     <i class="bi bi-download me-2"></i>Download Cover Letter
                                 </a>
                             }
@@ -136,6 +141,43 @@
             $('[title]').tooltip({
                 placement: 'top',
                 container: 'body'
+            });
+
+            $('.accept-application').on('click', function () {
+                const $button = $(this);
+                const applicationId = $button.data('id');
+
+                $button.prop('disabled', true);
+
+                $.ajax({
+                    url: `/api/JobApplication/reviewed/${applicationId}`,
+                    method: 'GET',
+                    contentType: 'application/json',
+                    success: function (response) {
+                        if (response.success) {
+                            // Update the status badge
+                            const $badge = $('.badge.float-end');
+                            $badge.removeClass('bg-secondary bg-info').addClass('bg-success');
+                            $badge.text(response.newStatus);
+                            // Disable the button after success
+                            $button.prop('disabled', true);
+                        } else {
+                            alert('Failed to accept application: ' + (response.message || 'Unknown error'));
+                            $button.prop('disabled', false);
+                        }
+                    },
+                    error: function (xhr) {
+                        let errorMsg = 'Error occurred while accepting application';
+                        try {
+                            const errorData = JSON.parse(xhr.responseText);
+                            errorMsg += ': ' + (errorData.message || xhr.statusText);
+                        } catch {
+                            errorMsg += ': ' + xhr.statusText;
+                        }
+                        alert(errorMsg);
+                        $button.prop('disabled', false);
+                    }
+                });
             });
         });
     </script>

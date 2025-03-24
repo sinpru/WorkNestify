@@ -39,16 +39,32 @@
                     </li>
                     @if (User.Identity.IsAuthenticated && User.IsInRole(Roles.Employer))
                     {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Employer" asp-controller="Job" asp-action="Index">
-                                <i class="bi bi-gear me-1"></i>Job Management
+                        <li class="nav-item dropdown">
+                            <a class="nav-link text-dark dropdown-toggle" href="#" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-gear me-1"></i> Management
                             </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item text-dark" asp-area="Employer" asp-controller="Job"
+                                       asp-action="Index">
+                                        Job Management
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-dark" asp-area="Employer" asp-controller="JobApplication"
+                                       asp-action="Index">
+                                        Job Application Management
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     }
                     @if (User.Identity.IsAuthenticated && User.IsInRole(Roles.Admin))
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
+                            <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard"
+                               asp-action="Index">
                                 <i class="bi bi-speedometer2 me-1"></i>Admin Dashboard
                             </a>
                         </li>
