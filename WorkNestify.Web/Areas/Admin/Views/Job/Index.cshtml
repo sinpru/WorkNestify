@@ -9,37 +9,37 @@
 <partial name="_ManagementNavigationPartial"/>
 <partial name="_NotificationsPartial"/>
 
-<table id="jobsTable" class="table table-striped table-hover nowrap w-100">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Company)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.StreetAddress)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Salary)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Type)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Status)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.JobCategory)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatedDate)
-            </th>
-            <th>
-                Actions
-            </th>
-        </tr>
+<table id="jobsTable" class="table table-striped table-hover nowrap w-100 animate__animated animate__fadeIn">
+    <thead class="animate__animated animate__slideInLeft">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Company)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.StreetAddress)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Salary)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Type)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Status)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.JobCategory)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CreatedDate)
+        </th>
+        <th>
+            Actions
+        </th>
+    </tr>
     </thead>
     <tbody></tbody>
 </table>
@@ -76,16 +76,16 @@
                     {
                         data: 'id',
                         render: function (data, type, row) {
-                            return `<div class="btn-group" role="group">
-                                <a href="/Admin/Job/Edit/${data}" class="btn btn-primary"> <i class="bi bi-pencil-square me-2"></i>Edit</a>
-                                <a href="/Admin/Job/Details/${data}" class="btn btn-info"> <i class="bi bi-info-circle me-2"></i>Details</a>
-                                <button class="btn btn-success accept-job" data-id="${data}" title="Accept job posting" ${row.status?.toLowerCase() === 'open' ? 'disabled' : ''}>
+                            return `<div class="btn-group animate__animated animate__fadeInUp" role="group">
+                                <a href="/Admin/Job/Edit/${data}" class="btn btn-primary animate__animated animate__zoomIn"> <i class="bi bi-pencil-square me-2"></i>Edit</a>
+                                <a href="/Admin/Job/Details/${data}" class="btn btn-info animate__animated animate__zoomIn"> <i class="bi bi-info-circle me-2"></i>Details</a>
+                                <button class="btn btn-success accept-job animate__animated animate__zoomIn" data-id="${data}" title="Accept job posting" ${row.status?.toLowerCase() === 'open' ? 'disabled' : ''}>
                                     <i class="bi bi-check-circle"></i> Accept
                                 </button>
-                                <button class="btn btn-warning decline-job" data-id="${data}" title="Decline job posting" ${row.status?.toLowerCase() === 'declined' ? 'disabled' : ''}>
+                                <button class="btn btn-warning decline-job animate__animated animate__zoomIn" data-id="${data}" title="Decline job posting" ${row.status?.toLowerCase() === 'declined' ? 'disabled' : ''}>
                                     <i class="bi bi-x-circle"></i> Decline
                                 </button>
-                                <a href="/Admin/Job/Delete/${data}" class="btn btn-danger"> <i class="bi bi-trash-fill me-2"></i>Delete</a>
+                                <a href="/Admin/Job/Delete/${data}" class="btn btn-danger animate__animated animate__zoomIn"> <i class="bi bi-trash-fill me-2"></i>Delete</a>
                             </div>`;
                         },
                         orderable: false,
@@ -99,6 +99,12 @@
                 ],
                 language: {
                     emptyTable: "No jobs found"
+                },
+                "drawCallback": function(settings) {
+                    $('#jobsTable tbody tr').each(function(index) {
+                        $(this).addClass('animate__animated animate__fadeInUp');
+                        $(this).css('animation-delay', (index * 0.1) + 's');
+                    });
                 }
             });
 
