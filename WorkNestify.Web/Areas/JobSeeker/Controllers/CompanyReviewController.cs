@@ -274,25 +274,6 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             }
         }
 
-        // GET: JobSeeker/CompanyReview/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var companyReview = await _unitOfWork.CompanyReviews
-                .GetAsync(cr => cr.Id == id,
-                    includeProperties: "Company,ApplicationUser");
-            if (companyReview == null)
-            {
-                return NotFound();
-            }
-
-            return View(companyReview);
-        }
-
         // POST: JobSeeker/CompanyReview/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -300,13 +281,31 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
         {
             var companyReview = await _unitOfWork.CompanyReviews
                 .GetAsync(cr => cr.Id == id);
-            if (companyReview != null)
+            if (companyReview == null)
             {
-                _unitOfWork.CompanyReviews.Remove(companyReview);
+                return NotFound();
+            }
+            
+            
+            var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (companyReview.ApplicationUserId != currentUserId)
+            {
+                return Unauthorized();
             }
 
-            await _unitOfWork.SaveAsync();
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                _unitOfWork.CompanyReviews.Remove(companyReview);
+                await _unitOfWork.SaveAsync();
+            
+                TempData["Success"] = "The review was successfully deleted.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error while deleting review: {ex.Message}";
+                return RedirectToAction(nameof(Index));
+            }
         }
     }
 }

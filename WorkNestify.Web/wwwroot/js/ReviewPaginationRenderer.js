@@ -1,7 +1,7 @@
 $(document).ready(function () {
     var config = window.reviewPaginationConfig || {};
     var totalReviews = config.totalReviews || 0;
-    var pageSize = config.pageSize || 6; // Match CSHTML default
+    var pageSize = config.pageSize || 6;
     var currentPage = config.currentPage || 1;
     var isInitialLoad = true;
 
@@ -49,13 +49,13 @@ $(document).ready(function () {
                                     <a href="/JobSeeker/CompanyReview/Edit/${review.id}" class="btn btn-primary me-2">
                                         <i class="bi bi-pencil-square me-1"></i>Edit
                                     </a>
-                                    <form action="/JobSeeker/CompanyReview/Delete/${review.id}" method="post" class="d-inline"
-                                          onsubmit="return confirm('Are you sure you want to delete this review?');">
-                                        <input type="hidden" name="__RequestVerificationToken" value="${$('input[name="__RequestVerificationToken"]').val()}" />
-                                        <button type="submit" class="btn btn-danger">
-                                            <i class="bi bi-trash me-1"></i>Delete
-                                        </button>
-                                    </form>
+                                    <button type="button" class="btn btn-danger delete-review-btn" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#reviewDeleteModal"
+                                            data-review-id="${review.id}"
+                                            data-review-name="${review.company || 'this company'}">
+                                        <i class="bi bi-trash me-1"></i>Delete
+                                    </button>
                                 </div>
                             </div>
                             <div class="card-footer text-muted">
