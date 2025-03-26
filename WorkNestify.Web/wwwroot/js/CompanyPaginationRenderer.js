@@ -1,11 +1,4 @@
 $(document).ready(function () {
-    // Ensure jQuery and pagination.js are loaded
-    if (typeof $.fn.pagination === 'undefined') {
-        console.error('pagination.js is not loaded. Please ensure the library is included.');
-        return;
-    }
-    console.log(typeof $.fn.pagination);
-
     var config = window.companyFilterConfig || {};
     var totalCompanies = config.totalCompanies || 0;
     var pageSize = config.pageSize || 12;

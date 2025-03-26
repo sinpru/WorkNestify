@@ -89,7 +89,7 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             if (user == null)
             {
                 // Construct the return URL to redirect back to this page after login
-                var returnUrl = Url.Action("Index", "JobApplication", new { jobId }, protocol: Request.Scheme);
+                var returnUrl = Url.Action("Create", "JobApplication", new { jobId }, protocol: Request.Scheme);
                 return RedirectToAction("Login", "Account", new { area = "Identity", returnUrl });
             }
 
@@ -166,6 +166,18 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             {
                 return NotFound();
             }
+            
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (currentUser == null)
+            {
+                var returnUrl = Url.Action("Details", "JobApplication", new { id }, protocol: Request.Scheme);
+                return RedirectToAction("Login", "Account", new { area = "Identity", returnUrl });
+            }
+
+            if (jobApplication.ApplicationUserId != currentUser.Id)
+            {
+                return Unauthorized();
+            }
 
             return View(jobApplication);
         }
@@ -182,6 +194,18 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             if (jobApplication == null)
             {
                 return NotFound();
+            }
+            
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (currentUser == null)
+            {
+                var returnUrl = Url.Action("Edit", "JobApplication", new { id }, protocol: Request.Scheme);
+                return RedirectToAction("Login", "Account", new { area = "Identity", returnUrl });
+            }
+
+            if (jobApplication.ApplicationUserId != currentUser.Id)
+            {
+                return Unauthorized();
             }
 
             return View(jobApplication);
@@ -228,6 +252,18 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             if (jobApplication == null)
             {
                 return NotFound();
+            }
+            
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (currentUser == null)
+            {
+                var returnUrl = Url.Action("Delete", "JobApplication", new { id }, protocol: Request.Scheme);
+                return RedirectToAction("Login", "Account", new { area = "Identity", returnUrl });
+            }
+
+            if (jobApplication.ApplicationUserId != currentUser.Id)
+            {
+                return Unauthorized();
             }
 
             return View(jobApplication);

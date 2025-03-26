@@ -40,7 +40,6 @@
     <ItemGroup>
       <Folder Include="Areas\Employer\Controllers\" />
       <Folder Include="wwwroot\assets\images\" />
-      <Folder Include="wwwroot\css\" />
     </ItemGroup>
 
     <ItemGroup>
