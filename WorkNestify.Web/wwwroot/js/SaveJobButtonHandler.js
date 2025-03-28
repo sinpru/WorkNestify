@@ -1,4 +1,3 @@
-// SaveJobButtonHandler.js
 function initializeSaveJobHandler() {
     const saveButtons = document.querySelectorAll('.save-job-btn');
 
@@ -42,7 +41,7 @@ function initializeSaveJobHandler() {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest'
-                }
+                },
             })
                 .then(response => {
                     if (!response.ok) {
@@ -64,6 +63,12 @@ function initializeSaveJobHandler() {
                             saveIcon.classList.remove('bi-heart-fill');
                             saveIcon.classList.add('bi-heart');
                             saveText.textContent = 'Save';
+
+                            // Reload saved jobs list if on the saved jobs page
+                            if (window.location.pathname.includes('/JobSeeker/SavedJob') &&
+                                typeof window.savedJobsList?.fetchSavedJobs === 'function') {
+                                window.savedJobsList.fetchSavedJobs();
+                            }
                         }
                     } else {
                         alert(data.message || 'Failed to save the job.');
