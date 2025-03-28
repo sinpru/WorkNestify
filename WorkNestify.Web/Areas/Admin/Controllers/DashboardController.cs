@@ -46,7 +46,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                             j.Status, 
                             j.CreatedDate 
                         })
-                        .ToList(), // Materialize the query
+                        .ToList(),
                     RecentPendingApplications = _unitOfWork.JobApplications.GetAllQueryable(includeProperties: "Job,ApplicationUser")
                         .Where(a => a.Status == JobApplicationStatuses.Pending)
                         .OrderByDescending(a => a.ApplicationDate)
@@ -58,7 +58,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                             ApplicationUser = a.ApplicationUser != null ? new { a.ApplicationUser.FullName } : new { FullName = "N/A" }, 
                             a.ApplicationDate 
                         })
-                        .ToList(), // Materialize the query
+                        .ToList(),
                     RecentReviews = _unitOfWork.CompanyReviews.GetAllQueryable(includeProperties: "Company")
                         .OrderByDescending(r => r.CreatedDate)
                         .Take(10)
@@ -70,14 +70,13 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                             r.Content, 
                             r.CreatedDate 
                         })
-                        .ToList() // Materialize the query
+                        .ToList()
                 };
 
                 return Json(data);
             }
             catch (Exception ex)
             {
-                // Log the exception if you have a logging mechanism
                 return StatusCode(500, new { Error = "An error occurred while fetching dashboard data.", Details = ex.Message });
             }
         }

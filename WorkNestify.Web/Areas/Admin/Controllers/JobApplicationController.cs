@@ -73,7 +73,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // GET: Admin/JobApplication/Create
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Create(int? jobId)
         {
             await PopulateDropdownsAsync();
             return View();
@@ -87,6 +87,15 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             JobApplication jobApplication,
             IFormFile coverLetterFile, IFormFile resumeFile)
         {
+            var currentJob = await _unitOfWork.Jobs.GetAsync(j => j.Id == jobApplication.JobId);
+            if (currentJob?.Status != JobStatuses.Open ||
+                currentJob.StartDate < DateTime.UtcNow ||
+                currentJob.EndDate > DateTime.UtcNow)
+            {
+                TempData["Warning"] = "You cannot apply for this job right now.";
+                return RedirectToAction("Create", "JobApplication", new { jobId = jobApplication.JobId, area = "Admin" });
+            }
+            
             ModelState.Remove("Resume");
             ModelState.Remove("CoverLetter");
 
@@ -196,71 +205,71 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 string existingCoverLetterUrl = existingJobApplication.CoverLetter ?? string.Empty;
                 string existingResumeUrl = existingJobApplication.Resume ?? string.Empty;
 
-                // Handle Cover Letter Upload
-                if (coverLetterFile != null && coverLetterFile.Length > 0)
-                {
-                    if (!string.IsNullOrEmpty(existingCoverLetterUrl))
+                    // Handle Cover Letter Upload
+                    if (coverLetterFile != null && coverLetterFile.Length > 0)
                     {
-                        bool coverLetterIsDeleted = await _cloudinary.DeleteDocumentAsync(existingCoverLetterUrl);
-                        if (!coverLetterIsDeleted)
+                        if (!string.IsNullOrEmpty(existingCoverLetterUrl))
                         {
-                            TempData["Warning"] = "Failed to delete the old cover letter";
+                            bool coverLetterIsDeleted = await _cloudinary.DeleteDocumentAsync(existingCoverLetterUrl);
+                            if (!coverLetterIsDeleted)
+                            {
+                                TempData["Warning"] = "Failed to delete the old cover letter";
+                                await PopulateDropdownsAsync(jobApplication);
+                                ViewBag.ExistingCoverLetter = existingCoverLetterUrl;
+                                ViewBag.ExistingResume = existingResumeUrl;
+                                return View(jobApplication);
+                            }
+                        }
+
+                        string newCoverLetterUrl = await _cloudinary.UploadDocumentAsync(coverLetterFile);
+                        if (string.IsNullOrEmpty(newCoverLetterUrl))
+                        {
+                            TempData["Warning"] = "Error uploading new cover letter";
                             await PopulateDropdownsAsync(jobApplication);
                             ViewBag.ExistingCoverLetter = existingCoverLetterUrl;
                             ViewBag.ExistingResume = existingResumeUrl;
                             return View(jobApplication);
                         }
+
+                        existingJobApplication.CoverLetter = newCoverLetterUrl;
+                    }
+                    else
+                    {
+                        existingJobApplication.CoverLetter = existingCoverLetterUrl;
                     }
 
-                    string newCoverLetterUrl = await _cloudinary.UploadDocumentAsync(coverLetterFile);
-                    if (string.IsNullOrEmpty(newCoverLetterUrl))
+                    // Handle Resume Upload
+                    if (resumeFile != null && resumeFile.Length > 0)
                     {
-                        TempData["Warning"] = "Error uploading new cover letter";
-                        await PopulateDropdownsAsync(jobApplication);
-                        ViewBag.ExistingCoverLetter = existingCoverLetterUrl;
-                        ViewBag.ExistingResume = existingResumeUrl;
-                        return View(jobApplication);
-                    }
-
-                    existingJobApplication.CoverLetter = newCoverLetterUrl;
-                }
-                else
-                {
-                    existingJobApplication.CoverLetter = existingCoverLetterUrl;
-                }
-
-                // Handle Resume Upload
-                if (resumeFile != null && resumeFile.Length > 0)
-                {
-                    if (!string.IsNullOrEmpty(existingResumeUrl))
-                    {
-                        bool resumeIsDeleted = await _cloudinary.DeleteDocumentAsync(existingResumeUrl);
-                        if (!resumeIsDeleted)
+                        if (!string.IsNullOrEmpty(existingResumeUrl))
                         {
-                            TempData["Warning"] = "Failed to delete the old resume";
+                            bool resumeIsDeleted = await _cloudinary.DeleteDocumentAsync(existingResumeUrl);
+                            if (!resumeIsDeleted)
+                            {
+                                TempData["Warning"] = "Failed to delete the old resume";
+                                await PopulateDropdownsAsync(jobApplication);
+                                ViewBag.ExistingCoverLetter = existingJobApplication.CoverLetter;
+                                ViewBag.ExistingResume = existingResumeUrl;
+                                return View(jobApplication);
+                            }
+                        }
+
+                        string newResumeUrl = await _cloudinary.UploadDocumentAsync(resumeFile);
+                        if (string.IsNullOrEmpty(newResumeUrl))
+                        {
+                            TempData["Warning"] = "Error uploading new resume";
                             await PopulateDropdownsAsync(jobApplication);
                             ViewBag.ExistingCoverLetter = existingJobApplication.CoverLetter;
                             ViewBag.ExistingResume = existingResumeUrl;
                             return View(jobApplication);
                         }
-                    }
 
-                    string newResumeUrl = await _cloudinary.UploadDocumentAsync(resumeFile);
-                    if (string.IsNullOrEmpty(newResumeUrl))
+                        existingJobApplication.Resume = newResumeUrl;
+                    }
+                    else
                     {
-                        TempData["Warning"] = "Error uploading new resume";
-                        await PopulateDropdownsAsync(jobApplication);
-                        ViewBag.ExistingCoverLetter = existingJobApplication.CoverLetter;
-                        ViewBag.ExistingResume = existingResumeUrl;
-                        return View(jobApplication);
+                        existingJobApplication.Resume = existingResumeUrl;
                     }
-
-                    existingJobApplication.Resume = newResumeUrl;
-                }
-                else
-                {
-                    existingJobApplication.Resume = existingResumeUrl;
-                }
 
                 existingJobApplication.ApplicationUserId = jobApplication.ApplicationUserId;
                 existingJobApplication.JobId = jobApplication.JobId;

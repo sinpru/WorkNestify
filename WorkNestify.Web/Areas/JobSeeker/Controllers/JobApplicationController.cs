@@ -89,7 +89,9 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             }
 
             var currentJob = await _unitOfWork.Jobs.GetAsync(j => j.Id == jobId);
-            if (currentJob?.Status != JobStatuses.Open)
+            if (currentJob?.Status != JobStatuses.Open || 
+                currentJob.StartDate < DateTime.UtcNow ||
+                currentJob.EndDate > DateTime.UtcNow)
             {
                 TempData["Warning"] = "You cannot apply for this job right now.";
                 return RedirectToAction("Index", "Job", new { area = "JobSeeker" });
@@ -170,7 +172,6 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
         // GET: JobSeeker/JobApplication/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            // TODO: Update the edit page for job application
             if (id == null)
             {
                 return NotFound();
@@ -180,6 +181,15 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             if (jobApplication == null)
             {
                 return NotFound();
+            }
+            
+            var currentJob = await _unitOfWork.Jobs.GetAsync(j => j.Id == jobApplication.JobId);
+            if (currentJob?.Status != JobStatuses.Open || 
+                currentJob.StartDate < DateTime.UtcNow ||
+                currentJob.EndDate > DateTime.UtcNow)
+            {
+                TempData["Warning"] = "You cannot apply for this job right now.";
+                return RedirectToAction("Index", "JobAppli", new { area = "JobSeeker" });
             }
 
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -201,32 +211,102 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,
-            [Bind("Id,Resume,CoverLetter,ApplicationUserId,JobId")]
-            JobApplication jobApplication)
+            [Bind("Id,ApplicationUserId,JobId")]
+            JobApplication jobApplication,
+            IFormFile? resumeFile,
+            IFormFile? coverLetterFile)
         {
+            ModelState.Remove("Resume");
+            ModelState.Remove("CoverLetter");
+            
             if (id != jobApplication.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                try
-                {
-                    await _unitOfWork.JobApplications.UpdateAsync(jobApplication);
-                    await _unitOfWork.SaveAsync();
-                }
-                catch (Exception ex)
-                {
-                    TempData["Error"] = $"Error updating job application: {ex.Message}";
-                    return RedirectToAction("Details", "Job",
-                        new { id = jobApplication.ApplicationUserId, area = "JobSeeker" });
-                }
-
-                return RedirectToAction(nameof(Index));
+                return View(jobApplication);
             }
 
-            return View(jobApplication);
+            try
+            {
+                var existingJobApplication = await _unitOfWork.JobApplications.GetAsync(ja => ja.Id == id);
+                if (existingJobApplication == null)
+                {
+                    return NotFound();
+                }
+                
+                string existingCoverLetterUrl = existingJobApplication.CoverLetter ?? string.Empty;
+                string existingResumeUrl = existingJobApplication.Resume ?? string.Empty;
+                
+                // Handle Cover Letter Upload
+                if (coverLetterFile != null && coverLetterFile.Length > 0)
+                {
+                    if (!string.IsNullOrEmpty(existingCoverLetterUrl))
+                    {
+                        bool coverLetterIsDeleted = await _cloudinary.DeleteDocumentAsync(existingCoverLetterUrl);
+                        if (!coverLetterIsDeleted)
+                        {
+                            TempData["Warning"] = "Failed to delete the old cover letter";
+                            return View(jobApplication);
+                        }
+                    }
+
+                    string newCoverLetterUrl = await _cloudinary.UploadDocumentAsync(coverLetterFile);
+                    if (string.IsNullOrEmpty(newCoverLetterUrl))
+                    {
+                        TempData["Warning"] = "Error uploading new cover letter";
+                        return View(jobApplication);
+                    }
+
+                    existingJobApplication.CoverLetter = newCoverLetterUrl;
+                }
+                else
+                {
+                    existingJobApplication.CoverLetter = existingCoverLetterUrl;
+                }
+
+                // Handle Resume Upload
+                if (resumeFile != null && resumeFile.Length > 0)
+                {
+                    if (!string.IsNullOrEmpty(existingResumeUrl))
+                    {
+                        bool resumeIsDeleted = await _cloudinary.DeleteDocumentAsync(existingResumeUrl);
+                        if (!resumeIsDeleted)
+                        {
+                            TempData["Warning"] = "Failed to delete the old resume";
+                            return View(jobApplication);
+                        }
+                    }
+
+                    string newResumeUrl = await _cloudinary.UploadDocumentAsync(resumeFile);
+                    if (string.IsNullOrEmpty(newResumeUrl))
+                    {
+                        TempData["Warning"] = "Error uploading new resume";
+                        return View(jobApplication);
+                    }
+
+                    existingJobApplication.Resume = newResumeUrl;
+                }
+                else
+                {
+                    existingJobApplication.Resume = existingResumeUrl;
+                }
+                
+                existingJobApplication.ModifiedDate = DateTime.UtcNow;
+                
+                await _unitOfWork.JobApplications.UpdateAsync(jobApplication);
+                await _unitOfWork.SaveAsync();
+                    
+                TempData["Success"] = "Successfully edited job application!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"Error updating job application: {ex.Message}";
+                return View(jobApplication);
+            }
         }
     }
 }
