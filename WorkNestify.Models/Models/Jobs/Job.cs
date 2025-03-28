@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using WorkNestify.Models.Models.Companies;
 using WorkNestify.Models.Models.JobApplications;
 using WorkNestify.Models.Models.Locations;
+using WorkNestify.Models.Models.Users;
 using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.Models.Models.Jobs
@@ -102,5 +103,6 @@ namespace WorkNestify.Models.Models.Jobs
         public Ward? Ward { get; set; }
 
         public ICollection<JobApplication> JobApplications { get; set; } = new HashSet<JobApplication>();
+        public ICollection<SavedJob> SavedByUsers { get; set; } = new HashSet<SavedJob>();
     }
 }

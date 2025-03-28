@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Repositories.Interfaces;
@@ -7,6 +8,7 @@ using WorkNestify.Models.Models.Companies;
 namespace WorkNestify.Web.Areas.JobSeeker.Controllers
 {
     [Area("JobSeeker")]
+    [Authorize]
     public class CompanyReviewController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

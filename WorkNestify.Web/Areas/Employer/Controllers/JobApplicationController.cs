@@ -34,7 +34,9 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
             var currentUser = await _userManager.GetUserAsync(HttpContext.User);
 
             var jobApplicationsList = _unitOfWork.JobApplications
-                .GetAllAsync(ja => ja.Job.CompanyId == currentUser.CompanyId,
+                .GetAllAsync(
+                    ja => ja.Job.CompanyId == currentUser.CompanyId
+                    && ja.Status != JobApplicationStatuses.Withdrawn,
                     includeProperties: "Job,ApplicationUser").Result;
             return Json(new
             {

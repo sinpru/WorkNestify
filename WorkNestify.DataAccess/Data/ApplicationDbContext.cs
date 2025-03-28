@@ -33,6 +33,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     // Users
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+    public DbSet<SavedJob> SavedJobs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -66,11 +67,27 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasForeignKey(cr => cr.CompanyId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Locations Relationships
+        // Locations Relationship
         modelBuilder.Entity<Ward>()
             .HasOne(w => w.District)
             .WithMany(d => d.Wards)
             .HasForeignKey(w => w.DistrictId)
             .OnDelete(DeleteBehavior.Restrict);
+        
+        // SavedJob Relationships
+        modelBuilder.Entity<SavedJob>()
+            .HasKey(sj => new { sj.UserId, sj.JobId });
+
+        modelBuilder.Entity<SavedJob>()
+            .HasOne(sj => sj.User)
+            .WithMany(u => u.SavedJobs)
+            .HasForeignKey(sj => sj.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<SavedJob>()
+            .HasOne(sj => sj.Job)
+            .WithMany(j => j.SavedByUsers)
+            .HasForeignKey(sj => sj.JobId)
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

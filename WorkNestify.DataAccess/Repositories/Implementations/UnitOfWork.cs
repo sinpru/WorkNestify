@@ -4,11 +4,13 @@ using WorkNestify.DataAccess.Repositories.Implementations.Companies;
 using WorkNestify.DataAccess.Repositories.Implementations.JobApplications;
 using WorkNestify.DataAccess.Repositories.Implementations.Jobs;
 using WorkNestify.DataAccess.Repositories.Implementations.Locations;
+using WorkNestify.DataAccess.Repositories.Implementations.Users;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
 using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
+using WorkNestify.DataAccess.Repositories.Interfaces.Users;
 using WorkNestify.Models.Models.Locations;
 
 namespace WorkNestify.DataAccess.Repositories.Implementations;
@@ -34,6 +36,8 @@ public class UnitOfWork : IUnitOfWork
     public IDistrictRepository Districts { get; private set; }
     public IProvinceRepository Provinces { get; private set; }
     public IWardRepository Wards { get; private set; }
+    
+    public ISavedJob SavedJobs { get; private set; }
 
     public UnitOfWork(ApplicationDbContext context)
     {
@@ -46,6 +50,7 @@ public class UnitOfWork : IUnitOfWork
         Provinces = new ProvinceRepository(_context);
         Districts = new DistrictRepository(_context);
         Wards = new WardRepository(_context);
+        SavedJobs = new SavedJobRepository(_context);
     }
 
     public async Task SaveAsync()

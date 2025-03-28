@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -12,6 +13,7 @@ using WorkNestify.Utilities.Constants;
 namespace WorkNestify.Web.Areas.JobSeeker.Controllers
 {
     [Area("JobSeeker")]
+    [Authorize]
     public class JobApplicationController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -81,9 +83,17 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
         // GET: JobSeeker/JobApplication/Create
         public async Task<IActionResult> Create(int? jobId)
         {
+            // If the user already apply for this job they can't create another one
+            if (_unitOfWork.JobApplications.GetAsync(ja => ja.JobId == jobId).Result != null)
+            {
+                TempData["Waring"] = "Your job is already in progress.";
+                return RedirectToAction("Details", "Job", new { id = jobId });
+            }
+            
             // Pass the JobId to the view via ViewBag
             ViewBag.JobId = jobId;
 
+            // TODO: Get rid of _userManager in functions that only retrives user id
             // Get the current user; if not logged in, redirect to the login page
             var user = await _userManager.GetUserAsync(HttpContext.User);
             if (user == null)

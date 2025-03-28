@@ -35,4 +35,5 @@ public class ApplicationUser : IdentityUser
     public string Role { get; set; } = Roles.JobSeeker;
     
     public ICollection<JobApplication> JobApplications { get; set; } = new HashSet<JobApplication>();
+    public ICollection<SavedJob> SavedJobs { get; set; } = new HashSet<SavedJob>();
 }
