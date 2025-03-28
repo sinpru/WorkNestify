@@ -1,11 +1,8 @@
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Models.Models.Companies;
-using WorkNestify.Models.Models.Users;
 using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
@@ -15,14 +12,11 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
     public class CompanyReviewController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<ApplicationUser> _userManager;
 
         public CompanyReviewController(
-            IUnitOfWork unitOfWork,
-            UserManager<ApplicationUser> userManager)
+            IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _userManager = userManager;
         }
 
         // GET: Admin/CompanyReview
@@ -75,8 +69,6 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // POST: Admin/CompanyReview/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ReviewerId,CompanyId,Content,Rating")] CompanyReview companyReview)
@@ -89,8 +81,8 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
             try
             {
-                var user = await _userManager.GetUserAsync(User);
-                companyReview.ApplicationUser = user;
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                companyReview.ApplicationUserId = userId;
                 
                 await _unitOfWork.CompanyReviews.AddAsync(companyReview);
                 await _unitOfWork.SaveAsync();
@@ -126,8 +118,6 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // POST: Admin/CompanyReview/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,ReviewerId,CompanyId,Content,Rating")] CompanyReview companyReview)
@@ -145,14 +135,16 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             
             try
             {
-                var user = await _userManager.GetUserAsync(User);
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
-                if (companyReview.ApplicationUser != user)
+                if (companyReview.ApplicationUserId != userId)
                 {
                     ViewData["CompanyId"] = new SelectList(_unitOfWork.Companies.GetAllAsync().Result, "Id", "Name");
                     TempData["Warning"] = "Review doesn't belong to user.";
                     return View(companyReview);
                 }
+                
+                companyReview.ModifiedDate = DateTime.UtcNow;
                 
                 await _unitOfWork.CompanyReviews.UpdateAsync(companyReview);
                 await _unitOfWork.SaveAsync();

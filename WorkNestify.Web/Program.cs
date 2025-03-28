@@ -11,6 +11,7 @@ using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Models.Models.Users;
 using WorkNestify.Services;
 using WorkNestify.Utilities;
+using WorkNestify.Utilities.EmailHelper;
 using WorkNestify.Web.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,7 +40,9 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Internal Services
 builder.Services.AddTransient<IEmailSender, EmailSender>();
+builder.Services.AddScoped<EmailSender>();
 builder.Services.AddScoped<LocationManager>();
+builder.Services.AddHostedService<JobStatusUpdateService>();
 
 // Setting up Identity 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()

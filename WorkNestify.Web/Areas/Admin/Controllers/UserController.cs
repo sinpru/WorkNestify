@@ -1,8 +1,6 @@
 using System.Text;
-using System.Text.Encodings.Web;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.WebUtilities;
@@ -11,6 +9,7 @@ using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Models.Models.Users;
 using WorkNestify.Models.ViewModels;
 using WorkNestify.Utilities.Constants;
+using WorkNestify.Utilities.EmailHelper;
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
@@ -20,12 +19,12 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IEmailSender _emailSender;
+        private readonly EmailSender _emailSender;
 
         public UserController(
             IUnitOfWork unitOfWork,
             UserManager<ApplicationUser> userManager,
-            IEmailSender emailSender)
+            EmailSender emailSender)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
@@ -91,8 +90,6 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // POST: Admin/User/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -146,8 +143,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                         values: new { area = "Identity", userId = userId, code = code },
                         protocol: Request.Scheme);
 
-                    await _emailSender.SendEmailAsync(applicationUser.Email, "Confirm your email",
-                        $"Please confirm your account by <a href='{HtmlEncoder.Default.Encode(callbackUrl)}'>clicking here</a>.");
+                    await _emailSender.SendEmailConfirmationAsync(user.Email, user.UserName, callbackUrl);
                     
                     TempData["Success"] = "User created successfully.";
                     return RedirectToAction(nameof(Index));
@@ -193,8 +189,6 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // POST: Admin/User/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(string id,

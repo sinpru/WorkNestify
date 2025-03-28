@@ -17,7 +17,10 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         private readonly GhnService _ghnService;
         private readonly LocationManager _locationManager;
 
-        public CompanyController(IUnitOfWork unitOfWork, CloudinaryService cloudinary, GhnService ghnService,
+        public CompanyController(
+            IUnitOfWork unitOfWork, 
+            CloudinaryService cloudinary, 
+            GhnService ghnService,
             LocationManager locationManager)
         {
             _unitOfWork = unitOfWork;
@@ -77,8 +80,6 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // POST: Admin/Company/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
@@ -162,8 +163,6 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // POST: Admin/Company/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,

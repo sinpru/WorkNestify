@@ -37,6 +37,7 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             // Define the filter
             Expression<Func<Job, bool>> filter = j =>
                 j.Status == "Open"
+                && j.StartDate >= DateTime.UtcNow
                 && (string.IsNullOrEmpty(search) || j.Title.Contains(search))
                 && (string.IsNullOrEmpty(category) || j.JobCategoryId.ToString() == category)
                 && (!location.HasValue || j.ProvinceId == location);

@@ -1,64 +1,109 @@
 @model WorkNestify.Models.Models.JobApplications.JobApplication
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Job Application";
 }
 
-<h1>Edit</h1>
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8">
+            <partial name="_NotificationsPartial"/>
 
-<h4>JobApplication</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Resume" class="control-label"></label>
-                <input asp-for="Resume" class="form-control" />
-                <span asp-validation-for="Resume" class="text-danger"></span>
+            <!-- Header Section -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h4 text-primary">Edit Job Application</h2>
+                <a asp-action="Index" class="btn btn-outline-primary d-flex align-items-center">
+                    <i class="fs-4 bi-arrow-left me-1"></i> Back to List
+                </a>
             </div>
-            <div class="form-group">
-                <label asp-for="CoverLetter" class="control-label"></label>
-                <input asp-for="CoverLetter" class="form-control" />
-                <span asp-validation-for="CoverLetter" class="text-danger"></span>
+
+            <!-- Job Application Form Card -->
+            <div class="card border-light shadow-sm">
+                <div class="card-body">
+                    <h5 class="card-title mb-4">Update Your Application</h5>
+                    <hr/>
+
+                    <form asp-action="Edit" enctype="multipart/form-data">
+                        <!-- Hidden Fields -->
+                        <input asp-for="Id" type="hidden" />
+                        <input asp-for="ApplicationUserId" type="hidden" />
+                        <input asp-for="JobId" type="hidden" />
+                        <input asp-for="Status" type="hidden" />
+                        <input asp-for="ApplicationDate" type="hidden" />
+                        <input asp-for="ModifiedDate" type="hidden" />
+
+                        <!-- Validation Summary -->
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Current Resume Display -->
+                        <div class="form-group mb-3">
+                            <label class="control-label">
+                                <i class="bi bi-file-earmark-text text-primary me-2"></i>Current Resume
+                            </label>
+                            @if (!string.IsNullOrEmpty(Model.Resume))
+                            {
+                                <div class="mb-2">
+                                    <a href="@Model.Resume" target="_blank" class="text-primary">
+                                        View Current Resume <i class="bi bi-box-arrow-up-right"></i>
+                                    </a>
+                                </div>
+                            }
+                            <input id="resume" name="resumeFile" type="file" class="form-control"
+                                   accept=".pdf,.doc,.docx,.odt,.rtf,.txt"/>
+                            <small class="form-text text-muted">
+                                Upload a new resume to replace the existing one (PDF, DOC, DOCX, ODT, RTF, or TXT format).
+                            </small>
+                        </div>
+
+                        <!-- Current Cover Letter Display -->
+                        <div class="form-group mb-4">
+                            <label class="control-label">
+                                <i class="bi bi-envelope text-primary me-2"></i>Current Cover Letter
+                            </label>
+                            @if (!string.IsNullOrEmpty(Model.CoverLetter))
+                            {
+                                <div class="mb-2">
+                                    <a href="@Model.CoverLetter" target="_blank" class="text-primary">
+                                        View Current Cover Letter <i class="bi bi-box-arrow-up-right"></i>
+                                    </a>
+                                </div>
+                            }
+                            <input id="coverLetter" name="coverLetterFile" type="file" class="form-control"
+                                   accept=".pdf,.doc,.docx,.odt,.rtf,.txt"/>
+                            <small class="form-text text-muted">
+                                Upload a new cover letter to replace the existing one (PDF, DOC, DOCX, ODT, RTF, or TXT format).
+                            </small>
+                        </div>
+
+                        <!-- Note Section -->
+                        <div class="alert alert-warning mt-4" role="alert">
+                            <h5 class="alert-heading">
+                                <i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Important Notes
+                            </h5>
+                            <ol>
+                                <li>
+                                    Only upload new files if you want to replace the existing ones. Leave fields empty to keep current documents.
+                                </li>
+                                <li>
+                                    For assistance with updating your application, contact us at
+                                    <a href="mailto:support@worknestify.com">support@worknestify.com</a>.
+                                </li>
+                            </ol>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-save me-2"></i>Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="ApplicationDate" class="control-label"></label>
-                <input asp-for="ApplicationDate" class="form-control" />
-                <span asp-validation-for="ApplicationDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ModifiedDate" class="control-label"></label>
-                <input asp-for="ModifiedDate" class="form-control" />
-                <span asp-validation-for="ModifiedDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ApplicationUserId" class="control-label"></label>
-                <select asp-for="ApplicationUserId" class="form-control" asp-items="ViewBag.ApplicationUserId"></select>
-                <span asp-validation-for="ApplicationUserId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="JobId" class="control-label"></label>
-                <select asp-for="JobId" class="form-control" asp-items="ViewBag.JobId"></select>
-                <span asp-validation-for="JobId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Status" class="control-label"></label>
-                <input asp-for="Status" class="form-control" />
-                <span asp-validation-for="Status" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }
