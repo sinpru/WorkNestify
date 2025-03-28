@@ -68,6 +68,15 @@
             category: '@Html.Raw(Context.Request.Query["category"])',
             location: '@Html.Raw(Context.Request.Query["location"])'
         };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize save job handler if authenticated
+            @if (User.Identity.IsAuthenticated)
+            {
+                @:initializeSaveJobHandler();
+            }
+        });
     </script>
+    <script src="~/js/SaveJobButtonHandler.js" asp-append-version="true"></script>
     <script src="~/js/JobPaginationRenderer.js" asp-append-version="true"></script>
 }

@@ -26,6 +26,9 @@ $(document).ready(function () {
             const jobCards = jobs.map(job => {
                 const daysAgo = Math.floor((new Date() - new Date(job.createdDate)) / (1000 * 60 * 60 * 24));
                 const postedText = daysAgo === 0 ? "Posted today" : `Posted ${daysAgo} day${daysAgo === 1 ? "" : "s"} ago`;
+                const isSaved = job.isSaved || false;
+                const saveIconClass = isSaved ? 'bi-heart-fill' : 'bi-heart';
+                const saveText = isSaved ? 'Saved' : 'Save';
 
                 if (layout === 'compact') {
                     return `
@@ -43,7 +46,12 @@ $(document).ready(function () {
                                 <p class="card-text text-muted mb-1">${(job.salary || 0).toLocaleString('vi-VN')} ₫</p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="badge bg-success">${job.status || 'N/A'}</span>
-                                    <a href="/JobSeeker/Job/Details/${job.id}" class="btn btn-outline-primary btn-sm">Details</a>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button class="btn btn-outline-secondary btn-sm save-job-btn" data-job-id="${job.id}">
+                                            <i class="bi ${saveIconClass} save-job-icon"></i> <span class="save-job-text">${saveText}</span>
+                                        </button>
+                                        <a href="/JobSeeker/Job/Details/${job.id}" class="btn btn-outline-primary btn-sm">Details</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -82,6 +90,9 @@ $(document).ready(function () {
                                             <span class="badge bg-success">${job.status || 'N/A'}</span>
                                             <div class="d-flex align-items-center gap-3">
                                                 <span class="text-muted">${postedText}</span>
+                                                <button class="btn btn-outline-secondary save-job-btn" data-job-id="${job.id}">
+                                                    <i class="bi ${saveIconClass} save-job-icon"></i> <span class="save-job-text">${saveText}</span>
+                                                </button>
                                                 <a href="/JobSeeker/Job/Details/${job.id}" class="btn btn-outline-primary">Details</a>
                                             </div>
                                         </div>
@@ -94,6 +105,11 @@ $(document).ready(function () {
                 }
             });
             $jobListings.append(jobCards.join(''));
+
+            // Reinitialize save button handlers after rendering
+            if (typeof initializeSaveJobHandler === 'function') {
+                initializeSaveJobHandler();
+            }
         } else {
             $jobListings.html('<div class="text-center"><p class="text-muted">No top jobs available at the moment.</p></div>');
         }

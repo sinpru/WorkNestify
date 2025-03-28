@@ -17,8 +17,8 @@
                     <a href="#" class="btn btn-outline-primary me-2 btn-share"><i class="bi bi-share"></i> Share</a>
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <button id="saveJobBtn" class="btn btn-outline-secondary me-2" data-job-id="@Model.Id">
-                            <i class="bi bi-heart" id="saveIcon"></i> <span id="saveText">Save</span>
+                        <button class="btn btn-outline-secondary me-2 save-job-btn" data-job-id="@Model.Id">
+                            <i class="bi bi-heart save-job-icon"></i> <span class="save-job-text">Save</span>
                         </button>
                     }
                     else
@@ -166,7 +166,7 @@
             // Initialize save job handler if authenticated
             @if (User.Identity.IsAuthenticated)
             {
-                @:initializeSaveJobHandler(@Model.Id);
+                @:initializeSaveJobHandler();
             }
         });
 

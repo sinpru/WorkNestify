@@ -77,6 +77,9 @@ namespace WorkNestify.Web.Controllers
                 var totalJobsQuery = _unitOfWork.Jobs.GetAllQueryable(filter: filter);
                 var totalJobs = await totalJobsQuery.CountAsync();
 
+                // Get current user to check if the job is saved or not
+                var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                
                 // Get paginated results
                 var paginatedJobs = await _unitOfWork.Jobs.GetAllQueryable(
                     filter: filter,
@@ -99,7 +102,8 @@ namespace WorkNestify.Web.Controllers
                     salary = j.Salary,
                     status = j.Status,
                     level = j.Level,
-                    type = j.Type
+                    type = j.Type,
+                    IsSaved = userId != null && j.SavedByUsers.Any(s => s.UserId == userId)
                 }).ToListAsync();
 
                 var response = new
