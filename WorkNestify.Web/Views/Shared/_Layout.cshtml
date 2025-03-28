@@ -5,6 +5,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - WorkNestify</title>
+    <link rel="icon" type="image/x-icon" href="~/assets/images/monogram.png"/>
     <link rel="stylesheet" href="~/lib/bootswatch/lux/bootstrap.min.css"/>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/lib/datatables/dataTables.bootstrap5.min.css"/>
@@ -17,7 +18,7 @@
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
         <div class="container-fluid">
             <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">
-                <img src="" alt=""/> <!-- Fixed 'image' tag to 'img' -->
+                <img src="" alt=""/>
                 WorkNestify
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
@@ -28,34 +29,56 @@
             <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="JobSeeker" asp-controller="Home"
-                           asp-action="Index">Home</a>
+                        <a class="nav-link text-dark" asp-area="JobSeeker" asp-controller="Home" asp-action="Index">
+                            <i class="bi bi-house me-1"></i>Home
+                        </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link text-dark" asp-area="JobSeeker" asp-controller="Job" asp-action="Index">
-                            Job Listing
+                            <i class="bi bi-briefcase me-1"></i>Job Listing
                         </a>
                     </li>
-                    <!-- Job Listing (visible only to users with the 'Employer' role) -->
+                    <li class="nav-item">
+                        <a class="nav-link text-dark" asp-area="JobSeeker" asp-controller="Company" asp-action="Index">
+                            <i class="bi bi-buildings me-1"></i>Company Listing
+                        </a>
+                    </li>
                     @if (User.Identity.IsAuthenticated && User.IsInRole(Roles.Employer))
                     {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Employer" asp-controller="Job" asp-action="Index">
-                                Job Management
+                        <li class="nav-item dropdown">
+                            <a class="nav-link text-dark dropdown-toggle" href="#" role="button"
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-gear me-1"></i> Management
                             </a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a class="dropdown-item text-dark" asp-area="Employer" asp-controller="Job"
+                                       asp-action="Index">
+                                        Job Management
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-item text-dark" asp-area="Employer" asp-controller="JobApplication"
+                                       asp-action="Index">
+                                        Job Application Management
+                                    </a>
+                                </li>
+                            </ul>
                         </li>
                     }
-                    <!-- Admin Dashboard (visible only to users with the 'Admin' role) -->
                     @if (User.Identity.IsAuthenticated && User.IsInRole(Roles.Admin))
                     {
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">
-                                Admin Dashboard
+                            <a class="nav-link text-dark" asp-area="Admin" asp-controller="Dashboard"
+                               asp-action="Index">
+                                <i class="bi bi-speedometer2 me-1"></i>Admin Dashboard
                             </a>
                         </li>
                     }
                     <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="JobSeeker" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        <a class="nav-link text-dark" asp-area="JobSeeker" asp-controller="Home" asp-action="Privacy">
+                            <i class="bi bi-shield-lock me-1"></i>Privacy
+                        </a>
                     </li>
                 </ul>
                 <partial name="_LoginPartial"/>
@@ -70,7 +93,9 @@
 
 <footer class="border-top text-muted text-center text-nowrap py-3">
     <div class="container">
-        © 2025 - WorkNestify - <a asp-area="JobSeeker" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        © 2025 - WorkNestify - <a asp-area="JobSeeker" asp-controller="Home" asp-action="Privacy">
+            <i class="bi bi-shield-lock me-1"></i>Privacy
+        </a>
     </div>
 </footer>
 

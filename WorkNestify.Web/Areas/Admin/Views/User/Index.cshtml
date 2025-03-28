@@ -11,14 +11,14 @@
 
 @if (TempData["Warning"] != null)
 {
-    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+    <div class="alert alert-warning alert-dismissible fade show animate__animated animate__fadeIn" role="alert">
         @TempData["Warning"]
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     </div>
 }
 
-<table id="usersTable" class="table table-striped table-hover nowrap w-100">
-    <thead>
+<table id="usersTable" class="table table-striped table-hover nowrap w-100 animate__animated animate__fadeIn">
+    <thead class="animate__animated animate__slideInLeft">
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.FullName)
@@ -27,7 +27,7 @@
                 @Html.DisplayNameFor(model => model.Email)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PhoneNumber)
+                Phone Number
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Role)
@@ -66,11 +66,11 @@
                     {
                         data: 'id',
                         render: function (data) {
-                            return `<div class="btn-group" role="group">
-                                <a href="/Admin/User/Edit/${data}" class="btn btn-primary"> <i class="bi bi-pencil-square me-2"></i>Edit</a>
-                                <a href="/Admin/User/Details/${data}" class="btn btn-info"> <i class="bi bi-info-circle me-2"></i>Details</a>
-                                <a href="/Admin/User/Delete/${data}" class="btn btn-danger"> <i class="bi bi-trash-fill me-2"></i>Delete</a>
-                                <a href="/Admin/User/ChangePassword/${data}" class="btn btn-warning"> <i class="bi bi-key-fill me-2"></i>Change Password</a>
+                            return `<div class="btn-group animate__animated animate__fadeInUp" role="group">
+                                <a href="/Admin/User/Edit/${data}" class="btn btn-primary animate__animated animate__zoomIn"> <i class="bi bi-pencil-square me-2"></i>Edit</a>
+                                <a href="/Admin/User/Details/${data}" class="btn btn-info animate__animated animate__zoomIn"> <i class="bi bi-info-circle me-2"></i>Details</a>
+                                <a href="/Admin/User/Delete/${data}" class="btn btn-danger animate__animated animate__zoomIn"> <i class="bi bi-trash-fill me-2"></i>Delete</a>
+                                <a href="/Admin/User/ChangePassword/${data}" class="btn btn-warning animate__animated animate__zoomIn"> <i class="bi bi-key-fill me-2"></i>Change Password</a>
                             </div>`;
                         },
                         orderable: false,
@@ -84,6 +84,12 @@
                 ],
                 language: {
                     emptyTable: "No users found"
+                },
+                "drawCallback": function(settings) {
+                    $('#usersTable tbody tr').each(function(index) {
+                        $(this).addClass('animate__animated animate__fadeInUp');
+                        $(this).css('animation-delay', (index * 0.1) + 's');
+                    });
                 }
             });
         });

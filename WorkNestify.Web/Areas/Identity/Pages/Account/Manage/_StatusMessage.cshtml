@@ -2,9 +2,13 @@
 
 @if (!String.IsNullOrEmpty(Model))
 {
-    var statusMessageClass = Model.StartsWith("Error") ? "danger" : "success";
-    <div class="alert alert-@statusMessageClass alert-dismissible" role="alert">
+    bool isError = Model.Contains("Error", StringComparison.OrdinalIgnoreCase);
+    var statusMessageClass = isError ? "danger" : "success";
+    var statusIcon = isError ? "bi-exclamation-triangle" : "bi-check-circle";
+    
+    <div class="alert alert-@statusMessageClass alert-dismissible fade show" role="alert">
+        <i class="bi @statusIcon me-2"></i>
+        <span>@Model</span>
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        @Model
     </div>
 }

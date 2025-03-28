@@ -334,10 +334,10 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
         private async Task PopulateDropdownsAsync(JobApplication? jobApplication = null)
         {
-            ViewData["JobId"] = new SelectList(_unitOfWork.Jobs.GetAllAsync().Result, "Id", "Title");
+            ViewData["JobId"] = new SelectList(_unitOfWork.Jobs.GetAllAsync().Result, "Id", "Title", jobApplication?.JobId);
             ViewData["Status"] = new SelectList(JobApplicationStatuses.AllStatuses);
             ViewData["ApplicationUserId"] =
-                new SelectList(await _userManager.Users.ToListAsync(), "Id", "FullName");
+                new SelectList(await _userManager.Users.ToListAsync(), "Id", "FullName", jobApplication?.ApplicationUserId);
         }
     }
 }

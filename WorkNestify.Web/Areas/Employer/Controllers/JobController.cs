@@ -1,34 +1,34 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Models.Models.Jobs;
 using WorkNestify.Models.Models.Users;
 using WorkNestify.Services;
 using WorkNestify.Utilities.Constants;
-using SelectList = Microsoft.AspNetCore.Mvc.Rendering.SelectList;
 
 namespace WorkNestify.Web.Areas.Employer.Controllers
 {
     [Area("Employer")]
-    [Authorize(Roles = Roles.Employer)]
+    [Authorize(Roles = Roles.Admin + "," + Roles.Employer)]
     public class JobController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly LocationManager _locationManager;
         private readonly GhnService _ghnService;
+        private readonly LocationManager _locationManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public JobController(
             IUnitOfWork unitOfWork,
-            UserManager<ApplicationUser> userManager,
+            GhnService ghnService,
             LocationManager locationManager,
-            GhnService ghnService)
+            UserManager<ApplicationUser> userManager)
         {
             _unitOfWork = unitOfWork;
-            _userManager = userManager;
-            _locationManager = locationManager;
             _ghnService = ghnService;
+            _locationManager = locationManager;
+            _userManager = userManager;
         }
 
         // GET: Employer/Job
@@ -36,47 +36,32 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
         {
             return View();
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null)
-            {
-                return Unauthorized();
-            }
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
             
-            if (currentUser.CompanyId == 0)
+            var jobsList = _unitOfWork.Jobs
+                .GetAllAsync(j => j.CompanyId == currentUser.CompanyId,
+                    includeProperties: "JobCategory").Result;
+            return Json(new
             {
-                return BadRequest(new { error = "User is not associated with a company." });
-            }
-
-            try
-            {
-                var jobsList = _unitOfWork.Jobs
-                    .GetAllAsync(j => j.CompanyId == currentUser.CompanyId, includeProperties: "Company,JobCategory")
-                    .Result;
-
-                var data = jobsList.Select(j => new
+                data = jobsList.Select(j => new
                 {
                     j.Id,
                     j.Title,
                     j.StreetAddress,
                     j.Salary,
-                    Type = j.Type,
-                    Status = j.Status,
-                    JobCategory = j.JobCategory?.Name ?? "N/A",
+                    j.Type,
+                    j.Status,
+                    j.Level,
+                    JobCategory = j.JobCategory?.Name ?? "Not specified",
                     CreatedDate = j.CreatedDate.ToString("o") // ISO 8601 for JavaScript
-                }).ToList();
-
-                return Json(new { data });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { error = $"Error retrieving jobs: {ex.Message}" });
-            }
+                })
+            });
         }
-
+        
         // GET: Employer/Job/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -85,25 +70,22 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
                 return NotFound();
             }
 
-            var job = await _unitOfWork.Jobs.GetAsync(j => j.Id == id);
+            var job = await _unitOfWork.Jobs
+                .GetAsync(j => j.Id == id,
+                    includeProperties: "Company,JobCategory,Province,District,Ward");
             if (job == null)
             {
                 return NotFound();
             }
-            
-            // Verify the job belongs to the current user's company
-            var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null || job.CompanyId != currentUser.CompanyId)
-            {
-                return Unauthorized();
-            }
 
-            return View(job);
+            return RedirectToAction("Details", "Job", new { area = "JobSeeker", id = job.Id });
         }
 
         // GET: Employer/Job/Create
         public async Task<IActionResult> Create()
         {
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            ViewBag.CompanyId = currentUser?.CompanyId;
             await PopulateDropdownsAsync();
             PopulateDateFields();
             return View();
@@ -115,30 +97,23 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Title,Salary,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,ProvinceId,DistrictId,WardCode,StreetAddress,StartDate,EndDate,Description")] 
+            [Bind("Title,Description,StreetAddress,Salary,StartDate,EndDate,Type,Status,Level,JobCategoryId,CompanyId,ProvinceId,DistrictId,WardCode")] 
             Job job)
         {
-            var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null)
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (job.CompanyId != currentUser.CompanyId)
             {
-                return Unauthorized();
-            }
-
-            if (currentUser.CompanyId == 0)
-            {
-                ModelState.AddModelError("", "User is not associated with a company.");
-                await PopulateDropdownsAsync();
-                PopulateDateFields();
-                return View(job);
+                TempData["Warning"] = "You are not authorized to access this page.";
+                return RedirectToAction(nameof(Index));
             }
             
             if (!ModelState.IsValid)
             {
                 await PopulateDropdownsAsync();
-                PopulateDateFields();
+                PopulateDateFields(job);
                 return View(job);
             }
-            
+
             try
             {
                 // Ensure the input location exists
@@ -149,22 +124,20 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
                 {
                     TempData["Warning"] = "Invalid location data.";
                     await PopulateDropdownsAsync();
+                    PopulateDateFields(job);
                     return View(job);
                 }
-                
-                job.CompanyId = (int)currentUser.CompanyId!;
-                
+
+                TempData["Success"] = "Job created successfully.";
                 await _unitOfWork.Jobs.AddAsync(job);
                 await _unitOfWork.SaveAsync();
-                    
-                TempData["Success"] = "Job created successfully.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 TempData["Warning"] = $"Error creating job: {ex.Message}";
                 await PopulateDropdownsAsync();
-                PopulateDateFields();
+                PopulateDateFields(job);
                 return View(job);
             }
         }
@@ -178,21 +151,22 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
             }
 
             var job = await _unitOfWork.Jobs
-                .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
+                .GetAsync(j => j.Id == id,
+                    includeProperties: "JobCategory,Province,District,Ward");
             if (job == null)
             {
                 return NotFound();
             }
             
-            // Verify the job belongs to the current user's company
-            var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null || job.CompanyId != currentUser.CompanyId)
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (job.CompanyId != currentUser.CompanyId)
             {
-                return Unauthorized();
+                TempData["Warning"] = "You cannot edit this job.";
+                return RedirectToAction(nameof(Index));
             }
             
-            await PopulateDropdownsAsync();
-            PopulateDateFields();
+            await PopulateDropdownsAsync(job);
+            PopulateDateFields(job);
             return View(job);
         }
 
@@ -202,27 +176,28 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,
-            [Bind("Id,Title,Salary,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,ProvinceId,DistrictId,WardCode,StreetAddress,StartDate,EndDate,Description")] 
+            [Bind("Id,Title,Description,StreetAddress,Salary,StartDate,EndDate,Type,Status,Level,JobCategoryId,CompanyId,ProvinceId,DistrictId,WardCode")] 
             Job job)
         {
             if (id != job.Id)
             {
                 return NotFound();
             }
-
-            var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null)
-            {
-                return Unauthorized();
-            }
             
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (job.CompanyId != currentUser.CompanyId)
+            {
+                TempData["Warning"] = "You cannot edit this job.";
+                return RedirectToAction(nameof(Index));
+            }
+
             if (!ModelState.IsValid)
             {
-                await PopulateDropdownsAsync();
-                PopulateDateFields();
+                await PopulateDropdownsAsync(job);
+                PopulateDateFields(job);
                 return View(job);
             }
-            
+
             try
             {
                 bool locationExists =
@@ -231,24 +206,25 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
                 if (!locationExists)
                 {
                     TempData["Warning"] = "Invalid location data.";
-                    await PopulateDropdownsAsync();
+                    await PopulateDropdownsAsync(job);
+                    PopulateDateFields(job);
                     return View(job);
                 }
-                    
+
                 job.ModifiedDate = DateTime.UtcNow;
                 await _unitOfWork.Jobs.UpdateAsync(job);
                 await _unitOfWork.SaveAsync();
+                
+                TempData["Success"] = "Job updated successfully.";
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 TempData["Warning"] = $"Error updating job: {ex.Message}";
-                await PopulateDropdownsAsync();
-                PopulateDateFields();
+                await PopulateDropdownsAsync(job);
+                PopulateDateFields(job);
                 return View(job);
             }
-                
-            TempData["Success"] = "Job updated successfully.";
-            return RedirectToAction(nameof(Index));
         }
 
         // GET: Employer/Job/Delete/5
@@ -260,16 +236,18 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
             }
 
             var job = await _unitOfWork.Jobs
-                .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
+                .GetAsync(j => j.Id == id,
+                    includeProperties: "JobCategory,Province,District,Ward");
             if (job == null)
             {
                 return NotFound();
             }
             
-            var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null || job.CompanyId != currentUser.CompanyId)
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (job.CompanyId != currentUser.CompanyId)
             {
-                return Unauthorized();
+                TempData["Warning"] = "You cannot edit this job.";
+                return RedirectToAction(nameof(Index));
             }
 
             return View(job);
@@ -280,16 +258,20 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var job = await _unitOfWork.Jobs.GetAsync(j => j.Id == id);
+            var job = await _unitOfWork.Jobs
+                .GetAsync(j => j.Id == id,
+                    includeProperties: "JobCategory,Province,District,Ward");
+            
             if (job == null)
             {
                 return NotFound();
             }
             
-            var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null || job.CompanyId != currentUser.CompanyId)
+            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
+            if (job.CompanyId != currentUser.CompanyId)
             {
-                return Unauthorized();
+                TempData["Warning"] = "You cannot edit this job.";
+                return RedirectToAction(nameof(Index));
             }
 
             try
@@ -303,6 +285,7 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
             catch (Exception ex)
             {
                 TempData["Warning"] = $"Error deleting job: {ex.Message}";
+                await PopulateDropdownsAsync(job);
                 return View(job);
             }
         }
@@ -340,8 +323,8 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
             var currentDate = DateTime.Now;
             var futureDate = currentDate.AddDays(14);
             
-            ViewData["EndDate"] = job?.EndDate?.ToString("yyyy-MM-ddTHH:mm") ?? futureDate.ToString("yyyy-MM-ddTHH:mm");
-            ViewData["StartDate"] = job?.StartDate?.ToString("yyyy-MM-ddTHH:mm") ?? currentDate.ToString("yyyy-MM-ddTHH:mm");
+            ViewData["EndDate"] = job?.EndDate?.ToString("yyyy-MM-dd") ?? futureDate.ToString("yyyy-MM-dd");
+            ViewData["StartDate"] = job?.StartDate?.ToString("yyyy-MM-dd") ?? currentDate.ToString("yyyy-MM-dd");
         }
     }
 }

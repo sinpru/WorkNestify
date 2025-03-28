@@ -5,23 +5,65 @@
     ViewData["ActivePage"] = ManageNavPages.Index;
 }
 
-<h3>@ViewData["Title"]</h3>
-<partial name="_StatusMessage" for="StatusMessage" />
 <div class="row">
-    <div class="col-md-6">
-        <form id="profile-form" method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Username" class="form-control" placeholder="Please choose your username." disabled />
-                <label asp-for="Username" class="form-label"></label>
+    <div class="col-md-12">
+        <h3><i class="bi bi-person me-2"></i>@ViewData["Title"]</h3>
+        <partial name="_StatusMessage" for="StatusMessage"/>
+
+        <div class="card">
+            <div class="card-body">
+                <form id="profile-form" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Username" class="form-control" placeholder="Username" disabled/>
+                        <label asp-for="Username" class="form-label">
+                            <i class="bi bi-person-circle me-2"></i>Username
+                        </label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.FullName" class="form-control" placeholder="Full Name"/>
+                        <label asp-for="Input.FullName" class="form-label">
+                            <i class="bi bi-person me-2"></i>Full Name
+                        </label>
+                        <span asp-validation-for="Input.FullName" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Phone number"/>
+                        <label asp-for="Input.PhoneNumber" class="form-label">
+                            <i class="bi bi-telephone me-2"></i>Phone number
+                        </label>
+                        <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="resumeFile" class="control-label">
+                            <i class="bi bi-file-earmark-text me-2"></i>Resume
+                        </label>
+                        <input id="resumeFile" name="resumeFile" type="file" class="form-control"
+                               accept=".pdf,.doc,.docx,.odt,.rtf,.txt"/>
+                        <small class="form-text text-muted">
+                            Upload your resume in PDF, DOC, DOCX, ODT, RTF, or TXT format. Current resume:
+                            @if (!string.IsNullOrEmpty(Model.Input.ResumeUrl))
+                            {
+                                <a href="@Model.Input.ResumeUrl" target="_blank">View Resume</a>
+                            }
+                            else
+                            {
+                                <span>No resume uploaded</span>
+                            }
+                        </small>
+                        <span asp-validation-for="Input.ResumeUrl" class="text-danger"></span>
+                    </div>
+
+                    <button id="update-profile-button" type="submit" class="w-100 btn btn-primary btn-lg">
+                        <i class="bi bi-save me-2"></i>Save
+                    </button>
+                </form>
             </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number."/>
-                <label asp-for="Input.PhoneNumber" class="form-label"></label>
-                <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
-            </div>
-            <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
-        </form>
+        </div>
     </div>
 </div>
 

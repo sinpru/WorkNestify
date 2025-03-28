@@ -5,55 +5,81 @@
     ViewData["IndexAction"] = "Index";
 }
 
-<partial name="_ManagementNavigationPartial"/>
-<partial name="_NotificationsPartial"/>
+<partial name="_ManagementNavigationPartial" />
 
-<form asp-action="Create" class="row">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input asp-for="Id" type="hidden"/>
-    <input asp-for="ApplicationUserId" type="hidden"/>
-
-    <div class="col-md-6">
-        <div class="form-group">
-            <label asp-for="CompanyId" class="form-label"></label>
-            <select asp-for="CompanyId" class="form-select" asp-items="ViewBag.CompanyId" required>
-                <option value="" disabled selected>Select Company</option>
-            </select>
-            <span asp-validation-for="CompanyId" class="text-danger"></span>
-        </div>
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Company Review</h2>
     </div>
 
-    <div class="col-md-12">
-        <div class="form-group">
-            <label asp-for="Content" class="form-label"></label>
-            <textarea asp-for="Content" id="editor" class="form-control"></textarea>
-            <div id="editor-word-count" class="small text-muted mt-1"></div>
-            <span asp-validation-for="Content" class="text-danger"></span>
-        </div>
-    </div>
+    <div class="card-body p-4">
+        <partial name="_NotificationsPartial" />
 
-    <div class="col-md-6">
-        <div class="form-group">
-            <label asp-for="Rating" class="form-label"></label>
-            <input asp-for="Rating" class="form-control" type="number" min="1" max="5" step="0.5" required/>
-            <span asp-validation-for="Rating" class="text-danger"></span>
-        </div>
-    </div>
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert" style="display: none;"></div>
+            <input asp-for="Id" type="hidden" />
+            <input asp-for="ApplicationUserId" type="hidden" />
 
-    <div class="col-md-12 mb-2">
-        <div class="form-group d-flex justify-content-between mt-2">
-            <a class="btn btn-outline-secondary d-flex align-items-center" asp-action="Index">
-                <i class="fs-4 bi-x-lg me-1"></i> Cancel
-            </a>
+            <div class="row g-4">
+                <!-- Company Selection -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="CompanyId" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-buildings"></i></span>
+                            <select asp-for="CompanyId" class="form-select" asp-items="ViewBag.CompanyId">
+                                <option value="" disabled>Select Company</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="CompanyId" class="text-danger small"></span>
+                    </div>
+                </div>
 
-            <button type="submit" class="btn btn-primary d-flex align-items-center">
-                <i class="fs-4 bi-check-circle me-1"></i> Save
-            </button>
-        </div>
+                <!-- Rating -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Rating" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-star-fill"></i></span>
+                            <input asp-for="Rating" class="form-control" type="number" min="1" max="5" step="0.5"
+                                   placeholder="Rate 1-5" />
+                        </div>
+                        <small class="text-muted">Enter a rating between 1 and 5 (0.5 steps)</small>
+                        <span asp-validation-for="Rating" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- Review Content -->
+                <div class="col-12">
+                    <div class="mb-3">
+                        <label asp-for="Content" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text align-items-start pt-2"><i class="bi bi-chat-text"></i></span>
+                            <textarea asp-for="Content" id="editor" class="form-control" rows="5"
+                                      placeholder="Write your review here"></textarea>
+                        </div>
+                        <div id="editor-word-count" class="small text-muted mt-1"></div>
+                        <span asp-validation-for="Content" class="text-danger small"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-4 d-flex justify-content-end gap-2">
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-x-lg me-2"></i>Cancel
+                </a>
+                <button type="submit"
+                        class="btn btn-primary px-4">
+                    <i class="bi bi-check-circle me-2"></i>Save Changes
+                </button>
+            </div>
+        </form>
     </div>
-</form>
+</div>
 
 @section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
-    @{ await Html.RenderPartialAsync("_FormScriptsPartial"); }
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_FormScriptsPartial" />
 }

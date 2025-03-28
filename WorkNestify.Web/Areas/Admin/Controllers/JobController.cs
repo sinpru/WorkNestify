@@ -61,7 +61,8 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
 
             var job = await _unitOfWork.Jobs
-                .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
+                .GetAsync(j => j.Id == id, 
+                    includeProperties: "Company,JobCategory,Province,District,Ward");
 
             if (job == null)
             {
@@ -91,7 +92,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             if (!ModelState.IsValid)
             {
                 await PopulateDropdownsAsync();
-                PopulateDateFields();
+                PopulateDateFields(job);
                 return View(job);
             }
 
@@ -105,10 +106,11 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 {
                     TempData["Warning"] = "Invalid location data.";
                     await PopulateDropdownsAsync();
-                    PopulateDateFields();
+                    PopulateDateFields(job);
                     return View(job);
                 }
 
+                TempData["Success"] = "Job created successfully.";
                 await _unitOfWork.Jobs.AddAsync(job);
                 await _unitOfWork.SaveAsync();
                 return RedirectToAction(nameof(Index));
@@ -117,7 +119,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             {
                 TempData["Warning"] = $"Error creating job: {ex.Message}";
                 await PopulateDropdownsAsync();
-                PopulateDateFields();
+                PopulateDateFields(job);
                 return View(job);
             }
         }
@@ -131,7 +133,8 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
 
             var job = await _unitOfWork.Jobs
-                .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
+                .GetAsync(j => j.Id == id, 
+                    includeProperties: "Company,JobCategory,Province,District,Ward");
 
             if (job == null)
             {
@@ -139,7 +142,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
 
             await PopulateDropdownsAsync(job);
-            PopulateDateFields();
+            PopulateDateFields(job);
             return View(job);
         }
 
@@ -149,7 +152,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,
-            [Bind("Id,Title,CompanyId,Salary,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,ProvinceId,DistrictId,WardCode,StreetAddress,StartDate,EndDate,Description")]
+            [Bind("Id,Title,CompanyId,Salary,Type,Status,Level,JobCategoryId,ProvinceId,DistrictId,WardCode,StreetAddress,StartDate,EndDate,Description")]
             Job job)
         {
             if (id != job.Id)
@@ -160,7 +163,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             if (!ModelState.IsValid)
             {
                 await PopulateDropdownsAsync();
-                PopulateDateFields();
+                PopulateDateFields(job);
                 return View(job);
             }
             
@@ -173,23 +176,25 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 {
                     TempData["Warning"] = "Invalid location data.";
                     await PopulateDropdownsAsync();
-                    PopulateDateFields();
+                    PopulateDateFields(job);
                     return View(job);
                 }
                 
+                // TODO: Update every edit function to update its modified date
+                job.ModifiedDate = DateTime.UtcNow;
                 await _unitOfWork.Jobs.UpdateAsync(job);
                 await _unitOfWork.SaveAsync();
+                
+                TempData["Success"] = "Job updated successfully.";
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 TempData["Warning"] = $"Error updating job: {ex.Message}";
                 await PopulateDropdownsAsync();
-                PopulateDateFields();
+                PopulateDateFields(job);
                 return View(job);
             }
-
-            TempData["Success"] = "Job updated successfully.";
-            return RedirectToAction(nameof(Index));
         }
 
         // GET: Admin/Job/Delete/5
@@ -201,7 +206,8 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             }
 
             var job = await _unitOfWork.Jobs
-                .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
+                .GetAsync(j => j.Id == id, 
+                    includeProperties: "Company,JobCategory,Province,District,Ward");
 
             if (job == null)
             {
@@ -217,7 +223,8 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var job = await _unitOfWork.Jobs
-                .GetAsync(j => j.Id == id, includeProperties: "Company,JobCategory");
+                .GetAsync(j => j.Id == id, 
+                    includeProperties: "Company,JobCategory,Province,District,Ward");
 
             if (job == null)
             {
@@ -238,11 +245,6 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 await PopulateDropdownsAsync();
                 return View(job);
             }
-        }
-
-        private async Task<bool> JobExists(int id)
-        {
-            return await _unitOfWork.Jobs.GetAsync(j => j.Id == id) != null;
         }
 
         private async Task PopulateDropdownsAsync(Job? job = null)
@@ -279,8 +281,8 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             var currentDate = DateTime.Now;
             var futureDate = currentDate.AddDays(14);
             
-            ViewData["EndDate"] = job?.EndDate?.ToString("yyyy-MM-ddTHH:mm") ?? futureDate.ToString("yyyy-MM-ddTHH:mm");
-            ViewData["StartDate"] = job?.StartDate?.ToString("yyyy-MM-ddTHH:mm") ?? currentDate.ToString("yyyy-MM-ddTHH:mm");
+            ViewData["EndDate"] = job?.EndDate?.ToString("yyyy-MM-dd") ?? futureDate.ToString("yyyy-MM-dd");
+            ViewData["StartDate"] = job?.StartDate?.ToString("yyyy-MM-dd") ?? currentDate.ToString("yyyy-MM-dd");
         }
     }
 }

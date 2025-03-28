@@ -5,7 +5,7 @@ $(document).ready(function () {
     var currentPage = config.currentPage || 1;
     var search = config.search || '';
     var category = config.category || '';
-    var location = config.location || '';
+    var location = (config.location && !isNaN(parseInt(config.location, 10))) ? parseInt(config.location, 10) : null;
     var isInitialLoad = true;
 
     function updateJobListings(jobs) {
@@ -23,10 +23,12 @@ $(document).ready(function () {
         }
 
         if (jobs && jobs.length > 0) {
-            console.log('Rendering', jobs.length, 'job cards');
             const jobCards = jobs.map(job => {
                 const daysAgo = Math.floor((new Date() - new Date(job.createdDate)) / (1000 * 60 * 60 * 24));
                 const postedText = daysAgo === 0 ? "Posted today" : `Posted ${daysAgo} day${daysAgo === 1 ? "" : "s"} ago`;
+                const isSaved = job.isSaved || false;
+                const saveIconClass = isSaved ? 'bi-heart-fill' : 'bi-heart';
+                const saveText = isSaved ? 'Saved' : 'Save';
 
                 if (layout === 'compact') {
                     return `
@@ -44,7 +46,12 @@ $(document).ready(function () {
                                 <p class="card-text text-muted mb-1">${(job.salary || 0).toLocaleString('vi-VN')} ₫</p>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <span class="badge bg-success">${job.status || 'N/A'}</span>
-                                    <a href="/JobSeeker/Job/Details/${job.id}" class="btn btn-outline-primary btn-sm">Details</a>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <button class="btn btn-outline-secondary btn-sm save-job-btn" data-job-id="${job.id}">
+                                            <i class="bi ${saveIconClass} save-job-icon"></i> <span class="save-job-text">${saveText}</span>
+                                        </button>
+                                        <a href="/JobSeeker/Job/Details/${job.id}" class="btn btn-outline-primary btn-sm">Details</a>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -83,6 +90,9 @@ $(document).ready(function () {
                                             <span class="badge bg-success">${job.status || 'N/A'}</span>
                                             <div class="d-flex align-items-center gap-3">
                                                 <span class="text-muted">${postedText}</span>
+                                                <button class="btn btn-outline-secondary save-job-btn" data-job-id="${job.id}">
+                                                    <i class="bi ${saveIconClass} save-job-icon"></i> <span class="save-job-text">${saveText}</span>
+                                                </button>
                                                 <a href="/JobSeeker/Job/Details/${job.id}" class="btn btn-outline-primary">Details</a>
                                             </div>
                                         </div>
@@ -94,77 +104,112 @@ $(document).ready(function () {
                 `;
                 }
             });
-            $jobListings.html(jobCards.join(''));
+            $jobListings.append(jobCards.join(''));
+
+            // Reinitialize save button handlers after rendering
+            if (typeof initializeSaveJobHandler === 'function') {
+                initializeSaveJobHandler();
+            }
         } else {
             $jobListings.html('<div class="text-center"><p class="text-muted">No top jobs available at the moment.</p></div>');
         }
     }
 
-    $('#pagination-container').pagination({
-        dataSource: Array(totalJobs).fill({}),
-        pageSize: pageSize,
-        pageNumber: currentPage,
-        totalNumber: totalJobs,
-        alias: {
-            pageNumber: 'page'
-        },
-        prevText: '«',
-        nextText: '»',
-        showPrevious: true,
-        showNext: true,
-        pageRange: 2,
-        callback: function (data, pagination) {
-            if (isInitialLoad) {
-                console.log('Initial load, skipping fetch');
-                isInitialLoad = false;
-                return;
-            }
+    function fetchJobs(page) {
+        var params = new URLSearchParams();
+        if (search) params.append('search', search);
 
-            console.log('Fetching page', pagination.pageNumber);
-            $('#loading-spinner').removeClass('d-none');
-            $('#job-listings').addClass('opacity-50');
+        // Get selected categories (multiple checkboxes)
+        var categories = $('#filter-form input[name="category"]:checked').map(function () {
+            return this.value;
+        }).get();
 
-            var params = new URLSearchParams();
-            if (search) params.append('search', search);
-            if (category) params.append('category', category);
-            if (location) params.append('location', location);
-            params.append('page', pagination.pageNumber);
-            params.append('pageSize', pagination.pageSize);
-
-            $.ajax({
-                url: `/api/Job/filter?${params.toString()}`,
-                method: 'GET',
-                dataType: 'json',
-                beforeSend: function (xhr) {
-                    console.log('Sending request to:', this.url);
-                },
-                success: function (response) {
-                    console.log('Received filter response:', response);
-                    updateJobListings(response.jobs);
-                    if (response.totalJobs !== totalJobs) {
-                        totalJobs = response.totalJobs;
-                        $('#pagination-container').pagination('updateItems', totalJobs);
-                    }
-                },
-                error: function (xhr, status, error) {
-                    console.error('AJAX error details:', {
-                        status: status, error: error, statusCode: xhr.status, responseText: xhr.responseText
-                    });
-                    alert('Error loading jobs. Please try again.');
-                },
-                complete: function (xhr, status) {
-                    console.log('Request completed with status:', status);
-                    $('#loading-spinner').addClass('d-none');
-                    $('#job-listings').removeClass('opacity-50');
-                }
-            });
-        },
-        afterRender: function () {
-            $('#pagination-container .paginationjs-pages ul').addClass('pagination');
-            $('#pagination-container .paginationjs-pages li').addClass('page-item');
-            $('#pagination-container .paginationjs-pages li a').addClass('page-link');
-            $('#pagination-container .paginationjs-pages li.active').addClass('active');
-            $('#pagination-container .paginationjs-pages li.disabled').addClass('disabled');
+        if (categories.length > 0) {
+            params.append('category', categories.join(','));
         }
+
+        // Get selected job type
+        var type = $('#filter-form input[name="type"]:checked').val();
+        if (type && type !== 'All') params.append('type', type);
+
+        // Get selected level
+        var level = $('#filter-form input[name="level"]:checked').val();
+        if (level && level !== 'All') params.append('level', level);
+
+        // Get selected salary range
+        var salary = $('#filter-form input[name="salary"]:checked').val();
+        if (salary && salary !== 'All') params.append('salary', salary);
+
+        if (location !== null && !isNaN(location)) params.append('location', location);
+        params.append('page', page);
+        params.append('pageSize', pageSize);
+
+        $('#loading-spinner').removeClass('d-none');
+        $('#job-listings').addClass('opacity-50');
+
+        $.ajax({
+            url: `/api/Job/filter-jobs?${params.toString()}`,
+            method: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                updateJobListings(response.jobs);
+                if (response.totalJobs !== totalJobs) {
+                    totalJobs = response.totalJobs;
+                    $('#pagination-container').pagination('destroy');
+                    initializePagination(page, totalJobs);
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching jobs:', error);
+                alert('Error loading jobs. Please try again.');
+            },
+            complete: function () {
+                $('#loading-spinner').addClass('d-none');
+                $('#job-listings').removeClass('opacity-50');
+            }
+        });
+    }
+
+    function initializePagination(page, total){
+        $('#pagination-container').pagination({
+            dataSource: Array(total).fill({}),
+            pageSize: pageSize,
+            pageNumber: page,
+            totalNumber: total,
+            alias: {
+                pageNumber: 'page'
+            },
+            prevText: '«',
+            nextText: '»',
+            showPrevious: true,
+            showNext: true,
+            pageRange: 2,
+            callback: function (data, pagination) {
+                if (isInitialLoad) {
+                    console.log('Initial load, skipping fetch');
+                    isInitialLoad = false;
+                    return;
+                }
+                fetchJobs(pagination.pageNumber);
+            },
+            afterRender: function () {
+                $('#pagination-container .paginationjs-pages ul').addClass('pagination');
+                $('#pagination-container .paginationjs-pages li').addClass('page-item');
+                $('#pagination-container .paginationjs-pages li a').addClass('page-link');
+                $('#pagination-container .paginationjs-pages li.active').addClass('active');
+                $('#pagination-container .paginationjs-pages li.disabled').addClass('disabled');
+            }
+        });
+    }
+
+    // Initial pagination setup
+    initializePagination(currentPage, totalJobs);
+
+    let debounceTimer;
+    $('#filter-form input').on('change', function () {
+        currentPage = 1;
+        $('#pagination-container').pagination('go', 1);
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => fetchJobs(1), 300);
     });
 });

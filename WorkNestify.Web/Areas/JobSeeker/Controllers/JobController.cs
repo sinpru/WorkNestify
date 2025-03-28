@@ -25,9 +25,9 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
 
         // GET: JobSeeker/Job
         public async Task<IActionResult> Index(
-            string search,
-            string category,
-            string location,
+            string? search,
+            string? category,
+            int? location,
             int page = 1,
             int pageSize = 10)
         {
@@ -38,10 +38,8 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             Expression<Func<Job, bool>> filter = j =>
                 j.Status == "Open"
                 && (string.IsNullOrEmpty(search) || j.Title.Contains(search))
-                && (string.IsNullOrEmpty(category) ||
-                    j.JobCategoryId.ToString() == category)
-                && (string.IsNullOrEmpty(location) ||
-                    j.StreetAddress.Contains(location));
+                && (string.IsNullOrEmpty(category) || j.JobCategoryId.ToString() == category)
+                && (!location.HasValue || j.ProvinceId == location);
 
             // Define ordering
             Expression<Func<Job, object>>[] orderByDescending = new[]
@@ -52,13 +50,14 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             var totalJobs = await totalJobsQuery.CountAsync();
 
             // Get paginated results
-            var paginatedJobs = await _unitOfWork.Jobs.GetAllQueryable(
-                filter: filter,
-                includeProperties: "Company,JobCategory,Province,District,Ward",
-                orderByDescending: orderByDescending,
-                skip: (page - 1) * pageSize,
-                take: pageSize
-            ).ToListAsync();
+            var paginatedJobs = await _unitOfWork.Jobs
+                .GetAllQueryable(
+                    filter: filter,
+                    includeProperties: "Company,JobCategory,Province,District,Ward",
+                    orderByDescending: orderByDescending,
+                    skip: (page - 1) * pageSize,
+                    take: pageSize
+                ).ToListAsync();
 
             // Pass data to ViewBag for pagination.js
             ViewBag.TotalJobs = totalJobs;
@@ -94,9 +93,12 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
                 job?.JobCategoryId);
             ViewData["ProvinceId"] =
                 new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name", job?.ProvinceId);
-            ViewData["Level"] = new SelectList(JobLevels.AllLevels);
-            ViewData["Status"] = new SelectList(JobStatuses.AllStatuses);
-            ViewData["Type"] = new SelectList(JobTypes.AllTypes);
+            ViewData["Level"] = new SelectList(JobLevels.AllLevels.Select(l => new { Value = l, Text = l }), "Value",
+                "Text");
+            ViewData["Status"] = new SelectList(JobStatuses.AllStatuses.Select(s => new { Value = s, Text = s }),
+                "Value", "Text");
+            ViewData["Type"] =
+                new SelectList(JobTypes.AllTypes.Select(t => new { Value = t, Text = t }), "Value", "Text");
             if (search != null)
             {
                 ViewBag.Search = search;

@@ -1,0 +1,65 @@
+@model IEnumerable<WorkNestify.Models.Models.Users.SavedJob>
+
+@{
+    ViewData["Title"] = "Saved Jobs";
+}
+
+<div class="container my-4 animate__animated animate__fadeIn">
+    <h2 class="h4 mb-4 text-primary animate__animated animate__fadeInUp animate__delay-1s">Saved Jobs</h2>
+
+    <div class="row">
+        <div class="col-12">
+            <!-- Loading spinner -->
+            <div id="loading-spinner" class="text-center d-none">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
+            <!-- Job Listings -->
+            <div class="row row-cols-1 g-4" id="saved-job-listings">
+                @if (Model.Any())
+                {
+                    @foreach (var savedJob in Model)
+                    {
+                        @await Html.PartialAsync("_JobCardPartial", savedJob.Job, new ViewDataDictionary(ViewData) { { "Layout", "wide" }, { "Animation", "animate__animated animate__fadeInUp animate__delay-2s" } })
+                    }
+                }
+                else
+                {
+                    <div class="text-center animate__animated animate__fadeInUp animate__delay-2s">
+                        <p class="text-muted">You haven’t saved any jobs yet.</p>
+                    </div>
+                }
+            </div>
+
+            <!-- Pagination -->
+            @if (ViewBag.TotalSavedJobs > ViewBag.PageSize)
+            {
+                <nav aria-label="Saved jobs pagination" class="mt-4 animate__animated animate__fadeInUp animate__delay-3s">
+                    <div id="pagination-container" class="d-flex justify-content-center"></div>
+                </nav>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script asp-append-version="true">
+        window.savedJobsListConfig = {
+            totalSavedJobs: @(ViewBag.TotalSavedJobs ?? 0),
+            pageSize: @(ViewBag.PageSize ?? 5),
+            currentPage: @(ViewBag.CurrentPage ?? 1)
+        }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize save job handler if authenticated
+            @if (User.Identity.IsAuthenticated)
+            {
+                @:initializeSaveJobHandler();
+            }
+        });
+    </script>
+    <script src="~/js/SaveJobButtonHandler.js" asp-append-version="true"></script>
+    <script src="~/js/SavedJobPaginationRenderer.js" asp-append-version="true"></script>
+}

@@ -1,109 +1,208 @@
-@model WorkNestify.Models.Models.JobApplications.JobApplication
+@using WorkNestify.Utilities.Constants
+@model IEnumerable<WorkNestify.Models.Models.JobApplications.JobApplication>
 
 @{
-    ViewData["Title"] = "Apply for Job";
+    ViewData["Title"] = "My Job Applications";
 }
 
-<div class="container my-4">
-    <div class="row justify-content-center">
-        <div class="col-12 col-md-8">
-            <partial name="_NotificationsPartial"/>
-            
-            <!-- Header Section -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h2 class="h4 text-primary">Apply for Job</h2>
-                <a asp-controller="Job" asp-action="Create" class="btn btn-outline-primary d-flex align-items-center">
-                    <i class="fs-4 bi-arrow-left me-1"></i> Back to List
-                </a>
-            </div>
+@functions {
 
-            <!-- Job Application Form Card -->
-            <div class="card border-light shadow-sm">
-                <div class="card-body">
-                    <!-- Introduction Section -->
-                    <div class="mb-4">
-                        <h5 class="text-success"><i class="bi bi-feather me-2"></i>Introduction</h5>
-                        <p class="text-muted">
-                            A brief introduction can make you stand out to employers and increase your chances of being
-                            selected for the role.
-                        </p>
-                        <p>
-                            I am [Your Name], a [Your Profession] with [X years] of experience in [Your Field]. I am
-                            passionate about [specific interest related to the job], and I am eager to contribute to
-                            your team with my skills in [specific skills].
-                        </p>
-                    </div>
+    private string GetStatusBadgeClass(string status)
+    {
+        return status switch
+        {
+            JobApplicationStatuses.Pending => "bg-secondary",
+            JobApplicationStatuses.Reviewed => "bg-info",
+            JobApplicationStatuses.InterviewScheduled => "bg-primary",
+            JobApplicationStatuses.Interviewed => "bg-warning",
+            JobApplicationStatuses.Hired => "bg-success",
+            JobApplicationStatuses.Rejected => "bg-danger",
+            JobApplicationStatuses.Withdrawn => "bg-dark",
+            _ => "bg-secondary" // Default case for null or unknown status
+        };
+    }
 
-                    <h5 class="card-title mb-4">Submit Your Application</h5>
-                    <hr/>
+}
 
-                    <form asp-action="Create" enctype="multipart/form-data">
-                        <!-- Hidden Fields -->
-                        <input asp-for="ApplicationUserId" type="hidden" value="@ViewBag.ApplicationUserId"/>
-                        <input asp-for="Status" type="hidden" value="Pending"/>
-                        <input asp-for="JobId" type="hidden" value="@ViewBag.JobId"/>
+<div class="container mt-4">
+    <partial name="_NotificationsPartial"/>
 
-                        <!-- Validation Summary -->
-                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
-
-                        <!-- Resume -->
-                        <div class="form-group mb-3">
-                            <label for="resume" class="control-label">
-                                <i class="bi bi-file-earmark-text text-primary me-2"></i>Resume
-                            </label>
-                            <input id="resume" name="resumeFile" type="file" class="form-control"
-                                   accept=".pdf,.doc,.docx,.odt,.rtf,.txt" required/>
-                            <small class="form-text text-muted">
-                                Upload your resume in PDF, DOC, DOCX, ODT, RTF, or TXT format.
-                            </small>
-                        </div>
-
-                        <!-- Cover Letter -->
-                        <div class="form-group mb-4">
-                            <label for="coverLetter" class="control-label">
-                                <i class="bi bi-envelope text-primary me-2"></i>Cover Letter
-                            </label>
-                            <input id="coverLetter" name="coverLetterFile" type="file" class="form-control"
-                                   accept=".pdf,.doc,.docx,.odt,.rtf,.txt" required/>
-                            <small class="form-text text-muted">
-                                A cover letter is a document that introduces yourself to the employer, explains why you
-                                are a good fit for the job, and highlights your relevant skills and experiences. Upload
-                                your cover letter in PDF, DOC, DOCX, ODT, RTF, or TXT format.
-                            </small>
-                        </div>
-
-                        <!-- Note Section -->
-                        <div class="alert alert-warning mt-4" role="alert">
-                            <h5 class="alert-heading"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Important
-                                Notes</h5>
-                            <ol>
-                                <li>
-                                    We strongly recommend creating a professional resume and cover letter to increase
-                                    your chances of being noticed by employers. If you don’t have one, you can contact
-                                    us for support at
-                                    <a
-                                        href="mailto:support@worknestify.com">support@worknestify.com</a>.
-                                </li>
-                                <li>
-                                    Ensure all information provided is accurate and up-to-date to avoid delays in the
-                                    hiring process.
-                                </li>
-                            </ol>
-                        </div>
-
-                        <!-- Submit Button -->
-                        <div class="text-end">
-                            <button type="submit" class="btn btn-success">
-                                <i class="bi bi-send me-2"></i>Submit Application
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
+    <div class="row mb-4 align-items-center">
+        <div class="col-md-6">
+            <h1 class="display-6 text-primary">
+                <i class="bi bi-file-earmark-person-fill me-2"></i>My Job Applications
+            </h1>
+            <p class="text-muted">Track and manage your job applications.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a asp-area="JobSeeker" asp-controller="Job" asp-action="Index"
+               class="btn btn-success shadow-sm" title="Browse available jobs">
+                <i class="bi bi-search me-2"></i>Browse Jobs
+            </a>
         </div>
     </div>
+
+    <!-- Status Filter -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <select class="form-select" id="statusFilter" asp-items="ViewBag.Status">
+                <option value="">All Statuses</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="row row-cols-1 g-4" id="application-listings">
+        @if (Model.Any())
+        {
+            @foreach (var jobApplication in Model)
+            {
+                <div class="card shadow-sm animate__animated animate__fadeInUp">
+                    <div class="card-body d-flex">
+                        <div class="me-4 align-self-center">
+                            <img src="@jobApplication.Job?.Company?.Logo"
+                                 alt="Company Logo"
+                                 style="width: 140px;"/>
+                        </div>
+                        <div class="flex-grow-1 border-start ps-4">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <div>
+                                    <h5 class="card-title mb-1 text-primary">@jobApplication.Job?.Title</h5>
+                                    <p class="card-subtitle text-muted mb-0">@(jobApplication.Job?.Company?.Name ?? "N/A")</p>
+                                </div>
+                                <p class="card-text mb-0">
+                                    <strong>Salary:</strong>
+                                    @jobApplication.Job?.Salary.ToString("C", new System.Globalization.CultureInfo("vi-VN"))
+                                </p>
+                            </div>
+                            <p class="card-text text-muted mb-1">
+                                <strong>Location:</strong>
+                                @(jobApplication.Job?.StreetAddress != null
+                                    ? $"{jobApplication.Job.StreetAddress}, {jobApplication.Job.Ward?.Name}, {jobApplication.Job.District?.Name}, {jobApplication.Job.Province?.Name}"
+                                    : "N/A")
+                            </p>
+                            <p class="card-text text-muted mb-1">
+                                <strong>Experience:</strong> @(jobApplication.Job?.Level ?? "N/A")
+                            </p>
+                            <p class="card-text text-muted mb-1">
+                                <strong>Type:</strong> @(jobApplication.Job?.Type ?? "N/A")
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="badge @GetStatusBadgeClass(jobApplication.Status)">
+                                    @(jobApplication.Status ?? JobApplicationStatuses.Pending)
+                                </span>
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="text-muted">
+                                        @(jobApplication.ApplicationDate.HasValue
+                                            ? DateTime.Now.Subtract(jobApplication.ApplicationDate.Value).Days
+                                            : 0) days ago
+                                    </span>
+                                    <!-- View Resume Button -->
+                                    @if (!string.IsNullOrEmpty(jobApplication.Resume))
+                                    {
+                                        <a href="@jobApplication.Resume"
+                                           target="_blank"
+                                           class="btn btn-outline-info btn-sm"
+                                           title="View Resume">
+                                            <i class="bi bi-file-earmark-text me-1"></i>View Documents
+                                        </a>
+                                    }
+                                    <!-- Withdraw Button -->
+                                    @if (jobApplication.Status != JobApplicationStatuses.Withdrawn)
+                                    {
+                                        <button class="btn btn-outline-danger btn-sm withdraw-btn"
+                                                data-application-id="@jobApplication.Id" title="Withdraw Application">
+                                            <i class="bi bi-x-circle me-1"></i>Withdraw
+                                        </button>
+                                    }
+                                    <a asp-action="Details" asp-controller="Job" asp-area="JobSeeker"
+                                       asp-route-id="@jobApplication.Id" class="btn btn-outline-primary btn-sm">
+                                        Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info text-center">
+                No job applications found matching your criteria.
+            </div>
+        }
+    </div>
+
+    @if (ViewBag.TotalApplications > ViewBag.PageSize)
+    {
+        <nav aria-label="Job pagination" class="mt-4">
+            <div id="pagination-container" class="d-flex justify-content-center"></div>
+        </nav>
+    }
 </div>
 
-@section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+@section Scripts
+{
+    <script asp-append-version="true">
+        $(document).ready(function () {
+            const totalApplications = @ViewBag.TotalApplications;
+            const pageSize = @ViewBag.PageSize;
+            const currentPage = @ViewBag.CurrentPage;
+            let currentStatus = '@(ViewBag.CurrentStatus ?? "")';
+            let isInitialLoad = true;
+
+            $('#statusFilter').on('change', function() {
+                const status = $(this).val();
+                currentStatus = status;
+                const params = new URLSearchParams({
+                    ...(status && { status: status }),
+                    page: 1,
+                    pageSize: pageSize
+                });
+                window.location.href = `/JobSeeker/JobApplication?${params.toString()}`;
+            });
+
+            if ($('#pagination-container').length > 0) {
+                if (typeof $.fn.pagination === 'function') {
+                    console.log('Initializing pagination');
+                    $('#pagination-container').pagination({
+                        dataSource: Array(totalApplications).fill({}),
+                        pageSize: pageSize,
+                        pageNumber: currentPage,
+                        totalNumber: totalApplications,
+                        alias: { pageNumber: 'page' },
+                        prevText: '«',
+                        nextText: '»',
+                        showPrevious: true,
+                        showNext: true,
+                        pageRange: 2,
+                        callback: function(data, pagination) {
+                            if (isInitialLoad) {
+                                isInitialLoad = false;
+                                return;
+                            }
+                            const params = new URLSearchParams({
+                                page: pagination.pageNumber,
+                                pageSize: pagination.pageSize,
+                                ...(currentStatus && { status: currentStatus })
+                            });
+                            window.location.href = `/JobSeeker/JobApplication?${params.toString()}`;
+                        },
+                        afterRender: function() {
+                            $('#pagination-container .paginationjs-pages ul').addClass('pagination mb-0');
+                            $('#pagination-container .paginationjs-pages li').addClass('page-item');
+                            $('#pagination-container .paginationjs-pages li a').addClass('page-link');
+                            $('#pagination-container .paginationjs-pages li.active').addClass('active');
+                            $('#pagination-container .paginationjs-pages li.disabled').addClass('disabled');
+                        }
+                    });
+                } else {
+                    console.error('jQuery pagination plugin not loaded');
+                }
+            } else {
+                console.log('Pagination container not needed (TotalApplications <= PageSize)');
+            }
+        });
+    </script>
+    <script src="~/js/JobApplicationButtonHandlers.js"></script>
 }

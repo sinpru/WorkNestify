@@ -1,0 +1,205 @@
+@model IEnumerable<WorkNestify.Models.Models.JobApplications.JobApplication>
+
+@{
+    ViewData["Title"] = "Job Applications Management";
+}
+
+<div class="container mt-4">
+    <partial name="_NotificationsPartial"/>
+
+    <div class="row mb-3 align-items-center">
+        <div class="col-md-6">
+            <h1 class="display-6 text-primary">
+                <i class="bi bi-file-earmark-person-fill me-2"></i>Job Applications Management
+            </h1>
+            <p class="text-muted">Manage job applications efficiently.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+            <a asp-action="Create" class="btn btn-success shadow-sm" title="Create a new job application">
+                <i class="bi bi-plus-circle me-2"></i>Create New Application
+            </a>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-body">
+            <table class="table table-striped table-hover nowrap w-100" id="jobApplicationsTable">
+                <thead class="table-dark">
+                <tr>
+                    <th>@Html.DisplayNameFor(model => model.ApplicationUser)</th>
+                    <th>@Html.DisplayNameFor(model => model.Job)</th>
+                    <th>@Html.DisplayNameFor(model => model.Status)</th>
+                    <th>@Html.DisplayNameFor(model => model.Resume)</th>
+                    <th>@Html.DisplayNameFor(model => model.CoverLetter)</th>
+                    <th>Actions</th>
+                    <th>@Html.DisplayNameFor(model => model.ApplicationDate)</th>
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    @{ await Html.RenderPartialAsync("_DataTablesScriptsPartial"); }
+    <style>
+        #jobApplicationsTable td {
+            vertical-align: middle;
+        }
+
+        #jobApplicationsTable .btn-group {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+    <script asp-append-version="true">
+        $(document).ready(function () {
+            const table = $('#jobApplicationsTable').DataTable({
+                ajax: {
+                    url: '/Employer/JobApplication/GetAll',
+                    dataSrc: 'data'
+                },
+                columns: [
+                    {data: 'applicationUser'},
+                    {data: 'job'},
+                    {
+                        data: 'status',
+                        render: function (data, type, row) {
+                            if (type === 'display') {
+                                let badgeClass;
+                                switch (data?.toLowerCase()) {
+                                    case 'pending':
+                                        badgeClass = 'bg-secondary';
+                                        break;
+                                    case 'reviewed':
+                                        badgeClass = 'bg-success';
+                                        break;
+                                    case  'rejected':
+                                        badgeClass = 'bg-danger';
+                                        break;
+                                    default:
+                                        badgeClass = 'bg-info';
+                                }
+                                return `<span class="badge ${badgeClass}">${data || 'Unknown'}</span>`;
+                            }
+                            return data;
+                        }
+                    },
+                    {
+                        data: 'resume',
+                        render: function (data) {
+                            return data ?
+                                `<a href="${data}" class="btn btn-sm btn-outline-primary" target="_blank" title="Download Resume">
+                                    <i class="bi bi-download"></i>
+                                </a>` :
+                                'N/A';
+                        },
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'coverLetter',
+                        render: function (data) {
+                            return data ?
+                                `<a href="${data}" class="btn btn-sm btn-outline-primary" target="_blank" title="Download Cover Letter">
+                                    <i class="bi bi-download"></i>
+                                </a>` :
+                                'N/A';
+                        },
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'id',
+                        render: function (data, type, row) {
+                            return `<div class="btn-group" role="group">
+                                        <button class="btn btn-success accept-application" 
+                                            data-id="${data}" 
+                                            title="Accept application"
+                                            ${row.status?.toLowerCase() !== 'pending' ? 'disabled' : ''}>
+                                            <i class="bi bi-check-circle"></i>
+                                        </button>
+                                        <button class="btn btn-danger decline-application" 
+                                            data-id="${data}" 
+                                            title="Decline application"
+                                            ${row.status?.toLowerCase() !== 'pending' ? 'disabled' : ''}>
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                        <a href="/Employer/JobApplication/Details/${data}" 
+                                            class="btn btn-info" 
+                                            title="View application details">
+                                            <i class="bi bi-info-circle"></i>
+                                        </a>
+                                    </div>`;
+                        },
+                        orderable: false,
+                        searchable: false
+                    },
+                    {
+                        data: 'applicationDate',
+                        render: function (data) {
+                            return new Date(data).toLocaleDateString('vi-VN');
+                        }
+                    },
+                ],
+                responsive: true,
+                dom: '<"row"<"col-md-6"l><"col-md-6"f>>rt<"row"<"col-md-6"i><"col-md-6"p>>B',
+                buttons: [
+                    {
+                        extend: 'copy',
+                        className: 'btn btn-outline-secondary',
+                        text: '<i class="bi bi-clipboard me-1"></i> Copy'
+                    },
+                    {
+                        extend: 'csv',
+                        className: 'btn btn-outline-secondary',
+                        text: '<i class="bi bi-file-earmark-text me-1"></i> CSV'
+                    },
+                    {
+                        extend: 'excel',
+                        className: 'btn btn-outline-secondary',
+                        text: '<i class="bi bi-file-earmark-excel me-1"></i> Excel'
+                    },
+                    {
+                        extend: 'pdf',
+                        className: 'btn btn-outline-secondary',
+                        text: '<i class="bi bi-file-earmark-pdf me-1"></i> PDF'
+                    },
+                    {
+                        extend: 'print',
+                        className: 'btn btn-outline-secondary',
+                        text: '<i class="bi bi-printer me-1"></i> Print'
+                    }
+                ],
+                language: {
+                    emptyTable: "No job applications found",
+                    search: '<i class="bi bi-search me-2"></i>',
+                    searchPlaceholder: 'Search applications...'
+                },
+                order: [[5, 'desc']],
+                pageLength: 10,
+                lengthMenu: [5, 10, 25, 50],
+                drawCallback: function () {
+                    $('[title]').tooltip({
+                        placement: 'top',
+                        container: 'body'
+                    });
+                }
+            });
+
+            // Handle accept application
+            $('#jobApplicationsTable').on('click', '.accept-application', function () {
+                acceptJobApplication($(this), table);
+            });
+            
+            // Handle decline application
+            $('#jobApplicationsTable').on('click', '.decline-application', function () {
+                declineJobApplication($(this), table);
+            });
+        });
+    </script>
+    <script src="~/js/JobApplicationButtonHandlers.js" asp-append-version="true"></script>
+}

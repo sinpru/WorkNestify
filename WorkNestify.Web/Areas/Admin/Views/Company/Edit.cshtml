@@ -5,128 +5,180 @@
     ViewData["IndexAction"] = "Index";
 }
 
-<partial name="_ManagementNavigationPartial"/>
-<partial name="_NotificationsPartial"/>
+<partial name="_ManagementNavigationPartial" />
 
-<form class="row" enctype="multipart/form-data" asp-action="Edit">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <input type="hidden" asp-for="Id"/>
-
-    <!-- Left Column -->
-    <div class="col-md-6 mb-2">
-        <div class="form-group mb-2">
-            <label asp-for="Name" class="form-label"></label>
-            <input asp-for="Name" class="form-control" placeholder="Enter company name" required/>
-            <span asp-validation-for="Name" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-2">
-            <label asp-for="Website" class="form-label"></label>
-            <input asp-for="Website" class="form-control" placeholder="https://example.com"/>
-            <span asp-validation-for="Website" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-2">
-            <label asp-for="Email" class="form-label"></label>
-            <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com" required/>
-            <span asp-validation-for="Email" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-2">
-            <label asp-for="Phone" class="form-label"></label>
-            <input asp-for="Phone" class="form-control" placeholder="+1 234 567 890"/>
-            <span asp-validation-for="Phone" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-2">
-            <label asp-for="Size" class="form-label">Company Size</label>
-            <select asp-for="Size" class="form-select" asp-items="ViewBag.Size" required>
-                <option value="" disabled>Select a Size</option>
-            </select>
-            <span asp-validation-for="Size" class="text-danger"></span>
-        </div>
-
-        <div class="form-group mb-2">
-            <label asp-for="Industry" class="form-label"></label>
-            <input asp-for="Industry" class="form-control" placeholder="e.g., Tech, Retail"/>
-            <span asp-validation-for="Industry" class="text-danger"></span>
-        </div>
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-primary text-white">
+        <h2 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Company Details</h2>
     </div>
 
-    <!-- Right Column -->
-    <div class="col-md-6 mb-2">
-        <div class="form-group mb-2">
-            <label asp-for="ProvinceId" class="form-label">Province</label>
-            <select asp-for="ProvinceId" class="form-select" asp-items="ViewBag.ProvinceId" required>
-                <option value="" disabled>Select Province</option>
-            </select>
-            <span asp-validation-for="ProvinceId" class="text-danger"></span>
-        </div>
+    <div class="card-body p-4">
+        <partial name="_NotificationsPartial" />
 
-        <div class="form-group mb-2">
-            <label asp-for="DistrictId" class="form-label">District</label>
-            <select asp-for="DistrictId" class="form-select" asp-items="ViewBag.DistrictId" required>
-                <option value="" disabled>Select District</option>
-            </select>
-            <span asp-validation-for="DistrictId" class="text-danger"></span>
-        </div>
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert" style="display: none;"></div>
+            <input type="hidden" asp-for="Id" />
 
-        <div class="form-group mb-2">
-            <label asp-for="WardCode" class="form-label">Ward</label>
-            <select asp-for="WardCode" class="form-select" asp-items="ViewBag.WardCode" required>
-                <option value="" disabled>Select Ward</option>
-            </select>
-            <span asp-validation-for="WardCode" class="text-danger"></span>
-        </div>
+            <div class="row g-4">
+                <!-- Left Column -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="Name" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-building"></i></span>
+                            <input asp-for="Name" class="form-control" placeholder="Enter company name" />
+                        </div>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
+                    </div>
 
-        <div class="form-group mb-2">
-            <label asp-for="StreetAddress" class="form-label"></label>
-            <input asp-for="StreetAddress" class="form-control" placeholder="Enter company address"/>
-            <span asp-validation-for="StreetAddress" class="text-danger"></span>
-        </div>
+                    <div class="mb-3">
+                        <label asp-for="Website" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                            <input asp-for="Website" class="form-control" placeholder="https://example.com" />
+                        </div>
+                        <span asp-validation-for="Website" class="text-danger small"></span>
+                    </div>
 
-        <div class="form-group mb-2">
-            <label asp-for="FoundedDate" class="form-label"></label>
-            <input asp-for="FoundedDate" type="date" class="form-control" required/>
-            <span asp-validation-for="FoundedDate" class="text-danger"></span>
-        </div>
+                    <div class="mb-3">
+                        <label asp-for="Email" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input asp-for="Email" type="email" class="form-control" placeholder="email@example.com" />
+                        </div>
+                        <span asp-validation-for="Email" class="text-danger small"></span>
+                    </div>
 
-        <div class="form-group mb-2">
-            <label asp-for="Logo" class="form-label"></label>
-            <div class="input-group">
-                <button id="toggleMode" class="btn btn-outline-secondary" type="button" onclick="logoInputToggle()">
-                    File
-                </button>
-                <input id="logoUrl" asp-for="Logo" type="url" class="form-control"
-                       placeholder="https://example.com/logo.png"/>
-                <input id="logoFile" name="file" type="file" class="form-control d-none" accept="image/*"/>
+                    <div class="mb-3">
+                        <label asp-for="Phone" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-telephone"></i></span>
+                            <input asp-for="Phone" class="form-control" placeholder="+1 234 567 890" />
+                        </div>
+                        <span asp-validation-for="Phone" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Size" class="form-label fw-bold">Company Size</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-people"></i></span>
+                            <select asp-for="Size" class="form-select" asp-items="ViewBag.Size">
+                                <option value="" disabled>Select a Size</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="Size" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Industry" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-gear"></i></span>
+                            <input asp-for="Industry" class="form-control" placeholder="e.g., Tech, Retail" />
+                        </div>
+                        <span asp-validation-for="Industry" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label asp-for="ProvinceId" class="form-label fw-bold">Province</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                            <select asp-for="ProvinceId" class="form-select" asp-items="ViewBag.ProvinceId">
+                                <option value="" disabled>Select Province</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="ProvinceId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="DistrictId" class="form-label fw-bold">District</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo"></i></span>
+                            <select asp-for="DistrictId" class="form-select" asp-items="ViewBag.DistrictId">
+                                <option value="" disabled>Select District</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="DistrictId" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="WardCode" class="form-label fw-bold">Ward</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-fill"></i></span>
+                            <select asp-for="WardCode" class="form-select" asp-items="ViewBag.WardCode">
+                                <option value="" disabled>Select Ward</option>
+                            </select>
+                        </div>
+                        <span asp-validation-for="WardCode" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="StreetAddress" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-house-door"></i></span>
+                            <input asp-for="StreetAddress" class="form-control" placeholder="Enter company address" />
+                        </div>
+                        <span asp-validation-for="StreetAddress" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="FoundedDate" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-calendar-event"></i></span>
+                            <input asp-for="FoundedDate" type="date" class="form-control" />
+                        </div>
+                        <span asp-validation-for="FoundedDate" class="text-danger small"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Logo" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <button id="toggleMode" class="btn btn-outline-secondary" type="button" onclick="logoInputToggle()">
+                                <i class="bi bi-link-45deg"></i>/<i class="bi bi-file-earmark-image"></i>
+                            </button>
+                            <input id="logoUrl" asp-for="Logo" type="url" class="form-control"
+                                   placeholder="https://example.com/logo.png" />
+                            <input id="logoFile" name="file" type="file" class="form-control d-none" accept="image/*" />
+                        </div>
+                        <small class="text-muted">Enter a URL or upload an image file</small>
+                        <span asp-validation-for="Logo" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <!-- Full Width Description -->
+                <div class="col-12">
+                    <div class="mb-3">
+                        <label asp-for="Description" class="form-label fw-bold"></label>
+                        <div class="input-group">
+                            <span class="input-group-text align-items-start pt-2"><i class="bi bi-text-paragraph"></i></span>
+                            <textarea asp-for="Description" id="editor" class="form-control" rows="5"
+                                      placeholder="Enter company description"></textarea>
+                        </div>
+                        <div id="editor-word-count" class="small text-muted mt-1"></div>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
+                    </div>
+                </div>
             </div>
-            <span asp-validation-for="Logo" class="text-danger"></span>
-        </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-4 d-flex justify-content-end gap-2">
+                <a asp-action="Index"
+                   class="btn btn-outline-secondary px-4">
+                    <i class="bi bi-x-lg me-2"></i>Cancel
+                </a>
+                <button type="submit"
+                        class="btn btn-primary px-4">
+                    <i class="bi bi-check-circle me-2"></i>Save Changes
+                </button>
+            </div>
+        </form>
     </div>
-
-    <div class="col-md-12 mb-2">
-        <div class="form-group">
-            <label asp-for="Description" class="form-label"></label>
-            <textarea asp-for="Description" id="editor" class="form-control"></textarea>
-            <div id="editor-word-count" class="small text-muted mt-1"></div>
-            <span asp-validation-for="Description" class="text-danger"></span>
-        </div>
-
-        <div class="form-group d-flex justify-content-between mt-2">
-            <a class="btn btn-outline-secondary d-flex align-items-center" asp-action="Index">
-                <i class="fs-4 bi-x-lg me-1"></i> Cancel
-            </a>
-
-            <button type="submit" class="btn btn-primary d-flex align-items-center">
-                <i class="fs-4 bi-check-circle me-1"></i> Save
-            </button>
-        </div>
-    </div>
-</form>
+</div>
 
 @section Scripts {
-    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
-    @{ await Html.RenderPartialAsync("_FormScriptsPartial"); }
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_FormScriptsPartial" />
     <script src="~/js/LogoInputToggle.js" asp-append-version="true"></script>
 }

@@ -1,0 +1,90 @@
+@model WorkNestify.Models.Models.Companies.CompanyReview
+
+@{
+    ViewData["Title"] = "Create Company Review";
+    var company = ViewBag.Company as WorkNestify.Models.Models.Companies.Company;
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <partial name="_NotificationsPartial"/>
+            
+            <!-- Company Information Section -->
+            @if (company != null)
+            {
+                <div class="card shadow-sm mb-4 animate__animated animate__fadeIn">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            @if (!string.IsNullOrEmpty(company.Logo))
+                            {
+                                <img src="@company.Logo" alt="@company.Name Logo" class="me-3" style="max-height: 80px;"/>
+                            }
+                            <div>
+                                <h3 class="mb-0">@company.Name</h3>
+                                <p class="text-muted mb-0">@company.Industry</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            <!-- Review Form Section -->
+            <div class="card shadow-sm animate__animated animate__fadeIn">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Write a Review for @(company?.Name ?? "Company")</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Hidden Fields -->
+                        <input asp-for="CompanyId" type="hidden" value="@ViewBag.CompanyId"/>
+                        <input asp-for="ApplicationUserId" type="hidden" value="@Context.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value"/>
+
+                        <!-- Review Content -->
+                        <div class="form-group mb-4">
+                            <label asp-for="Content" class="form-label fw-bold"></label>
+                            <textarea asp-for="Content" class="form-control" rows="5" placeholder="Share your experience with this company..."></textarea>
+                            <span asp-validation-for="Content" class="text-danger"></span>
+                        </div>
+
+                        <!-- Star Rating -->
+                        <div class="form-group mb-4">
+                            <label asp-for="Rating" class="form-label fw-bold">Rating</label>
+                            <div class="star-rating">
+                                <input type="radio" id="star5" name="Rating" value="5" @(Model?.Rating == 5 ? "checked" : "")/>
+                                <label for="star5" title="5 stars"><i class="bi bi-star-fill"></i></label>
+                                <input type="radio" id="star4" name="Rating" value="4" @(Model?.Rating == 4 ? "checked" : "")/>
+                                <label for="star4" title="4 stars"><i class="bi bi-star-fill"></i></label>
+                                <input type="radio" id="star3" name="Rating" value="3" @(Model?.Rating == 3 ? "checked" : "")/>
+                                <label for="star3" title="3 stars"><i class="bi bi-star-fill"></i></label>
+                                <input type="radio" id="star2" name="Rating" value="2" @(Model?.Rating == 2 ? "checked" : "")/>
+                                <label for="star2" title="2 stars"><i class="bi bi-star-fill"></i></label>
+                                <input type="radio" id="star1" name="Rating" value="1" @(Model?.Rating == 1 ? "checked" : "")/>
+                                <label for="star1" title="1 star"><i class="bi bi-star-fill"></i></label>
+                            </div>
+                            <span asp-validation-for="Rating" class="text-danger"></span>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="form-group text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send me-2"></i>Submit Review
+                            </button>
+                            <a asp-action="Index" class="btn btn-outline-secondary ms-2">
+                                <i class="bi bi-arrow-left me-2"></i>Back to List
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+<link rel="stylesheet" href="~/css/StarRating.css" asp-append-version="true"/>

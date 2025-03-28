@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WorkNestify.Models.Models.Users;
+using WorkNestify.Services;
 
 namespace WorkNestify.Web.Areas.Identity.Pages.Account.Manage
 {
@@ -14,48 +15,39 @@ namespace WorkNestify.Web.Areas.Identity.Pages.Account.Manage
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly CloudinaryService _cloudinary;
 
         public IndexModel(
             UserManager<ApplicationUser> userManager,
-            SignInManager<ApplicationUser> signInManager)
+            SignInManager<ApplicationUser> signInManager,
+            CloudinaryService cloudinary)
         {
             _userManager = userManager;
             _signInManager = signInManager;
+            _cloudinary = cloudinary;
         }
 
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
         public string Username { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        
         [TempData]
         public string StatusMessage { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        
         [BindProperty]
         public InputModel Input { get; set; }
-
-        /// <summary>
-        ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-        ///     directly from your code. This API may change or be removed in future releases.
-        /// </summary>
+        
         public class InputModel
         {
-            /// <summary>
-            ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
-            ///     directly from your code. This API may change or be removed in future releases.
-            /// </summary>
             [Phone]
             [Display(Name = "Phone number")]
             public string PhoneNumber { get; set; }
+            
+            [Required]
+            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at most {1} characters long.", MinimumLength = 2)]
+            [Display(Name = "Full Name")]
+            public string FullName { get; set; }
+            
+            [Display(Name = "Resume URL")]
+            public string ResumeUrl { get; set; }
         }
 
         private async Task LoadAsync(ApplicationUser user)
@@ -67,7 +59,9 @@ namespace WorkNestify.Web.Areas.Identity.Pages.Account.Manage
 
             Input = new InputModel
             {
-                PhoneNumber = phoneNumber
+                PhoneNumber = phoneNumber,
+                FullName = user.FullName,
+                ResumeUrl = user.ResumeUrl
             };
         }
 
@@ -83,7 +77,7 @@ namespace WorkNestify.Web.Areas.Identity.Pages.Account.Manage
             return Page();
         }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(IFormFile? resumeFile)
         {
             var user = await _userManager.GetUserAsync(User);
             if (user == null)
@@ -97,6 +91,9 @@ namespace WorkNestify.Web.Areas.Identity.Pages.Account.Manage
                 return Page();
             }
 
+            bool hasChanges = false;
+
+            // Update PhoneNumber if changed
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
             if (Input.PhoneNumber != phoneNumber)
             {
@@ -104,6 +101,63 @@ namespace WorkNestify.Web.Areas.Identity.Pages.Account.Manage
                 if (!setPhoneResult.Succeeded)
                 {
                     StatusMessage = "Unexpected error when trying to set phone number.";
+                    return RedirectToPage();
+                }
+                hasChanges = true;
+            }
+
+            // Update FullName if changed
+            if (Input.FullName != user.FullName)
+            {
+                user.FullName = Input.FullName;
+                hasChanges = true;
+            }
+
+            // Handle Resume file upload if provided
+            if (resumeFile != null && resumeFile.Length > 0)
+            {
+                try
+                {
+                    string existingResumeUrl = user.ResumeUrl ?? string.Empty;
+
+                    if (!string.IsNullOrEmpty(existingResumeUrl))
+                    {
+                        bool resumeIsDeleted = await _cloudinary.DeleteDocumentAsync(existingResumeUrl);
+                        if (!resumeIsDeleted)
+                        {
+                            StatusMessage = "Failed to delete the old resume file.";
+                            await LoadAsync(user);
+                            return Page();
+                        }
+                    }
+                    
+                    string resumeUrl = await _cloudinary.UploadDocumentAsync(resumeFile);
+                    if (string.IsNullOrEmpty(resumeUrl))
+                    {
+                        StatusMessage = "Failed to upload resume file.";
+                        await LoadAsync(user);
+                        return Page();
+                    }
+
+                    user.ResumeUrl = resumeUrl;
+                    hasChanges = true;
+                }
+                catch (Exception ex)
+                {
+                    StatusMessage = $"Error uploading resume: {ex.Message}";
+                    await LoadAsync(user);
+                    return Page();
+                }
+            }
+
+            // Update ModifiedDate and save if there are changes
+            if (hasChanges)
+            {
+                user.ModifiedDate = DateTime.UtcNow;
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    StatusMessage = "Unexpected error when trying to update profile.";
                     return RedirectToPage();
                 }
             }

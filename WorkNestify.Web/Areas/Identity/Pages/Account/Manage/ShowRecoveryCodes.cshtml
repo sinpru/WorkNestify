@@ -2,24 +2,48 @@
 @model ShowRecoveryCodesModel
 @{
     ViewData["Title"] = "Recovery codes";
-    ViewData["ActivePage"] = "TwoFactorAuthentication";
+    ViewData["ActivePage"] = ManageNavPages.TwoFactorAuthentication;
 }
 
-<partial name="_StatusMessage" for="StatusMessage" />
-<h3>@ViewData["Title"]</h3>
-<div class="alert alert-warning" role="alert">
-    <p>
-        <strong>Put these codes in a safe place.</strong>
-    </p>
-    <p>
-        If you lose your device and don't have the recovery codes you will lose access to your account.
-    </p>
-</div>
 <div class="row">
     <div class="col-md-12">
-        @for (var row = 0; row < Model.RecoveryCodes.Length; row += 2)
-        {
-            <code class="recovery-code">@Model.RecoveryCodes[row]</code><text>&nbsp;</text><code class="recovery-code">@Model.RecoveryCodes[row + 1]</code><br />
-        }
+        <h3><i class="bi bi-key me-2"></i>@ViewData["Title"]</h3>
+        <partial name="_StatusMessage" for="StatusMessage" />
+
+        <div class="alert alert-warning alert-dismissible fade show" role="alert">
+            <p>
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                <strong>Put these codes in a safe place.</strong>
+            </p>
+            <p>
+                <i class="bi bi-lock me-2"></i>
+                If you lose your device and don’t have these recovery codes, you will lose access to your account.
+            </p>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <p><i class="bi bi-info-circle me-2"></i>Your recovery codes:</p>
+                <div class="row row-cols-1 row-cols-md-2 g-3">
+                    @for (var row = 0; row < Model.RecoveryCodes.Length; row += 2)
+                    {
+                        <div class="col">
+                            <code class="recovery-code d-block p-2 bg-dark text-light rounded">
+                                @Model.RecoveryCodes[row]
+                            </code>
+                        </div>
+                        @if (row + 1 < Model.RecoveryCodes.Length)
+                        {
+                            <div class="col">
+                                <code class="recovery-code d-block p-2 bg-dark text-light rounded">
+                                    @Model.RecoveryCodes[row + 1]
+                                </code>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
     </div>
 </div>

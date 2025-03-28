@@ -1,0 +1,109 @@
+@model WorkNestify.Models.Models.JobApplications.JobApplication
+
+@{
+    ViewData["Title"] = "Apply for Job";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8">
+            <partial name="_NotificationsPartial"/>
+
+            <!-- Header Section -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="h4 text-primary">Apply for Job</h2>
+                <a asp-controller="Job" asp-action="Index" class="btn btn-outline-primary d-flex align-items-center">
+                    <i class="fs-4 bi-arrow-left me-1"></i> Back to List
+                </a>
+            </div>
+
+            <!-- Job Application Form Card -->
+            <div class="card border-light shadow-sm">
+                <div class="card-body">
+                    <!-- Introduction Section -->
+                    <div class="mb-4">
+                        <h5 class="text-success"><i class="bi bi-feather me-2"></i>Introduction</h5>
+                        <p class="text-muted">
+                            A brief introduction can make you stand out to employers and increase your chances of being
+                            selected for the role.
+                        </p>
+                        <p>
+                            I am [Your Name], a [Your Profession] with [X years] of experience in [Your Field]. I am
+                            passionate about [specific interest related to the job], and I am eager to contribute to
+                            your team with my skills in [specific skills].
+                        </p>
+                    </div>
+
+                    <h5 class="card-title mb-4">Submit Your Application</h5>
+                    <hr/>
+
+                    <form asp-action="Create" enctype="multipart/form-data">
+                        <!-- Hidden Fields -->
+                        <input asp-for="ApplicationUserId" type="hidden" value="@ViewBag.ApplicationUserId"/>
+                        <input asp-for="Status" type="hidden" value="Pending"/>
+                        <input asp-for="JobId" type="hidden" value="@ViewBag.JobId"/>
+
+                        <!-- Validation Summary -->
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <!-- Resume -->
+                        <div class="form-group mb-3">
+                            <label for="resume" class="control-label">
+                                <i class="bi bi-file-earmark-text text-primary me-2"></i>Resume
+                            </label>
+                            <input id="resume" name="resumeFile" type="file" class="form-control"
+                                   accept=".pdf,.doc,.docx,.odt,.rtf,.txt" required/>
+                            <small class="form-text text-muted">
+                                Upload your resume in PDF, DOC, DOCX, ODT, RTF, or TXT format.
+                            </small>
+                        </div>
+
+                        <!-- Cover Letter -->
+                        <div class="form-group mb-4">
+                            <label for="coverLetter" class="control-label">
+                                <i class="bi bi-envelope text-primary me-2"></i>Cover Letter
+                            </label>
+                            <input id="coverLetter" name="coverLetterFile" type="file" class="form-control"
+                                   accept=".pdf,.doc,.docx,.odt,.rtf,.txt" required/>
+                            <small class="form-text text-muted">
+                                A cover letter is a document that introduces yourself to the employer, explains why you
+                                are a good fit for the job, and highlights your relevant skills and experiences. Upload
+                                your cover letter in PDF, DOC, DOCX, ODT, RTF, or TXT format.
+                            </small>
+                        </div>
+
+                        <!-- Note Section -->
+                        <div class="alert alert-warning mt-4" role="alert">
+                            <h5 class="alert-heading"><i class="bi bi-exclamation-triangle-fill text-danger me-2"></i>Important
+                                Notes</h5>
+                            <ol>
+                                <li>
+                                    We strongly recommend creating a professional resume and cover letter to increase
+                                    your chances of being noticed by employers. If you don’t have one, you can contact
+                                    us for support at
+                                    <a
+                                        href="mailto:support@worknestify.com">support@worknestify.com</a>.
+                                </li>
+                                <li>
+                                    Ensure all information provided is accurate and up-to-date to avoid delays in the
+                                    hiring process.
+                                </li>
+                            </ol>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-success">
+                                <i class="bi bi-send me-2"></i>Submit Application
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

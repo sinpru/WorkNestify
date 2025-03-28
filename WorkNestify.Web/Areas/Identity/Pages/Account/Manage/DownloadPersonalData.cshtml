@@ -5,7 +5,25 @@
     ViewData["ActivePage"] = ManageNavPages.PersonalData;
 }
 
-<h3>@ViewData["Title"]</h3>
+<div class="row">
+    <div class="col-md-12">
+        <h3><i class="bi bi-cloud-download me-2"></i>@ViewData["Title"]</h3>
+        
+        <div class="card">
+            <div class="card-body">
+                <p>
+                    <i class="bi bi-info-circle me-2"></i>
+                    Your personal data is being prepared for download. Depending on the amount of data, this may take a moment.
+                </p>
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    <i class="bi bi-check-circle me-2"></i>
+                    Once ready, your data will be downloaded automatically as a file.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
