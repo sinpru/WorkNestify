@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Models.Models.Jobs;
 using WorkNestify.Utilities.Constants;
@@ -64,8 +63,6 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // POST: Admin/JobCategory/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,Description")] JobCategory jobCategory)
@@ -101,8 +98,6 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         }
 
         // POST: Admin/JobCategory/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Description")] JobCategory jobCategory)

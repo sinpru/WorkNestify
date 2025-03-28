@@ -17,16 +17,13 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
     public class JobApplicationController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<ApplicationUser> _userManager;
         private readonly CloudinaryService _cloudinary;
 
         public JobApplicationController(
             IUnitOfWork unitOfWork,
-            UserManager<ApplicationUser> userManager,
             CloudinaryService cloudinary)
         {
             _unitOfWork = unitOfWork;
-            _userManager = userManager;
             _cloudinary = cloudinary;
         }
 
@@ -39,22 +36,22 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             ViewData["Status"] = new SelectList(JobApplicationStatuses.AllStatuses);
             ViewBag.CurrentStatus = status;
 
-            var currentUser = await _userManager.GetUserAsync(User);
-            if (currentUser == null)
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
             {
                 var returnUrl = Url.Action("Index", "JobApplication");
                 return RedirectToAction("Login", "Account", new { area = "Identity", returnUrl });
             }
-    
+
             // Define the filter
-            Expression<Func<JobApplication, bool>> filter = ja => 
-                ja.ApplicationUser.Id == currentUser.Id 
+            Expression<Func<JobApplication, bool>> filter = ja =>
+                ja.ApplicationUser.Id == userId
                 && (string.IsNullOrEmpty(status) || ja.Status == status);
 
             // Define ordering (kept as requested)
             Expression<Func<JobApplication, object>>[] orderByDescending = new[]
-            { 
-                (Expression<Func<JobApplication, object>>)(ja => ja.ApplicationDate) 
+            {
+                (Expression<Func<JobApplication, object>>)(ja => ja.ApplicationDate)
             };
 
             // Get total count
@@ -76,7 +73,7 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             ViewBag.TotalApplications = totalApplications;
             ViewBag.CurrentPage = page;
             ViewBag.PageSize = pageSize;
-    
+
             return View(paginatedApplications);
         }
 
@@ -84,26 +81,33 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
         public async Task<IActionResult> Create(int? jobId)
         {
             // If the user already apply for this job they can't create another one
-            if (_unitOfWork.JobApplications.GetAsync(ja => ja.JobId == jobId).Result != null)
+            var existingJobApplication = await _unitOfWork.JobApplications.GetAsync(ja => ja.JobId == jobId);
+            if (existingJobApplication != null && existingJobApplication.Status != JobApplicationStatuses.Withdrawn)
             {
-                TempData["Waring"] = "Your job is already in progress.";
-                return RedirectToAction("Details", "Job", new { id = jobId });
+                TempData["Warning"] = "Your job is already in progress.";
+                return RedirectToAction("Details", "Job", new { id = jobId, area = "JobSeeker" });
             }
-            
+
+            var currentJob = await _unitOfWork.Jobs.GetAsync(j => j.Id == jobId);
+            if (currentJob?.Status != JobStatuses.Open)
+            {
+                TempData["Warning"] = "You cannot apply for this job right now.";
+                return RedirectToAction("Index", "Job", new { area = "JobSeeker" });
+            }
+
             // Pass the JobId to the view via ViewBag
             ViewBag.JobId = jobId;
 
-            // TODO: Get rid of _userManager in functions that only retrives user id
             // Get the current user; if not logged in, redirect to the login page
-            var user = await _userManager.GetUserAsync(HttpContext.User);
-            if (user == null)
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
             {
                 // Construct the return URL to redirect back to this page after login
                 var returnUrl = Url.Action("Create", "JobApplication", new { jobId }, protocol: Request.Scheme);
                 return RedirectToAction("Login", "Account", new { area = "Identity", returnUrl });
             }
 
-            ViewBag.ApplicationUserId = user.Id;
+            ViewBag.ApplicationUserId = userId;
 
             return View();
         }
@@ -163,38 +167,10 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             }
         }
 
-        // GET: JobSeeker/JobApplication/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var jobApplication = await _unitOfWork.JobApplications.GetAsync(ja => ja.Id == id);
-            if (jobApplication == null)
-            {
-                return NotFound();
-            }
-            
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-            if (currentUser == null)
-            {
-                var returnUrl = Url.Action("Details", "JobApplication", new { id }, protocol: Request.Scheme);
-                return RedirectToAction("Login", "Account", new { area = "Identity", returnUrl });
-            }
-
-            if (jobApplication.ApplicationUserId != currentUser.Id)
-            {
-                return Unauthorized();
-            }
-
-            return View(jobApplication);
-        }
-
         // GET: JobSeeker/JobApplication/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            // TODO: Update the edit page for job application
             if (id == null)
             {
                 return NotFound();
@@ -205,15 +181,15 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
             {
                 return NotFound();
             }
-            
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-            if (currentUser == null)
+
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
             {
                 var returnUrl = Url.Action("Edit", "JobApplication", new { id }, protocol: Request.Scheme);
                 return RedirectToAction("Login", "Account", new { area = "Identity", returnUrl });
             }
 
-            if (jobApplication.ApplicationUserId != currentUser.Id)
+            if (jobApplication.ApplicationUserId != userId)
             {
                 return Unauthorized();
             }
@@ -242,56 +218,15 @@ namespace WorkNestify.Web.Areas.JobSeeker.Controllers
                 }
                 catch (Exception ex)
                 {
+                    TempData["Error"] = $"Error updating job application: {ex.Message}";
+                    return RedirectToAction("Details", "Job",
+                        new { id = jobApplication.ApplicationUserId, area = "JobSeeker" });
                 }
 
                 return RedirectToAction(nameof(Index));
             }
 
             return View(jobApplication);
-        }
-
-        // GET: JobSeeker/JobApplication/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var jobApplication = await _unitOfWork.JobApplications.GetAsync(ja => ja.Id == id);
-            if (jobApplication == null)
-            {
-                return NotFound();
-            }
-            
-            var currentUser = await _userManager.GetUserAsync(HttpContext.User);
-            if (currentUser == null)
-            {
-                var returnUrl = Url.Action("Delete", "JobApplication", new { id }, protocol: Request.Scheme);
-                return RedirectToAction("Login", "Account", new { area = "Identity", returnUrl });
-            }
-
-            if (jobApplication.ApplicationUserId != currentUser.Id)
-            {
-                return Unauthorized();
-            }
-
-            return View(jobApplication);
-        }
-
-        // POST: JobSeeker/JobApplication/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var jobApplication = await _unitOfWork.JobApplications.GetAsync(ja => ja.Id == id);
-            if (jobApplication != null)
-            {
-                _unitOfWork.JobApplications.Remove(jobApplication);
-            }
-
-            await _unitOfWork.SaveAsync();
-            return RedirectToAction(nameof(Index));
         }
     }
 }

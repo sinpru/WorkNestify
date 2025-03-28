@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Utilities.Constants;
-using Microsoft.EntityFrameworkCore; // For ToListAsync or similar if needed
 
 namespace WorkNestify.Web.Areas.Admin.Controllers
 {
