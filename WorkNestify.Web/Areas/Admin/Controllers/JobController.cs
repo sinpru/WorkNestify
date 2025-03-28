@@ -150,7 +150,6 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             [Bind("Id,Title,CompanyId,Salary,Type,Status,Level,JobCategoryId,ProvinceId,DistrictId,WardCode,StreetAddress,StartDate,EndDate,Description")]
             Job job)
         {
-            // TODO: Find a way to update the job status to expire when the end date is due
             if (id != job.Id)
             {
                 return NotFound();
