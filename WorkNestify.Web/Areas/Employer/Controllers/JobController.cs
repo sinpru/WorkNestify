@@ -104,6 +104,12 @@ namespace WorkNestify.Web.Areas.Employer.Controllers
                 TempData["Warning"] = "You are not authorized to access this page.";
                 return RedirectToAction(nameof(Index));
             }
+
+            if (job.EndDate < job.StartDate || job.StartDate > job.EndDate || job.EndDate < DateTime.UtcNow)
+            {
+                TempData["Warning"] = "Dates are invalid.";
+                return View(job);
+            }
             
             if (!ModelState.IsValid)
             {

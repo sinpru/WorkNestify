@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using WorkNestify.DataAccess.Data;
 using Microsoft.AspNetCore.Identity;
@@ -10,7 +9,6 @@ using WorkNestify.DataAccess.Repositories.Implementations;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.Models.Models.Users;
 using WorkNestify.Services;
-using WorkNestify.Utilities;
 using WorkNestify.Utilities.EmailHelper;
 using WorkNestify.Web.Hubs;
 
