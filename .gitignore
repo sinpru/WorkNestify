@@ -11,10 +11,6 @@
 # Rider (JetBrains IDE) specific files
 .idea/
 
-# Compiled DLLs and other outputs
-bin/
-obj/
-
 # ASP.NET Core configuration
 appsettings.*.json
 appsettings.json
@@ -43,6 +39,8 @@ _ReSharper.Caches/
 
 # macOS specific files
 .DS_Store
+.AppleDouble
+.LSOverride
 
 # Windows image file caches
 Thumbs.db
@@ -59,3 +57,52 @@ ehthumbs.db
 
 # LibMan-installed libraries
 wwwroot/lib/
+
+### DotnetCore template
+# .NET Core build folders
+bin/
+obj/
+
+# Common node modules locations
+/node_modules
+/wwwroot/node_modules
+
+### Sass template
+*.css.map
+*.sass.map
+*.scss.map
+
+### SonarQube template
+# SonarQube ignore files.
+#
+# https://docs.sonarqube.org/display/SCAN/Analyzing+with+SonarQube+Scanner
+# Sonar Scanner working directories
+.sonar/
+.sonarqube/
+.scannerwork/
+
+# http://www.sonarlint.org/commandline/
+# SonarLint working directories, configuration files (including credentials)
+.sonarlint/
+
+### Git template
+# Created by git for backups. To disable backups in Git:
+# $ git config --global mergetool.keepBackup false
+*.orig
+
+# Created by git when using merge tools for conflicts
+*.BACKUP.*
+*.BASE.*
+*.LOCAL.*
+*.REMOTE.*
+*_BACKUP_*.txt
+*_BASE_*.txt
+*_LOCAL_*.txt
+*_REMOTE_*.txt
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
