@@ -37,7 +37,7 @@ namespace WorkNestify.Web.Controllers
                 var paginatedCompanies = await _unitOfWork.Companies
                     .GetAllQueryable(
                         filter: c => string.IsNullOrEmpty(search) || c.Name.Contains(search),
-                        includeProperties: "Province,District,Ward",
+                        includeProperties: "",
                         skip: (page - 1) * pageSize,
                         take: pageSize
                         ).Select(c => new
@@ -46,9 +46,8 @@ namespace WorkNestify.Web.Controllers
                         name = c.Name,
                         logo = c.Logo,
                         streetAddress = c.StreetAddress,
-                        ward = c.Ward != null ? c.Ward.Name : null,
-                        district = c.District != null ? c.District.Name : null,
-                        province = c.Province != null ? c.Province.Name : null,
+                        provinceCode = c.ProvinceCode, 
+                        wardCode = c.WardCode,
                         industry = c.Industry,
                         size = c.Size
                     }).ToListAsync();

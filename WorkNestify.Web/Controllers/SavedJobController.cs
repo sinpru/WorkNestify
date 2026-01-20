@@ -23,7 +23,7 @@ namespace WorkNestify.Web.Controllers
             int page = 1, 
             int pageSize = 5)
         {
-            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized();
@@ -33,7 +33,7 @@ namespace WorkNestify.Web.Controllers
             {
                 var query = _unitOfWork.SavedJobs.GetAllQueryable(
                     sj => sj.UserId == userId,
-                    includeProperties: "Job,Job.Company,Job.Province,Job.Ward,Job.District"
+                    includeProperties: "Job,Job.Company"
                 ).OrderByDescending(sj => sj.SavedDate);
 
                 var totalSavedJobs = await query.CountAsync();
@@ -42,20 +42,19 @@ namespace WorkNestify.Web.Controllers
                     .Take(pageSize)
                     .Select(sj => new
                     {
-                        Id = sj.Job.Id,
-                        Title = sj.Job.Title,
-                        CompanyName = sj.Job.Company.Name,
-                        CompanyLogo = sj.Job.Company.Logo,
-                        Salary = sj.Job.Salary,
-                        Province = sj.Job.Province != null ? sj.Job.Province.Name : null,
-                        Ward = sj.Job.Ward != null ? sj.Job.Ward.Name : null,
-                        District = sj.Job.District != null ? sj.Job.District.Name : null,
-                        StreetAddress = sj.Job.StreetAddress,
-                        Level = sj.Job.Level,
-                        Type = sj.Job.Type,
-                        Status = sj.Job.Status,
-                        CreatedDate = sj.Job.CreatedDate,
-                        IsSaved = true
+                        id = sj.Job.Id,
+                        title = sj.Job.Title,
+                        companyName = sj.Job.Company.Name,
+                        companyLogo = sj.Job.Company.Logo,
+                        salary = sj.Job.Salary,
+                        provinceCode = sj.Job.ProvinceCode,
+                        wardCode = sj.Job.WardCode,
+                        streetAddress = sj.Job.StreetAddress,
+                        level = sj.Job.Level,
+                        type = sj.Job.Type,
+                        status = sj.Job.Status,
+                        createdDate = sj.Job.CreatedDate,
+                        isSaved = true
                     })
                     .ToListAsync();
 

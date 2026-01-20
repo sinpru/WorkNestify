@@ -39,7 +39,6 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Internal Services
 builder.Services.AddTransient<IEmailSender, EmailSender>();
 builder.Services.AddScoped<EmailSender>();
-builder.Services.AddScoped<LocationManager>();
 builder.Services.AddHostedService<JobStatusUpdateService>();
 
 // Setting up Identity 

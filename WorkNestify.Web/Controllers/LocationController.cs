@@ -5,26 +5,18 @@ namespace WorkNestify.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class LocationController : ControllerBase
+    public class LocationController(ProvinceOpenApiService openApiService) : ControllerBase
     {
-        private readonly GhnService _ghnService;
-
-        public LocationController(GhnService ghnService)
+        [HttpGet("provinces")]
+        public async Task<IActionResult> GetProvinces()
         {
-            _ghnService = ghnService;
+            return Ok(await openApiService.GetProvincesAsync());
         }
 
-        [HttpGet("districts/{provinceId}")]
-        public async Task<IActionResult> GetDistricts(int provinceId)
+        [HttpGet("wards/{provinceId}")]
+        public async Task<IActionResult> GetWards(int provinceId)
         {
-            var districts = await _ghnService.GetDistrictsAsync(provinceId);
-            return Ok(districts);
-        }
-
-        [HttpGet("wards/{districtId}")]
-        public async Task<IActionResult> GetWards(int districtId)
-        {
-            var wards = await _ghnService.GetWardsAsync(districtId);
+            var wards = await openApiService.GetWardsByProvinceAsync(provinceId);
             return Ok(wards);
         }
     }

@@ -29,7 +29,7 @@ namespace WorkNestify.Web.Controllers
         public async Task<IActionResult> GetFilteredJobs(
             string? search,
             string? category,
-            int? location,
+            int? locationCode,
             string? type,
             string? level,
             string? salary,
@@ -57,7 +57,7 @@ namespace WorkNestify.Web.Controllers
                     j.Status == "Open"
                     && (string.IsNullOrEmpty(search) || j.Title.Contains(search))
                     && (categoryList.Length == 0 || categoryList.Contains(j.JobCategoryId))
-                    && (!location.HasValue || j.ProvinceId == location)
+                    && (!locationCode.HasValue || j.ProvinceCode == locationCode)
                     && (string.IsNullOrEmpty(type) || j.Type == type)
                     && (string.IsNullOrEmpty(level) || j.Level == level)
                     && (string.IsNullOrEmpty(salary) || (
@@ -83,7 +83,7 @@ namespace WorkNestify.Web.Controllers
                 // Get paginated results
                 var paginatedJobs = await _unitOfWork.Jobs.GetAllQueryable(
                     filter: filter,
-                    includeProperties: "Company,JobCategory,Province,District,Ward",
+                    includeProperties: "Company,JobCategory",
                     orderByDescending: orderByDescending,
                     skip: (page - 1) * pageSize,
                     take: pageSize
@@ -95,9 +95,8 @@ namespace WorkNestify.Web.Controllers
                     companyLogo = j.Company != null ? j.Company.Logo : null,
                     streetAddress = j.StreetAddress,
                     category = j.JobCategory != null ? j.JobCategory.Name : null,
-                    province = j.Province != null ? j.Province.Name : null,
-                    district = j.District != null ? j.District.Name : null,
-                    ward = j.Ward != null ? j.Ward.Name : null,
+                    provinceCode = j.ProvinceCode, 
+                    wardCode = j.WardCode,
                     createdDate = j.CreatedDate,
                     salary = j.Salary,
                     status = j.Status,
