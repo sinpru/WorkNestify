@@ -22,9 +22,8 @@ public static class CompanySeed
                 Industry = "Information technology, telecommunications, education",
                 FoundedDate = new DateTime(1988, 09, 13),
                 Size = CompanySizes.Large,
-                ProvinceId = 201,
-                DistrictId = 1485,
-                WardCode = "1A0602"
+                ProvinceCode = 1,
+                WardCode = 166
             },
             new Company
             {
@@ -39,9 +38,8 @@ public static class CompanySeed
                 Industry = "Software as a Service (SaaS)",
                 FoundedDate = new DateTime(2016, 8, 1),
                 Size = CompanySizes.Small,
-                ProvinceId = 201,
-                DistrictId = 1493,
-                WardCode = "1A0706"
+                ProvinceCode = 1,
+                WardCode = 367
             },
             new Company
             {
@@ -56,9 +54,8 @@ public static class CompanySeed
                 Industry = "Retail Technology, POS Systems",
                 FoundedDate = new DateTime(2014, 5, 15),
                 Size = CompanySizes.Small,
-                ProvinceId = 202,
-                DistrictId = 1455,
-                WardCode = "21402"
+                ProvinceCode = 2,
+                WardCode = 26977
             },
             new Company
             {
@@ -73,9 +70,8 @@ public static class CompanySeed
                 Industry = "Food & Beverage, Coffee Retail",
                 FoundedDate = new DateTime(2014, 7, 1),
                 Size = CompanySizes.Medium,
-                ProvinceId = 202,
-                DistrictId = 1444,
-                WardCode = "20304"
+                ProvinceCode = 2,
+                WardCode = 27139
             },
             new Company
             {
@@ -90,9 +86,8 @@ public static class CompanySeed
                 Industry = "Food Delivery, E-commerce",
                 FoundedDate = new DateTime(2012, 6, 5),
                 Size = CompanySizes.Medium,
-                ProvinceId = 202,
-                DistrictId = 1442,
-                WardCode = "20109"
+                ProvinceCode = 2,
+                WardCode = 26743
             },
             new Company
             {
@@ -107,9 +102,8 @@ public static class CompanySeed
                 Industry = "Technology, Distribution",
                 FoundedDate = new DateTime(1997, 9, 1),
                 Size = CompanySizes.Large,
-                ProvinceId = 201,
-                DistrictId = 1486,
-                WardCode = "1A0407"
+                ProvinceCode = 1,
+                WardCode = 199
             },
             new Company
             {
@@ -124,9 +118,8 @@ public static class CompanySeed
                 Industry = "Banking, Financial Services",
                 FoundedDate = new DateTime(1993, 9, 27),
                 Size = CompanySizes.Large,
-                ProvinceId = 201,
-                DistrictId = 1489,
-                WardCode = "1A0217"
+                ProvinceCode = 1,
+                WardCode = 190
             },
             new Company
             {
@@ -141,9 +134,8 @@ public static class CompanySeed
                 Industry = "Automotive, Electric Vehicles",
                 FoundedDate = new DateTime(2017, 9, 2),
                 Size = CompanySizes.Large,
-                ProvinceId = 201,
-                DistrictId = 1491,
-                WardCode = "1A0914"
+                ProvinceCode = 1,
+                WardCode = 136
             },
             new Company
             {
@@ -158,9 +150,8 @@ public static class CompanySeed
                 Industry = "E-commerce, Online Retail",
                 FoundedDate = new DateTime(2016, 1, 1),
                 Size = CompanySizes.Large,
-                ProvinceId = 201,
-                DistrictId = 1484,
-                WardCode = "1A0108"
+                ProvinceCode = 1,
+                WardCode = 8
             },
             new Company
             {
@@ -175,9 +166,8 @@ public static class CompanySeed
                 Industry = "Gaming, Technology, Fintech",
                 FoundedDate = new DateTime(2004, 9, 9),
                 Size = CompanySizes.Large,
-                ProvinceId = 202,
-                DistrictId = 1449,
-                WardCode = "20709"
+                ProvinceCode = 2,
+                WardCode = 27478
             },
             new Company
             {
@@ -192,9 +182,8 @@ public static class CompanySeed
                 Industry = "Software Development, IT Consulting",
                 FoundedDate = new DateTime(2012, 10, 1),
                 Size = CompanySizes.Medium,
-                ProvinceId = 202,
-                DistrictId = 1462,
-                WardCode = "21612"
+                ProvinceCode = 2,
+                WardCode = 26740
             },
             new Company
             {
@@ -209,9 +198,8 @@ public static class CompanySeed
                 Industry = "Food & Beverage, Coffee Retail",
                 FoundedDate = new DateTime(1999, 1, 1),
                 Size = CompanySizes.Large,
-                ProvinceId = 201,
-                DistrictId = 1489,
-                WardCode = "1A0218"
+                ProvinceCode = 1,
+                WardCode = 70
             },
             new Company
             {
@@ -226,9 +214,8 @@ public static class CompanySeed
                 Industry = "Telecommunications, IT Solutions",
                 FoundedDate = new DateTime(1989, 6, 1),
                 Size = CompanySizes.Large,
-                ProvinceId = 201,
-                DistrictId = 1485,
-                WardCode = "1A0608"
+                ProvinceCode = 1,
+                WardCode = 166
             },
             new Company
             {
@@ -243,9 +230,8 @@ public static class CompanySeed
                 Industry = "Real Estate, Hospitality",
                 FoundedDate = new DateTime(2001, 10, 25),
                 Size = CompanySizes.Large,
-                ProvinceId = 201,
-                DistrictId = 3440,
-                WardCode = "13005"
+                ProvinceCode = 1,
+                WardCode = 592
             },
             new Company
             {
@@ -260,9 +246,8 @@ public static class CompanySeed
                 Industry = "E-commerce, Online Retail",
                 FoundedDate = new DateTime(2012, 3, 1),
                 Size = CompanySizes.Large,
-                ProvinceId = 202,
-                DistrictId = 1442,
-                WardCode = "20101"
+                ProvinceCode = 2,
+                WardCode = 26740
             },
             new Company
             {
@@ -277,9 +262,8 @@ public static class CompanySeed
                 Industry = "E-commerce, Online Retail",
                 FoundedDate = new DateTime(2010, 3, 1),
                 Size = CompanySizes.Medium,
-                ProvinceId = 202,
-                DistrictId = 1455,
-                WardCode = "21404"
+                ProvinceCode = 2,
+                WardCode = 27559
             },
             new Company
             {
@@ -294,9 +278,8 @@ public static class CompanySeed
                 Industry = "Software Development, IT Services",
                 FoundedDate = new DateTime(2008, 1, 1),
                 Size = CompanySizes.Medium,
-                ProvinceId = 203,
-                DistrictId = 1526,
-                WardCode = "40105"
+                ProvinceCode = 48,
+                WardCode = 20257
             },
             new Company
             {
@@ -311,9 +294,8 @@ public static class CompanySeed
                 Industry = "Food & Beverage, Coffee Retail",
                 FoundedDate = new DateTime(2007, 1, 1),
                 Size = CompanySizes.Medium,
-                ProvinceId = 202,
-                DistrictId = 1442,
-                WardCode = "20101"
+                ProvinceCode = 2,
+                WardCode = 26740
             }
         };
     }

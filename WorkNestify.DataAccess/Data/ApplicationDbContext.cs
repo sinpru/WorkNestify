@@ -3,9 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using WorkNestify.Models.Models.Companies;
 using WorkNestify.Models.Models.JobApplications;
 using WorkNestify.Models.Models.Jobs;
-using WorkNestify.Models.Models.Locations;
 using WorkNestify.Models.Models.Users;
-using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.DataAccess.Data;
 
@@ -25,11 +23,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
 
     // Job Applications
     public DbSet<JobApplication> JobApplications { get; set; }
-
-    // Locations
-    public DbSet<Ward> Wards { get; set; }
-    public DbSet<District> Districts { get; set; }
-    public DbSet<Province> Provinces { get; set; }
 
     // Users
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
@@ -67,13 +60,6 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             .HasForeignKey(cr => cr.CompanyId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // Locations Relationship
-        modelBuilder.Entity<Ward>()
-            .HasOne(w => w.District)
-            .WithMany(d => d.Wards)
-            .HasForeignKey(w => w.DistrictId)
-            .OnDelete(DeleteBehavior.Restrict);
-        
         // SavedJob Relationships
         modelBuilder.Entity<SavedJob>()
             .HasKey(sj => new { sj.UserId, sj.JobId });

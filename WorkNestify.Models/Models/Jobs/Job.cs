@@ -1,10 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
 using WorkNestify.Models.Models.Companies;
 using WorkNestify.Models.Models.JobApplications;
-using WorkNestify.Models.Models.Locations;
 using WorkNestify.Models.Models.Users;
 using WorkNestify.Utilities.Constants;
 
@@ -74,33 +72,11 @@ namespace WorkNestify.Models.Models.Jobs
         
         [Required]
         [Display(Name = "Province")]
-        public int ProvinceId { get; set; }
-        
-        [ForeignKey(nameof(ProvinceId))]
-        [BindNever]
-        [Display(Name = "Province")]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
-        public Province? Province { get; set; }
-        
-        [Required]
-        [Display(Name = "District")]
-        public int DistrictId { get; set; }
-        
-        [ForeignKey(nameof(DistrictId))]
-        [BindNever]
-        [Display(Name = "District")]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
-        public District? District { get; set; }
+        public int ProvinceCode { get; set; }
         
         [Required]
         [Display(Name = "Ward")]
-        public string WardCode { get; set; }
-        
-        [ForeignKey(nameof(WardCode))]
-        [BindNever]
-        [Display(Name = "Ward")]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
-        public Ward? Ward { get; set; }
+        public int WardCode { get; set; }
 
         public ICollection<JobApplication> JobApplications { get; set; } = new HashSet<JobApplication>();
         public ICollection<SavedJob> SavedByUsers { get; set; } = new HashSet<SavedJob>();

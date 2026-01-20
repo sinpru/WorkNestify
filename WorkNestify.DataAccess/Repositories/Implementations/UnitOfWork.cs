@@ -1,17 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WorkNestify.DataAccess.Data;
+﻿using WorkNestify.DataAccess.Data;
 using WorkNestify.DataAccess.Repositories.Implementations.Companies;
 using WorkNestify.DataAccess.Repositories.Implementations.JobApplications;
 using WorkNestify.DataAccess.Repositories.Implementations.Jobs;
-using WorkNestify.DataAccess.Repositories.Implementations.Locations;
 using WorkNestify.DataAccess.Repositories.Implementations.Users;
 using WorkNestify.DataAccess.Repositories.Interfaces;
 using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
-using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
 using WorkNestify.DataAccess.Repositories.Interfaces.Users;
-using WorkNestify.Models.Models.Locations;
 
 namespace WorkNestify.DataAccess.Repositories.Implementations;
 
@@ -32,11 +28,6 @@ public class UnitOfWork : IUnitOfWork
     // JobApplications
     public IJobApplicationRepository JobApplications { get; private set; }
     
-    // Locations
-    public IDistrictRepository Districts { get; private set; }
-    public IProvinceRepository Provinces { get; private set; }
-    public IWardRepository Wards { get; private set; }
-    
     public ISavedJob SavedJobs { get; private set; }
 
     public UnitOfWork(ApplicationDbContext context)
@@ -47,9 +38,6 @@ public class UnitOfWork : IUnitOfWork
         Jobs = new JobRepository(_context);
         JobCategories = new JobCategoryRepository(_context);
         JobApplications = new JobApplicationRepository(_context);
-        Provinces = new ProvinceRepository(_context);
-        Districts = new DistrictRepository(_context);
-        Wards = new WardRepository(_context);
         SavedJobs = new SavedJobRepository(_context);
     }
 
@@ -57,38 +45,6 @@ public class UnitOfWork : IUnitOfWork
     {
         try
         {
-            // Save Provinces
-            var provincesToAdd = _context.ChangeTracker.Entries<Province>()
-                .Where(e => e.State == EntityState.Added)
-                .ToList();
-            if (provincesToAdd.Any())
-            {
-                await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Provinces ON");
-                await _context.SaveChangesAsync();
-                await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Provinces OFF");
-            }
-
-            // Save Districts
-            var districtsToAdd = _context.ChangeTracker.Entries<District>()
-                .Where(e => e.State == EntityState.Added)
-                .ToList();
-            if (districtsToAdd.Any())
-            {
-                await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Districts ON");
-                await _context.SaveChangesAsync();
-                await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Districts OFF");
-            }
-
-            // Save Wards
-            var wardsToAdd = _context.ChangeTracker.Entries<Ward>()
-                .Where(e => e.State == EntityState.Added)
-                .ToList();
-            if (wardsToAdd.Any())
-            {
-                await _context.SaveChangesAsync();
-            }
-
-            // Save remaining changes
             if (_context.ChangeTracker.HasChanges())
             {
                 await _context.SaveChangesAsync();
@@ -102,8 +58,6 @@ public class UnitOfWork : IUnitOfWork
             {
                 Console.WriteLine($"Entity: {entry.Entity}, State: {entry.State}");
             }
-            await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Provinces OFF");
-            await _context.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Districts OFF");
             throw;
         }
     }

@@ -2,7 +2,6 @@
 using WorkNestify.DataAccess.Repositories.Interfaces.Companies;
 using WorkNestify.DataAccess.Repositories.Interfaces.JobApplications;
 using WorkNestify.DataAccess.Repositories.Interfaces.Jobs;
-using WorkNestify.DataAccess.Repositories.Interfaces.Locations;
 using WorkNestify.DataAccess.Repositories.Interfaces.Users;
 
 namespace WorkNestify.DataAccess.Repositories.Interfaces;
@@ -21,11 +20,6 @@ public interface IUnitOfWork : IDisposable
     
     // JobApplications
     IJobApplicationRepository JobApplications { get; }
-    
-    // Locations
-    IDistrictRepository Districts { get; }
-    IProvinceRepository Provinces { get; }
-    IWardRepository Wards { get; }
     
     ISavedJob SavedJobs { get; }
 

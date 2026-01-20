@@ -79,8 +79,8 @@ builder.Services.AddScoped<IDbInitializer, DbInitializer>();
 // Cloudinary
 builder.Services.AddSingleton<CloudinaryService>();
 
-// GiaoHangNhanh
-builder.Services.AddHttpClient<GhnService>();
+// Province Open API Service
+builder.Services.AddHttpClient<ProvinceOpenApiService>();
 
 var app = builder.Build();
 

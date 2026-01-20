@@ -1,0 +1,10 @@
+namespace WorkNestify.Models.DTOs.ProvinceOpenApi;
+
+public class ApiWard
+{
+    public int Code { get; set; }
+    public string Name { get; set; }
+    public string CodeName { get; set; }
+    public string DivisionType { get; set; }
+    public string ShortCodeName { get; set; }
+}

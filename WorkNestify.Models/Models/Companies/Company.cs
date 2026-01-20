@@ -1,10 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.EntityFrameworkCore;
 using WorkNestify.Models.Models.Users;
 using WorkNestify.Models.Models.Jobs;
-using WorkNestify.Models.Models.Locations;
 using WorkNestify.Utilities.Constants;
 
 namespace WorkNestify.Models.Models.Companies
@@ -63,33 +59,11 @@ namespace WorkNestify.Models.Models.Companies
         
         [Required]
         [Display(Name = "Province")]
-        public int ProvinceId { get; set; }
-        
-        [Display(Name = "Province")]
-        [ForeignKey(nameof(ProvinceId))]
-        [BindNever]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
-        public Province? Province { get; set; }
-        
-        [Required]
-        [Display(Name = "District")]
-        public int DistrictId { get; set; }
-        
-        [Display(Name = "District")]
-        [ForeignKey(nameof(DistrictId))]
-        [BindNever]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
-        public District? District { get; set; }
+        public int ProvinceCode { get; set; }
         
         [Required]
         [Display(Name = "Ward")]
-        public string WardCode { get; set; }
-        
-        [Display(Name = "Ward")]
-        [ForeignKey(nameof(WardCode))]
-        [BindNever]
-        [DeleteBehavior(DeleteBehavior.Restrict)]
-        public Ward? Ward { get; set; }
+        public int WardCode { get; set; }
         
         public ICollection<CompanyReview> CompanyReviews { get; set; } = new HashSet<CompanyReview>();
         public ICollection<ApplicationUser> ApplicationUsers { get; set; } = new HashSet<ApplicationUser>();
