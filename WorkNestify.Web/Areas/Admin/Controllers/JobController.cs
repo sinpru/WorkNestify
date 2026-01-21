@@ -13,14 +13,12 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
     public class JobController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly GhnService _ghnService;
-        private readonly LocationManager _locationManager;
+        private readonly ProvinceOpenApiService _provinceOpenApiService;
 
-        public JobController(IUnitOfWork unitOfWork, GhnService ghnService, LocationManager locationManager)
+        public JobController(IUnitOfWork unitOfWork, ProvinceOpenApiService provinceOpenApiService)
         {
             _unitOfWork = unitOfWork;
-            _ghnService = ghnService;
-            _locationManager = locationManager;
+            _provinceOpenApiService = provinceOpenApiService;
         }
 
         // GET: Admin/Job
@@ -83,30 +81,18 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
-            [Bind("Title,CompanyId,Salary,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,ProvinceId,DistrictId,WardCode,StreetAddress,StartDate,EndDate,Description")]
+            [Bind("Title,CompanyId,Salary,JobTypeId,JobStatusId,JobLevelId,JobCategoryId,ProvinceCode,WardCode,StreetAddress,StartDate,EndDate,Description")]
             Job job)
         {
             if (!ModelState.IsValid)
             {
-                await PopulateDropdownsAsync();
+                await PopulateDropdownsAsync(job);
                 PopulateDateFields(job);
                 return View(job);
             }
 
             try
             {
-                // Ensure the input location exists
-                bool locationExists =
-                    await _locationManager.EnsureLocationExists(job.ProvinceId, job.DistrictId, job.WardCode);
-
-                if (!locationExists)
-                {
-                    TempData["Warning"] = "Invalid location data.";
-                    await PopulateDropdownsAsync();
-                    PopulateDateFields(job);
-                    return View(job);
-                }
-
                 TempData["Success"] = "Job created successfully.";
                 await _unitOfWork.Jobs.AddAsync(job);
                 await _unitOfWork.SaveAsync();
@@ -115,7 +101,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 TempData["Warning"] = $"Error creating job: {ex.Message}";
-                await PopulateDropdownsAsync();
+                await PopulateDropdownsAsync(job);
                 PopulateDateFields(job);
                 return View(job);
             }
@@ -131,7 +117,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
             var job = await _unitOfWork.Jobs
                 .GetAsync(j => j.Id == id, 
-                    includeProperties: "Company,JobCategory,Province,District,Ward");
+                    includeProperties: "Company,JobCategory");
 
             if (job == null)
             {
@@ -147,7 +133,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,
-            [Bind("Id,Title,CompanyId,Salary,Type,Status,Level,JobCategoryId,ProvinceId,DistrictId,WardCode,StreetAddress,StartDate,EndDate,Description")]
+            [Bind("Id,Title,CompanyId,Salary,Type,Status,Level,JobCategoryId,ProvinceCode,WardCode,StreetAddress,StartDate,EndDate,Description")]
             Job job)
         {
             if (id != job.Id)
@@ -164,17 +150,6 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             
             try
             {
-                bool locationExists =
-                    await _locationManager.EnsureLocationExists(job.ProvinceId, job.DistrictId, job.WardCode);
-
-                if (!locationExists)
-                {
-                    TempData["Warning"] = "Invalid location data.";
-                    await PopulateDropdownsAsync();
-                    PopulateDateFields(job);
-                    return View(job);
-                }
-                
                 job.ModifiedDate = DateTime.UtcNow;
                 await _unitOfWork.Jobs.UpdateAsync(job);
                 await _unitOfWork.SaveAsync();
@@ -185,7 +160,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             catch (Exception ex)
             {
                 TempData["Warning"] = $"Error updating job: {ex.Message}";
-                await PopulateDropdownsAsync();
+                await PopulateDropdownsAsync(job);
                 PopulateDateFields(job);
                 return View(job);
             }
@@ -201,7 +176,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
             var job = await _unitOfWork.Jobs
                 .GetAsync(j => j.Id == id, 
-                    includeProperties: "Company,JobCategory,Province,District,Ward");
+                    includeProperties: "Company,JobCategory");
 
             if (job == null)
             {
@@ -218,7 +193,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         {
             var job = await _unitOfWork.Jobs
                 .GetAsync(j => j.Id == id, 
-                    includeProperties: "Company,JobCategory,Province,District,Ward");
+                    includeProperties: "Company,JobCategory");
 
             if (job == null)
             {
@@ -248,25 +223,13 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
             ViewData["Level"] = new SelectList(JobLevels.AllLevels);
             ViewData["Status"] = new SelectList(JobStatuses.AllStatuses);
             ViewData["Type"] = new SelectList(JobTypes.AllTypes);
-            ViewData["ProvinceId"] = new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name");
+            var provinces = await _provinceOpenApiService.GetProvincesAsync();
+            ViewData["ProvinceCode"] = new SelectList(provinces, "Code", "Name", job?.ProvinceCode);
 
-            if (job != null && job.ProvinceId != 0)
+            if (job != null && job.ProvinceCode != 0)
             {
-                ViewData["DistrictId"] =
-                    new SelectList(await _ghnService.GetDistrictsAsync(job.ProvinceId), "Id", "Name");
-            }
-            else
-            {
-                ViewData["DistrictId"] = new SelectList(Enumerable.Empty<object>(), "Id", "Name");
-            }
-
-            if (job != null && job.DistrictId != 0)
-            {
-                ViewData["WardCode"] = new SelectList(await _ghnService.GetWardsAsync(job.DistrictId), "Code", "Name");
-            }
-            else
-            {
-                ViewData["WardCode"] = new SelectList(Enumerable.Empty<object>(), "Code", "Name");
+                var wards = await _provinceOpenApiService.GetWardsByProvinceAsync(job.ProvinceCode);
+                ViewData["WardCode"] = new SelectList(wards, "Code", "Name", job.WardCode);
             }
         }
         

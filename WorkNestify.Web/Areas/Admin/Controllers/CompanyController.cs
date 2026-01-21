@@ -14,19 +14,16 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly CloudinaryService _cloudinary;
-        private readonly GhnService _ghnService;
-        private readonly LocationManager _locationManager;
+        private readonly ProvinceOpenApiService _provinceOpenApiService;
 
         public CompanyController(
             IUnitOfWork unitOfWork, 
             CloudinaryService cloudinary, 
-            GhnService ghnService,
-            LocationManager locationManager)
+            ProvinceOpenApiService provinceOpenApiService)
         {
             _unitOfWork = unitOfWork;
             _cloudinary = cloudinary;
-            _ghnService = ghnService;
-            _locationManager = locationManager;
+            _provinceOpenApiService = provinceOpenApiService;
         }
 
         // GET: Admin/Company
@@ -84,29 +81,17 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(
             [Bind(
-                "Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,Size,ProvinceId,DistrictId,WardCode")]
+                "Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,Size,ProvinceCode,WardCode")]
             Company company, IFormFile? file)
         {
             if (!ModelState.IsValid)
             {
-                await PopulateDropdowns();
+                await PopulateDropdowns(company);
                 return View(company);
             }
 
             try
             {
-                // Ensure the input location exists
-                bool locationExists =
-                    await _locationManager.EnsureLocationExists(company.ProvinceId, company.DistrictId,
-                        company.WardCode);
-
-                if (!locationExists)
-                {
-                    TempData["Warning"] = "Invalid location data.";
-                    await PopulateDropdowns();
-                    return View(company);
-                }
-
                 // Ensure only one input is used
                 if (!string.IsNullOrEmpty(company.Logo) && file != null)
                 {
@@ -167,7 +152,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id,
             [Bind(
-                "Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,Size,ProvinceId,DistrictId,WardCode")]
+                "Id,Name,Website,Email,Phone,StreetAddress,Description,Logo,Industry,FoundedDate,Size,ProvinceCode,WardCode")]
             Company company, IFormFile? file)
         {
             if (id != company.Id)
@@ -177,23 +162,12 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
 
             if (!ModelState.IsValid)
             {
-                await PopulateDropdowns();
+                await PopulateDropdowns(company);
                 return View(company);
             }
 
             try
             {
-                // Ensure the input location exists
-                bool locationExists =
-                    await _locationManager.EnsureLocationExists(company.ProvinceId, company.DistrictId,
-                        company.WardCode);
-                if (!locationExists)
-                {
-                    TempData["Warning"] = "Invalid location data.";
-                    await PopulateDropdowns();
-                    return View(company);
-                }
-
                 // Ensure only one input is used for logo
                 if (!string.IsNullOrEmpty(company.Logo) && file != null)
                 {
@@ -256,8 +230,7 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
                 existingCompany.Industry = company.Industry;
                 existingCompany.FoundedDate = company.FoundedDate;
                 existingCompany.Size = company.Size;
-                existingCompany.ProvinceId = company.ProvinceId;
-                existingCompany.DistrictId = company.DistrictId;
+                existingCompany.ProvinceCode = company.ProvinceCode;
                 existingCompany.WardCode = company.WardCode;
                 existingCompany.ModifiedDate = DateTime.UtcNow;
 
@@ -324,17 +297,13 @@ namespace WorkNestify.Web.Areas.Admin.Controllers
         private async Task PopulateDropdowns(Company? company = null)
         {
             ViewData["Size"] = new SelectList(CompanySizes.AllSizes);
-            ViewData["ProvinceId"] =
-                new SelectList(await _ghnService.GetProvincesAsync(), "Id", "Name", company?.ProvinceId);
+            var provinces = await _provinceOpenApiService.GetProvincesAsync();
+            ViewData["ProvinceCode"] = new SelectList(provinces, "Code", "Name", company?.ProvinceCode);
 
-            if (company != null)
+            if (company != null && company.ProvinceCode != 0)
             {
-                ViewData["DistrictId"] =
-                    new SelectList(await _ghnService.GetDistrictsAsync(company.ProvinceId), "Id", "Name",
-                        company?.DistrictId);
-                ViewData["WardCode"] =
-                    new SelectList(await _ghnService.GetWardsAsync(company.DistrictId), "Code", "Name",
-                        company?.WardCode);
+                var wards = await _provinceOpenApiService.GetWardsByProvinceAsync(company.ProvinceCode);
+                ViewData["WardCode"] = new SelectList(wards, "Code", "Name", company.WardCode);
             }
         }
     }
